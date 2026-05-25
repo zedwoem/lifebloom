@@ -131,6 +131,38 @@ export async function smartTranslate(text: string, targetLang: string, sourceLan
     }
   }
 
+  // 3.5. Fallback: Google Gemini API (No-cost premium translation using server key)
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey) {
+    try {
+      const prompt = `Translate the following text strictly from "${sourceLang}" into target language "${targetLang}". Return ONLY the direct translation, do not explain or add commentary.\n\nText: ${text}`;
+      
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          }),
+          signal: AbortSignal.timeout(6000) // 6s timeout
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const translated = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (translated && translated.trim().length > 0) {
+          const cleanText = translated.trim();
+          await saveTranslationToCache(hash, text, cleanText, sourceLang, targetLang, 'gemini');
+          return cleanText;
+        }
+      }
+    } catch (error) {
+      console.error("[Translation] Gemini Fallback Failed.", error);
+    }
+  }
+
   // 4. Tertiary Fallback (Graceful Degradation)
   console.warn(`[Translation] All providers failed for text: "${text.substring(0, 20)}..."`);
   return text;

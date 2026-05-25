@@ -3,15 +3,40 @@ import { generateMockProfile } from "@/lib/utils/mockProfileGenerator";
 import { ShieldCheck, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-// Simulate Supabase fetch or edge utility
-// import { getApprovedSponsorsByPillar } from "@/lib/services/contentService";
+import { useLocale } from "next-intl";
 
 interface Props {
   pillarSlug: string;
   articleSlug: string;
 }
 
+const TRANSLATIONS = {
+  en: {
+    supportedBy: "Featured Partner",
+    viewProfile: "View Profile"
+  },
+  id: {
+    supportedBy: "Fitur ini didukung oleh",
+    viewProfile: "Lihat Profil"
+  },
+  es: {
+    supportedBy: "Socio Destacado",
+    viewProfile: "Ver Perfil"
+  },
+  fr: {
+    supportedBy: "Partenaire En Vedette",
+    viewProfile: "Voir le Profil"
+  },
+  de: {
+    supportedBy: "Empfohlener Partner",
+    viewProfile: "Profil Anzeigen"
+  }
+};
+
 export function SponsorShowcase({ pillarSlug, articleSlug }: Props) {
+  const locale = useLocale() as keyof typeof TRANSLATIONS;
+  const t = TRANSLATIONS[locale] || TRANSLATIONS.en;
+  
   // Try to fetch real sponsors here
   // const sponsors = await getApprovedSponsorsByPillar(pillarSlug);
   // Using Mock Data as fallback for SEO E-E-A-T and testing until DB is populated
@@ -42,19 +67,20 @@ export function SponsorShowcase({ pillarSlug, articleSlug }: Props) {
       </div>
 
       <div className="flex-grow text-center md:text-left">
-        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Fitur ini didukung oleh</p>
+        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">{t.supportedBy}</p>
         <h4 className="text-xl font-black text-slate-800">{sponsor.name}</h4>
         <p className="text-sm text-slate-500 mt-1">{sponsor.title}</p>
       </div>
 
       <div className="flex-shrink-0">
         <Link 
-          href={`/support/partners/${sponsor.id}`} 
+          href={`/${locale}/support/partners/${sponsor.id}`} 
           className="inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-brand-blue transition-colors group-hover:border-brand-green/30"
         >
-          Lihat Profil <ArrowUpRight className="w-4 h-4 ml-1 opacity-50 group-hover:opacity-100 transition-opacity" />
+          {t.viewProfile} <ArrowUpRight className="w-4 h-4 ml-1 opacity-50 group-hover:opacity-100 transition-opacity" />
         </Link>
       </div>
     </div>
   );
 }
+

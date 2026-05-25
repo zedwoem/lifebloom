@@ -44,15 +44,23 @@ export const MetricsService = {
       return []; // Return empty in mock mode, global-search fallback will handle it
     }
 
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('content_metrics')
-      .select('*')
-      .order('trending_score', { ascending: false })
-      .limit(limit);
-      
-    if (error) throw error;
-    return data as ContentMetric[];
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('content_metrics')
+        .select('*')
+        .order('trending_score', { ascending: false })
+        .limit(limit);
+        
+      if (error) {
+        console.warn("[MetricsService] Supabase getTrending returned error:", error.message);
+        return [];
+      }
+      return (data || []) as ContentMetric[];
+    } catch (e: any) {
+      console.warn("[MetricsService] getTrending failed gracefully:", e.message || e);
+      return [];
+    }
   },
 
   async getPopular(limit: number = 5): Promise<ContentMetric[]> {
@@ -60,15 +68,23 @@ export const MetricsService = {
       return []; 
     }
 
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('content_metrics')
-      .select('*')
-      .order('total_views', { ascending: false })
-      .limit(limit);
-      
-    if (error) throw error;
-    return data as ContentMetric[];
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('content_metrics')
+        .select('*')
+        .order('total_views', { ascending: false })
+        .limit(limit);
+        
+      if (error) {
+        console.warn("[MetricsService] Supabase getPopular returned error:", error.message);
+        return [];
+      }
+      return (data || []) as ContentMetric[];
+    } catch (e: any) {
+      console.warn("[MetricsService] getPopular failed gracefully:", e.message || e);
+      return [];
+    }
   },
 
   async getRandom(limit: number = 5): Promise<ContentMetric[]> {
@@ -76,24 +92,32 @@ export const MetricsService = {
       return []; 
     }
 
-    const supabase = createClient();
-    // In PostgreSQL, to get random rows efficiently we can use a random sort or postgrest's random feature.
-    // Supabase JS doesn't have a built-in random order, but we can fetch recent ones and shuffle in JS 
-    // or use a custom RPC. For simplicity, we'll fetch the top 50 popular/trending and shuffle them here.
-    const { data, error } = await supabase
-      .from('content_metrics')
-      .select('*')
-      .limit(50);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('content_metrics')
+        .select('*')
+        .limit(50);
+        
+      if (error) {
+        console.warn("[MetricsService] Supabase getRandom returned error:", error.message);
+        return [];
+      }
       
-    if (error) throw error;
-    
-    // Shuffle array using Fisher-Yates
-    const array = [...(data as ContentMetric[])];
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      const array = [...((data || []) as ContentMetric[])];
+      if (array.length === 0) return [];
+      
+      // Shuffle array using Fisher-Yates
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      
+      return array.slice(0, limit);
+    } catch (e: any) {
+      console.warn("[MetricsService] getRandom failed gracefully:", e.message || e);
+      return [];
     }
-    
-    return array.slice(0, limit);
   }
 };
+

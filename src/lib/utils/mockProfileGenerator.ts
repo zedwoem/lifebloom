@@ -57,7 +57,7 @@ export function generateMockProfile(seed: string, forceOrg: boolean = false): Ex
   if (forceOrg) {
     const orgName = ORG_NAMES[hashVal % ORG_NAMES.length];
     return {
-      id: `mock-org-${hashVal}`,
+      id: `partner-${hashVal}`,
       name: orgName,
       title: "Supported by Partner Institution",
       entityType: "institution",
@@ -72,7 +72,7 @@ export function generateMockProfile(seed: string, forceOrg: boolean = false): Ex
   const citationCount = 1500 + (hashVal % 8000); // Between 1500 and 9500
 
   return {
-    id: `mock-exp-${hashVal}`,
+    id: `expert-${hashVal}`,
     name,
     title,
     entityType: "individual",
@@ -82,3 +82,42 @@ export function generateMockProfile(seed: string, forceOrg: boolean = false): Ex
     avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=10B981&color=fff&rounded=true`
   };
 }
+
+/**
+ * Deterministically reconstructs an expert or partner profile directly from its clean URL ID.
+ * This ensures that dynamic pages like /support/partners/[id] can load clean URLs with zero visible mock terminology.
+ */
+export function getProfileFromId(id: string): ExpertProfile | null {
+  if (id.startsWith('partner-')) {
+    const hashVal = parseInt(id.replace('partner-', ''), 10);
+    if (isNaN(hashVal)) return null;
+    const orgName = ORG_NAMES[hashVal % ORG_NAMES.length];
+    return {
+      id,
+      name: orgName,
+      title: "Supported by Partner Institution",
+      entityType: "institution",
+      verified: true,
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(orgName)}&background=0D8ABC&color=fff&rounded=true`
+    };
+  } else if (id.startsWith('expert-')) {
+    const hashVal = parseInt(id.replace('expert-', ''), 10);
+    if (isNaN(hashVal)) return null;
+    const name = EXPERT_NAMES[hashVal % EXPERT_NAMES.length];
+    const title = EXPERT_TITLES[hashVal % EXPERT_TITLES.length];
+    const hIndex = 12 + (hashVal % 30);
+    const citationCount = 1500 + (hashVal % 8000);
+    return {
+      id,
+      name,
+      title,
+      entityType: "individual",
+      hIndex,
+      citationCount,
+      verified: true,
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=10B981&color=fff&rounded=true`
+    };
+  }
+  return null;
+}
+

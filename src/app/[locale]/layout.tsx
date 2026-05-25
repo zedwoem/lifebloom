@@ -11,12 +11,13 @@ export function generateStaticParams() {
   return routing.locales.map((locale: string) => ({ locale }));
 }
 
+import Image from 'next/image';
 import { StructuredData } from '@/components/seo/StructuredData';
 import { WebSite, WithContext } from 'schema-dts';
 
 import { GlobalSearch } from '@/components/ui/global-search';
 import Link from 'next/link';
-import { Home, LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
 
 export default async function LocaleLayout({
   children,
@@ -48,7 +49,9 @@ export default async function LocaleLayout({
     <html lang={locale} className="scroll-smooth">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
         <meta name="theme-color" content="#1E3A8A" />
         <StructuredData data={websiteSchema} />
       </head>
@@ -73,7 +76,7 @@ export default async function LocaleLayout({
             <header className="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 border-b border-slate-200">
               <div className="container mx-auto px-6 h-16 flex items-center justify-between">
                 <Link href={`/${locale}`} className="flex items-center gap-2 text-brand-blue font-black text-xl font-display">
-                  <div className="w-8 h-8 bg-brand-green rounded-xl flex items-center justify-center text-white">L</div>
+                  <Image src="/logo.png" width={32} height={32} alt="LifeBloom Logo" className="rounded-xl object-contain" />
                   LifeBloom Hub
                 </Link>
                 <div className="flex-1 max-w-md mx-6 hidden md:block">

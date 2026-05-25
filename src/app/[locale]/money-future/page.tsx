@@ -1,7 +1,6 @@
-
 import { PILLARS } from '@/lib/constants/pillars';
 import { notFound } from 'next/navigation';
-import { ChevronLeft, Construction } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { RetirementCalculator } from "@/components/calculators/retirement-calculator";
 import { YieldRadar } from "@/components/calculators/yield-radar";
@@ -47,24 +46,9 @@ export default async function PillarPage({
           </p>
         </header>
 
-        <div className="bg-white rounded-3xl p-8 md:p-16 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col items-center justify-center text-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <div className="w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
-            <Construction className="w-10 h-10 text-amber-600" />
-          </div>
-
-          <p className="text-slate-500 max-w-md text-lg mx-auto">
-            The specialized page for <strong>{pillar.label}</strong> is currently being built. Soon, you will find calculators, health articles, and step-by-step guides right here.
-          </p>
-        </div>
-
         <div className="mt-12 w-full max-w-4xl mx-auto space-y-8">
           <RetirementCalculator />
-            <div className="bg-brand-blue/5 border border-brand-blue/20 rounded-2xl p-6 text-center">
-              <span className="inline-block px-3 py-1 bg-brand-blue text-white text-xs font-bold uppercase rounded-full tracking-wider mb-3">Live Scraper Demo</span>
-              <h3 className="text-xl font-bold text-brand-blue mb-2">Phase 2: Instant Local Scraping Preview</h3>
-              <p className="text-slate-600">This component uses Next.js Server Actions and Cheerio to instantly scrape live CD rates from financial sites when you load the page.</p>
-            </div>
-            <YieldRadar />
+          <YieldRadar />
         </div>
 
         <div className="mt-12 w-full max-w-4xl mx-auto space-y-8">

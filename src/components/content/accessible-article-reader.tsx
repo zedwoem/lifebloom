@@ -16,6 +16,10 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isNativeSpeechRef = useRef(false);
+
+  // Dynamic status/alert state to replace raw browser pop-up alerts
+  const [statusMsg, setStatusMsg] = useState("");
 
   useEffect(() => {
     // Cleanup audio on unmount
@@ -24,13 +28,26 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         audioRef.current.pause();
         audioRef.current.src = "";
       }
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
     };
   }, []);
 
   const handleSpeech = async () => {
-    if (isSpeaking && audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+    // Clear status
+    setStatusMsg("");
+
+    // Handle cancel/stop
+    if (isSpeaking) {
+      if (isNativeSpeechRef.current) {
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+        }
+      } else if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
       setIsSpeaking(false);
       setIsPaused(false);
       return;
@@ -39,19 +56,22 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
     // Strip HTML tags for clean reading
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = article.content;
-    const textToRead = `${article.title}. By ${article.author?.name || "Editorial Team"}. ${tempDiv.textContent || tempDiv.innerText || ""}`.substring(0, 1000); // chunk limit for Edge TTS
+    const textToRead = `${article.title}. By ${article.author?.name || "Editorial Team"}. ${tempDiv.textContent || tempDiv.innerText || ""}`.substring(0, 1500);
 
     try {
       setIsSpeaking(true);
       setIsPaused(false);
+      isNativeSpeechRef.current = false;
       
       const res = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: textToRead, locale })
+        body: JSON.stringify({ text: textToRead, locale }),
+        // 5s timeout to trigger immediate fallback if server is slow
+        signal: AbortSignal.timeout(5000)
       });
       
-      if (!res.ok) throw new Error("TTS Failed");
+      if (!res.ok) throw new Error("Cloud TTS Failed");
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -73,13 +93,56 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         };
       }
     } catch (err) {
-      console.error(err);
-      setIsSpeaking(false);
-      alert("Layanan Suara tidak tersedia saat ini.");
+      console.warn("[TTS] Cloud voice failed. Invoking premium browser-native SpeechSynthesis fallback...", err);
+      
+      // Invoke premium browser-native SpeechSynthesis
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        isNativeSpeechRef.current = true;
+        window.speechSynthesis.cancel(); // Stop active tracks
+        
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        
+        // Dynamic Lang matching
+        utterance.lang = locale === 'id' ? 'id-ID' : 'en-US';
+        
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          setIsPaused(false);
+        };
+        
+        utterance.onerror = (e) => {
+          console.error("Native Speech Error:", e);
+          setIsSpeaking(false);
+          setIsPaused(false);
+          setStatusMsg(locale === 'id' ? "Gagal memutar suara." : "Voice synthesis failed.");
+        };
+
+        window.speechSynthesis.speak(utterance);
+        setStatusMsg(locale === 'id' ? "Memutar audio menggunakan suara sistem..." : "Playing audio using system voice...");
+        
+        // Auto clear status banner after 3s
+        setTimeout(() => setStatusMsg(""), 3000);
+      } else {
+        setIsSpeaking(false);
+        setStatusMsg(locale === 'id' ? "Layanan suara tidak didukung di browser ini." : "Speech service is not supported in this browser.");
+      }
     }
   };
 
   const togglePause = () => {
+    if (isNativeSpeechRef.current) {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        if (isPaused) {
+          window.speechSynthesis.resume();
+          setIsPaused(false);
+        } else {
+          window.speechSynthesis.pause();
+          setIsPaused(true);
+        }
+      }
+      return;
+    }
+
     if (audioRef.current) {
       if (isPaused) {
         audioRef.current.play();
@@ -90,6 +153,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
       }
     }
   };
+
 
   const proseSizeClasses = {
     normal: 'prose-lg',
@@ -129,6 +193,13 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
   return (
     <article className={`min-h-screen pb-20 transition-colors duration-300 ${containerClasses}`}>
+      {/* Toast status message for native Speech Synthesis */}
+      {statusMsg && (
+        <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-2xl shadow-xl border animate-bounce ${highContrast ? 'bg-yellow-300 text-black border-yellow-300' : 'bg-slate-900 text-white border-slate-800'} text-sm font-semibold flex items-center gap-2`}>
+          <div className="w-2.5 h-2.5 rounded-full bg-brand-green animate-ping" />
+          <span>{statusMsg}</span>
+        </div>
+      )}
       
       {/* Top Navigation Bar with Accessibility Controls - HIDDEN ON PRINT */}
       <div className={`sticky top-0 w-full z-50 print:hidden ${stickyHeaderClasses}`}>

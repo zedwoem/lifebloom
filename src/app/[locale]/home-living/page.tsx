@@ -1,7 +1,6 @@
-
 import { PILLARS } from '@/lib/constants/pillars';
 import { notFound } from 'next/navigation';
-import { ChevronLeft, Construction } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { HomeBudgetCalculator } from "@/components/calculators/home-budget-calculator";
 import { SmartHomeMatcher } from "@/components/calculators/smart-home-matcher";
@@ -46,16 +45,6 @@ export default async function PillarPage({
             A centralized hub of information and smart tools specifically designed to simplify your {pillar.label.toLowerCase()} needs.
           </p>
         </header>
-
-        <div className="bg-white rounded-3xl p-8 md:p-16 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col items-center justify-center text-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <div className="w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
-            <Construction className="w-10 h-10 text-amber-600" />
-          </div>
-
-          <p className="text-slate-500 max-w-md text-lg mx-auto">
-            The specialized page for <strong>{pillar.label}</strong> is currently being built. Soon, you will find calculators, health articles, and step-by-step guides right here.
-          </p>
-        </div>
 
         <div className="mt-12 w-full max-w-4xl mx-auto space-y-8">
           <HomeBudgetCalculator />
