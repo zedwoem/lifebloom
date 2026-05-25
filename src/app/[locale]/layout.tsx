@@ -18,6 +18,9 @@ import { WebSite, WithContext } from 'schema-dts';
 import { GlobalSearch } from '@/components/ui/global-search';
 import Link from 'next/link';
 import { LayoutDashboard } from 'lucide-react';
+import OnboardingOverlay from '@/components/ui/onboarding-overlay';
+import { NavbarUserStatus } from '@/components/ui/navbar-user-status';
+import NextTopLoader from 'nextjs-toploader';
 
 export default async function LocaleLayout({
   children,
@@ -56,6 +59,7 @@ export default async function LocaleLayout({
         <StructuredData data={websiteSchema} />
       </head>
       <body className="min-h-screen flex flex-col font-sans bg-warm-beige text-slate-900">
+        <NextTopLoader color="#10B981" showSpinner={false} />
         <div className="gtranslate_wrapper"></div>
         <script
           dangerouslySetInnerHTML={{
@@ -96,15 +100,14 @@ export default async function LocaleLayout({
                   <Link href={`/${locale}/support`} className="hidden md:block text-sm font-semibold text-slate-600 hover:text-brand-blue transition-colors">
                     Helpdesk
                   </Link>
-                  <Link href={`/${locale}/dashboard`} className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full text-sm font-semibold text-brand-blue transition-colors">
-                    <LayoutDashboard className="w-4 h-4" /> Dashboard
-                  </Link>
+                  <NavbarUserStatus />
                   <div className="md:hidden">
                     <GlobalSearch />
                   </div>
                 </nav>
               </div>
             </header>
+            <OnboardingOverlay />
             <main className="flex-grow">
               {children}
             </main>

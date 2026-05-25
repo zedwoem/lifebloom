@@ -7,17 +7,17 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 
 export const searchIndex = [
-  { id: 1, title: 'Retirement Calculator', category: 'money', tags: ['finance', 'planning', 'savings', '401k'], url: '/en/money-future/retirement-planner' },
-  { id: 2, title: 'Yield Radar', category: 'money', tags: ['investment', 'rates', 'bonds', 'interest'], url: '/en/money-future/yield-radar' },
-  { id: 3, title: 'Smart Home Matcher', category: 'home', tags: ['automation', 'matter', 'iot', 'security'], url: '/en/home-living/smart-matcher' },
-  { id: 4, title: 'DIY Budget Renovator', category: 'home', tags: ['renovation', 'cost', 'diy', 'materials'], url: '/en/home-living/budget-renovator' },
-  { id: 5, title: 'Pet Matchmaker', category: 'pet', tags: ['dogs', 'cats', 'adoption', 'quiz'], url: '/en/pet-family/matchmaker' },
-  { id: 6, title: 'Canine Symptom Checker', category: 'pet', tags: ['health', 'symptoms', 'vet', 'dog'], url: '/en/pet-family/canine-symptom-checker' },
-  { id: 7, title: 'Drug Interaction Checker', category: 'senior', tags: ['health', 'medication', 'safety', 'pills'], url: '/en/senior-wellness/drug-checker' },
-  { id: 8, title: 'Home Mobility Planner', category: 'senior', tags: ['safety', 'accessibility', 'wheelchair', 'aging in place'], url: '/en/senior-wellness/mobility-planner' },
-  { id: 9, title: 'Accessible Trip Planner', category: 'travel', tags: ['vacation', 'accessibility', 'family', 'budget'], url: '/en/travel-mobility/trip-planner' },
-  { id: 10, title: 'The New Medicare Part D Changes Explained', category: 'senior', tags: ['health', 'insurance', 'medicare'], url: '/en/article/the-new-medicare-part-d-changes-explained' },
-  { id: 11, title: 'The 10 Most Wheelchair-Accessible Cities in Europe', category: 'travel', tags: ['europe', 'accessible', 'guide'], url: '/en/article/the-10-most-wheelchair-accessible-cities-in-europe' }
+  { id: 1, title: 'Retirement Calculator', category: 'money', tags: ['finance', 'planning', 'savings', '401k', 'High-Yield Savings'], url: '/money-future/retirement-planner' },
+  { id: 2, title: 'Yield Radar', category: 'money', tags: ['investment', 'rates', 'bonds', 'interest', 'High-Yield Savings'], url: '/money-future/yield-radar' },
+  { id: 3, title: 'Smart Home Matcher', category: 'home', tags: ['automation', 'matter', 'iot', 'security', 'Smart Home Cameras'], url: '/home-living/smart-matcher' },
+  { id: 4, title: 'DIY Budget Renovator', category: 'home', tags: ['renovation', 'cost', 'diy', 'materials'], url: '/home-living/budget-renovator' },
+  { id: 5, title: 'Pet Matchmaker', category: 'pet', tags: ['dogs', 'cats', 'adoption', 'quiz'], url: '/pet-family/matchmaker' },
+  { id: 6, title: 'Canine Symptom Checker', category: 'pet', tags: ['health', 'symptoms', 'vet', 'dog', 'Dog Joint Health'], url: '/pet-family/canine-symptom-checker' },
+  { id: 7, title: 'Drug Interaction Checker', category: 'senior', tags: ['health', 'medication', 'safety', 'pills', 'Medicare'], url: '/senior/drug-checker' },
+  { id: 8, title: 'Home Mobility Planner', category: 'senior', tags: ['safety', 'accessibility', 'wheelchair', 'aging in place'], url: '/senior/mobility-planner' },
+  { id: 9, title: 'Accessible Trip Planner', category: 'travel', tags: ['vacation', 'accessibility', 'family', 'budget'], url: '/travel/trip-planner' },
+  { id: 10, title: 'The New Medicare Part D Changes Explained', category: 'senior', tags: ['health', 'insurance', 'medicare', 'Medicare Part D'], url: '/article/the-new-medicare-part-d-changes-explained' },
+  { id: 11, title: 'The 10 Most Wheelchair-Accessible Cities in Europe', category: 'travel', tags: ['europe', 'accessible', 'guide'], url: '/article/the-10-most-wheelchair-accessible-cities-in-europe' }
 ];
 
 const SUGGESTIONS = ["Medicare Part D", "Smart Home Cameras", "Dog Joint Health", "High-Yield Savings"];
@@ -25,8 +25,8 @@ const CATEGORIES = [
   { name: "Money", path: "money-future", color: "bg-blue-100 text-blue-700" },
   { name: "Home", path: "home-living", color: "bg-orange-100 text-orange-700" },
   { name: "Pet", path: "pet-family", color: "bg-yellow-100 text-yellow-700" },
-  { name: "Senior", path: "senior-wellness", color: "bg-purple-100 text-purple-700" },
-  { name: "Travel", path: "travel-mobility", color: "bg-teal-100 text-teal-700" }
+  { name: "Senior", path: "senior", color: "bg-purple-100 text-purple-700" },
+  { name: "Travel", path: "travel", color: "bg-teal-100 text-teal-700" }
 ];
 
 export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'hero' }) {
@@ -57,7 +57,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
           setTrending([
             { title: "Medicare Part D Changes", url: `/${locale}/article/the-new-medicare-part-d-changes-explained` },
             { title: "Accessible European Cities", url: `/${locale}/article/the-10-most-wheelchair-accessible-cities-in-europe` },
-            { title: "Retirement Planner", url: `/${locale}/money/retirement-planner` }
+            { title: "Retirement Planner", url: `/${locale}/money-future/retirement-planner` }
           ]);
         }
         setIsLoadingDynamic(false);
@@ -69,7 +69,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
         setTrending([
           { title: "Medicare Part D Changes", url: `/${locale}/article/the-new-medicare-part-d-changes-explained` },
           { title: "Accessible European Cities", url: `/${locale}/article/the-10-most-wheelchair-accessible-cities-in-europe` },
-          { title: "Retirement Planner", url: `/${locale}/money/retirement-planner` }
+          { title: "Retirement Planner", url: `/${locale}/money-future/retirement-planner` }
         ]);
         setIsLoadingDynamic(false);
       });
@@ -78,7 +78,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
 
   const fuse = useMemo(() => new Fuse(searchIndex, {
     keys: ['title', 'category', 'tags'],
-    threshold: 0.3,
+    threshold: 0.5,
     includeScore: true
   }), []);
 
@@ -173,7 +173,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
                   {results.map(({ item }) => (
                     <li key={item.id}>
                       <Link 
-                        href={item.url}
+                        href={`/${locale}${item.url}`}
                         onClick={() => setIsOpen(false)}
                         className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-slate-light group transition-colors"
                       >

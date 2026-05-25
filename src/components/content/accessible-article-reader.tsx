@@ -7,6 +7,7 @@ import { ChevronLeft, Share2, Printer, Contrast, Play, Square, Pause } from 'luc
 import { EmbedGenerator } from '@/components/ui/embed-generator';
 import { SponsorShowcase } from '@/components/content/sponsor-showcase';
 import { generateProfile } from '@/lib/utils/profileGenerator';
+import { RelatedPostsWidget } from '@/components/content/related-posts-widget';
 
 export function AccessibleArticleReader({ article, locale, slug }: { article: any, locale: string, slug: string }) {
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
@@ -20,6 +21,28 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
   // Dynamic status/alert state to replace raw browser pop-up alerts
   const [statusMsg, setStatusMsg] = useState("");
+
+  const handleCopy = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    setStatusMsg("Copying disabled. Please use the Share & Embed widget below.");
+    setTimeout(() => setStatusMsg(""), 4000);
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setStatusMsg("Right-click disabled to protect our expert content.");
+    setTimeout(() => setStatusMsg(""), 4000);
+  };
+
+  const processedContent = article?.content ? article.content.replace(
+    /<a([^>]+)>/gi,
+    (match: string, p1: string) => {
+      if (!p1.includes('target=')) {
+        return `<a${p1} target="_blank" rel="nofollow noopener noreferrer">`;
+      }
+      return match;
+    }
+  ) : "";
 
   useEffect(() => {
     // Cleanup audio on unmount
@@ -192,7 +215,11 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(articleUrl)}`;
 
   return (
-    <article className={`min-h-screen pb-20 transition-colors duration-300 ${containerClasses}`}>
+    <article 
+      className={`min-h-screen pb-20 transition-colors duration-300 ${containerClasses} select-none`}
+      onCopy={handleCopy}
+      onContextMenu={handleContextMenu}
+    >
       {/* Toast status message for native Speech Synthesis */}
       {statusMsg && (
         <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-2xl shadow-xl border animate-bounce ${highContrast ? 'bg-yellow-300 text-black border-yellow-300' : 'bg-slate-900 text-white border-slate-800'} text-sm font-semibold flex items-center gap-2`}>
@@ -328,8 +355,20 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         <div 
           className={proseClasses}
           style={{ animationDelay: '0.2s' }}
-          dangerouslySetInnerHTML={{ __html: article.content }}
+          dangerouslySetInnerHTML={{ __html: processedContent }}
         />
+
+        {/* Reaction Emojis */}
+        <div className="mt-12 flex justify-center gap-4 animate-fade-in print:hidden">
+          {['👍 Helpful', '💡 Insightful', '❤️ Love it'].map((reaction) => (
+            <button key={reaction} className={`px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
+              {reaction}
+            </button>
+          ))}
+        </div>
+
+        {/* Related Posts Widget */}
+        <RelatedPostsWidget currentSlug={slug} />
 
         {/* PRINT ONLY FOOTER & QR CODE */}
         <div className="hidden print:flex flex-col items-center mt-12 pt-8 border-t-2 border-black page-break-inside-avoid">

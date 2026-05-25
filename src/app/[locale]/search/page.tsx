@@ -11,15 +11,28 @@ import { Suspense } from 'react';
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
+  const params = useParams();
+  const locale = params.locale as string;
   const query = searchParams.get('q') || '';
 
   const fuse = useMemo(() => new Fuse(searchIndex, {
     keys: ['title', 'category', 'tags'],
-    threshold: 0.4,
+    threshold: 0.5,
     includeScore: true
   }), []);
 
-  const results = query ? fuse.search(query) : [];
+  let results = query ? fuse.search(query) : [];
+
+  // Fallback word matcher if no strict match
+  if (query && results.length === 0) {
+    const words = query.toLowerCase().split(' ').filter(w => w.length > 2);
+    const fallback = searchIndex.filter(item => {
+      return words.some(w => item.category.toLowerCase().includes(w)) || 
+             words.some(w => item.tags.some(t => t.toLowerCase().includes(w))) ||
+             words.some(w => item.title.toLowerCase().includes(w));
+    });
+    results = fallback.map((item, idx) => ({ item, refIndex: idx, score: 0.5 }));
+  }
 
   return (
     <div className="min-h-[70vh] bg-warm-beige py-12">
@@ -41,7 +54,7 @@ function SearchResultsContent() {
             {results.map(({ item }) => (
               <Link 
                 key={item.id}
-                href={item.url}
+                href={`/${locale}${item.url}`}
                 className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between group"
               >
                 <div>
@@ -68,7 +81,8 @@ function SearchResultsContent() {
         ) : query ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
             <h2 className="text-xl font-bold text-slate-700 mb-2">No exact matches found</h2>
-            <p className="text-slate-500">Try adjusting your keywords or browsing our categories.</p>
+            <p className="text-slate-500 mb-4">Try adjusting your keywords or browsing our categories.</p>
+            <Link href={`/${locale}`} className="px-6 py-2 bg-emerald-100 text-emerald-800 rounded-full font-bold inline-block">Go Home</Link>
           </div>
         ) : null}
       </div>
