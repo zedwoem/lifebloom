@@ -1,4 +1,6 @@
-const CACHE_NAME = 'lifebloom-hub-v1';
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+
+const CACHE_NAME = 'lifebloom-hub-v2';
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {
@@ -6,8 +8,6 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll([
         OFFLINE_URL,
-        '/',
-        '/en',
         '/icon-192x192.png',
         '/icon-512x512.png'
       ]);
@@ -32,20 +32,22 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
   if (event.request.method !== 'GET') return;
-  // Don't cache API routes or Supabase calls
   if (event.request.url.includes('/api/') || event.request.url.includes('supabase.co')) return;
 
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).catch(() => {
-        // Fallback to offline page for navigations
-        if (event.request.mode === 'navigate') {
-          return caches.match(OFFLINE_URL);
-        }
-        return Response.error();
-      });
+    // Network-First strategy to avoid opaque redirect caching errors
+    fetch(event.request).then((networkResponse) => {
+      // Don't cache opaque responses or redirects manually like this if not needed
+      return networkResponse;
+    }).catch(async () => {
+      const cachedResponse = await caches.match(event.request);
+      if (cachedResponse) return cachedResponse;
+      
+      if (event.request.mode === 'navigate') {
+        return caches.match(OFFLINE_URL);
+      }
+      return Response.error();
     })
   );
 });
