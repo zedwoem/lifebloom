@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import { searchIndex } from '@/components/ui/global-search';
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
