@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { ChevronLeft, Share2, Printer, Contrast, Play, Square, Pause } from 'lucide-react';
 import { EmbedGenerator } from '@/components/ui/embed-generator';
 import { SponsorShowcase } from '@/components/content/sponsor-showcase';
-import { generateMockProfile } from '@/lib/utils/mockProfileGenerator';
+import { generateProfile } from '@/lib/utils/profileGenerator';
 
 export function AccessibleArticleReader({ article, locale, slug }: { article: any, locale: string, slug: string }) {
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
@@ -180,8 +180,8 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
     : 'text-slate-500 hover:text-brand-blue';
 
   const proseClasses = highContrast
-    ? `prose ${proseSizeClasses[fontSize]} max-w-none prose-headings:text-yellow-300 prose-headings:font-bold prose-p:text-yellow-300 prose-p:leading-relaxed prose-a:text-yellow-400 prose-strong:text-yellow-300 animate-slide-up`
-    : `prose ${proseSizeClasses[fontSize]} prose-slate max-w-none prose-headings:text-brand-blue prose-headings:font-bold prose-p:leading-relaxed prose-a:text-brand-green animate-slide-up`;
+    ? `prose ${proseSizeClasses[fontSize]} max-w-none prose-headings:text-yellow-300 prose-headings:font-bold prose-p:text-yellow-300 prose-p:leading-relaxed prose-p:mb-6 prose-a:text-yellow-400 prose-strong:text-yellow-300 animate-slide-up`
+    : `prose ${proseSizeClasses[fontSize]} prose-slate max-w-none prose-headings:text-brand-blue prose-headings:font-bold prose-p:leading-relaxed prose-p:mb-6 prose-a:text-brand-green animate-slide-up`;
 
   const handlePrint = () => {
     window.print();
@@ -281,7 +281,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
             {article.title}
           </h1>
           <div className={`flex flex-col md:flex-row md:items-center gap-2 md:gap-6 font-medium ${highContrast ? 'text-yellow-200' : 'text-slate-500'}`}>
-            <span>By {article.author?.name || generateMockProfile(slug, false).name}</span>
+            <span>By {article.author?.name || generateProfile(slug, false).name}</span>
             <span className="hidden md:inline">•</span>
             <span>{article.date}</span>
           </div>
@@ -301,12 +301,12 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
           ) : (
             <div className={`mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl ${highContrast ? 'bg-yellow-300/10 border border-yellow-300 text-yellow-300' : 'bg-slate-50 border border-slate-200 text-slate-700'}`}>
               <div className="w-8 h-8 rounded-full bg-brand-green text-white flex items-center justify-center font-bold text-xs">
-                {generateMockProfile(slug, false).name.charAt(0)}
+                {generateProfile(slug, false).name.charAt(0)}
               </div>
               <div className="text-sm">
                 <span className="opacity-70">Expert Reviewed By</span>
                 <br />
-                <span className="font-bold">{generateMockProfile(slug, false).name}</span>
+                <span className="font-bold">{generateProfile(slug, false).name}</span>
               </div>
             </div>
           )}
@@ -341,7 +341,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
         {/* Sponsor Showcase Integration */}
         <div className={`mt-12 pt-8 border-t print:hidden ${highContrast ? 'border-yellow-300/30' : 'border-slate-200'}`}>
-          <SponsorShowcase pillarSlug={article.pillar || "health"} articleSlug={slug} />
+          <SponsorShowcase pillarSlug={article.pillar || "health"} articleSlug={slug} locale={locale} />
         </div>
 
         {/* Footer Share & Embed - HIDDEN ON PRINT */}

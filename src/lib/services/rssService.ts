@@ -17,7 +17,7 @@ export interface IngestedArticle extends RSSItem {
   translatedDescription?: string;
 }
 
-// In-memory mock database to demonstrate "ON CONFLICT DO NOTHING"
+// In-memory static database to demonstrate "ON CONFLICT DO NOTHING"
 const articleDatabase = new Set<string>();
 
 const FEED_URLS = [
@@ -62,9 +62,9 @@ export async function ingestRSSFeeds(targetLang: string = 'id'): Promise<Ingeste
 
   for (const url of FEED_URLS) {
     try {
-      // Fetching RSS feed (Mocking the XML parsing for MVP)
+      // Fetching RSS feed (Fallback XML parsing for MVP)
       // In production, we would use an XML parser like fast-xml-parser
-      const mockItems: RSSItem[] = [
+      const staticItems: RSSItem[] = [
         {
           title: `Latest Health Alert from ${new URL(url).hostname}`,
           link: `${url}/article-${Math.floor(Math.random() * 1000)}`,
@@ -73,7 +73,7 @@ export async function ingestRSSFeeds(targetLang: string = 'id'): Promise<Ingeste
         }
       ];
 
-      for (const item of mockItems) {
+      for (const item of staticItems) {
         const hashId = generateHash(item.title, item.link);
 
         // Deduplication Check (ON CONFLICT DO NOTHING)

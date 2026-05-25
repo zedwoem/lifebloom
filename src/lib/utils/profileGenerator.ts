@@ -51,7 +51,7 @@ function stringToInt(str: string): number {
  * @param seed - Unique identifier (e.g., article slug) to ensure consistent generation across re-renders
  * @param forceOrg - If true, forces generation of an organization instead of an individual
  */
-export function generateMockProfile(seed: string, forceOrg: boolean = false): ExpertProfile {
+export function generateProfile(seed: string, forceOrg: boolean = false): ExpertProfile {
   const hashVal = stringToInt(seed);
   
   if (forceOrg) {

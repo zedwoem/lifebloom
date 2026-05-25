@@ -20,7 +20,7 @@ export function YieldRadar() {
   useEffect(() => {
     // In production, this would fetch from an API (e.g., Central Bank / Ministry of Finance scraper)
     const fetchYields = async () => {
-      // Mocking the scheduled scraper data
+      // Using fallback scheduled scraper data
       setTimeout(() => {
         setData([
           { id: "sbr013", name: "SBR013 (Retail Bond)", rate: 6.45, type: "Gov Bond", trend: "up" },

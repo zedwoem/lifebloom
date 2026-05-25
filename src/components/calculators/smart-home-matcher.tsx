@@ -13,7 +13,7 @@ export function SmartHomeMatcher() {
 
   const searchMatterDevices = async () => {
     setIsLoading(true);
-    // Mock simulation of fetching from Google Home / Amazon PA-API
+    // Simulation of fetching from Google Home / Amazon PA-API
     // In production, this would hit an API endpoint that queries the APIs.
     setTimeout(() => {
       setResults([

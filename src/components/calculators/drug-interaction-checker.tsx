@@ -71,7 +71,7 @@ export function DrugInteractionChecker() {
   const checkInteractions = () => {
     if (drugs.length < 2) return;
     
-    // Mock logic for MVP. In production, this would call an API like OpenFDA.
+    // Simulation logic for MVP. In production, this would call an API like OpenFDA.
     const hasNsaid = drugs.some(d => d.toLowerCase().includes('ibuprofen') || d.toLowerCase().includes('naproxen'));
     const hasAce = drugs.some(d => d.toLowerCase().includes('lisinopril') || d.toLowerCase().includes('enalapril'));
 

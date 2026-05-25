@@ -4,10 +4,10 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, Mail, ShieldAlert, CheckCircle2, Lock, ChevronRight } from "lucide-react";
+import { Mail, ShieldAlert, CheckCircle2, UserPlus, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { user, signInWithMagicLink, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
@@ -42,7 +42,7 @@ export default function LoginPage() {
       if (error) {
         setErrorMsg(error.message || "Failed to send magic link. Please try again.");
       } else {
-        setSuccessMsg("Success! We've sent a secure sign-in link to your email. Please check your inbox (and spam folder) to log in.");
+        setSuccessMsg("Success! We've sent a secure registration link to your email. Please check your inbox (and spam folder) to activate your account.");
       }
     } catch (err: any) {
       setErrorMsg("An unexpected error occurred. Please try again.");
@@ -69,12 +69,12 @@ export default function LoginPage() {
         
         {/* Brand Icon and Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-            <Lock className="w-8 h-8 text-brand-blue" />
+          <div className="w-16 h-16 bg-brand-green/10 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+            <UserPlus className="w-8 h-8 text-brand-green" />
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-800">Secure Access Control</h1>
+          <h1 className="text-3xl font-black tracking-tight text-slate-800">Create an Account</h1>
           <p className="text-slate-500 mt-2 text-base">
-            Sign in to access your secure LifeBloom Hub profile, calculations, and active collections.
+            Join LifeBloom Hub to save your collections, access premium calculators, and get personalized recommendations.
           </p>
         </div>
 
@@ -122,11 +122,11 @@ export default function LoginPage() {
             {isSubmitting ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Requesting Secure Key...</span>
+                <span>Creating Account...</span>
               </>
             ) : (
               <>
-                <span>Send Passwordless Magic Link</span>
+                <span>Send Registration Link</span>
                 <ChevronRight className="w-4 h-4" />
               </>
             )}
@@ -135,9 +135,9 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center border-t border-slate-100 pt-6">
           <p className="text-slate-500 text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href={`/${locale}/register`} className="font-bold text-brand-blue hover:text-brand-green transition-colors">
-              Create one now
+            Already have an account?{" "}
+            <Link href={`/${locale}/login`} className="font-bold text-brand-blue hover:text-brand-green transition-colors">
+              Sign in
             </Link>
           </p>
         </div>
@@ -145,4 +145,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

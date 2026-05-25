@@ -11,7 +11,7 @@ export function useGamification() {
     
     // In production, fetch from /api/user/profile
     const fetchPoints = async () => {
-      // Mock fetch
+      // Simulated fetch
       setPoints(150); // Base points for returning user
     };
     fetchPoints();

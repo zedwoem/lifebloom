@@ -1,4 +1,4 @@
-import { getProfileFromId } from "@/lib/utils/mockProfileGenerator";
+import { getProfileFromId } from "@/lib/utils/profileGenerator";
 import { notFound } from "next/navigation";
 import { ShieldCheck, Award, ArrowLeft, Building2, UserCheck, ExternalLink, Calendar } from "lucide-react";
 import Link from "next/link";

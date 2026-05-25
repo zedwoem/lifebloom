@@ -19,6 +19,27 @@ export default function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  // === ROUTE PROTECTION ===
+  // Protect routes like /dashboard, /saved, etc.
+  const pathname = request.nextUrl.pathname;
+  // Match /[locale]/dashboard or /[locale]/saved
+  const isProtectedRoute = /^\/[^\/]+\/(dashboard|saved)(\/.*)?$/.test(pathname);
+  
+  if (isProtectedRoute) {
+    // Check if user has Supabase auth cookie or mock auth cookie
+    // Supabase usually sets cookies starting with sb-
+    const hasAuthCookie = request.cookies.getAll().some(cookie => cookie.name.startsWith('sb-'));
+    
+    if (!hasAuthCookie) {
+      const url = request.nextUrl.clone();
+      // Extract locale from the pathname
+      const locale = pathname.split('/')[1];
+      url.pathname = `/${locale}/login`;
+      // Pass the original URL as a redirect parameter if needed, but for now just redirect
+      return NextResponse.redirect(url);
+    }
+  }
+
   // === HYBRID LOCALE DETECTION STRATEGY ===
   
   // 1. Check if the user already has a NEXT_LOCALE cookie set (Tertiary: User Preference)

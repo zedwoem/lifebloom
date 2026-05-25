@@ -4,45 +4,24 @@ import React, { useState } from "react";
 import { useSavedItems } from "@/lib/hooks/useSavedItems";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { Heart, Search, Trash2, ExternalLink } from "lucide-react";
-import { useLocale } from "next-intl";
 
 const TRANSLATIONS = {
-  en: {
-    restrictedTitle: "Restricted Access",
-    restrictedDesc: "Please sign in first to manage your saved items.",
-    pageTitle: "Saved Collection",
-    pageDesc: "Save calculators, articles, and product guides supporting your senior lifestyle.",
-    searchPlaceholder: "Search items...",
-    noItemsTitle: "No items found",
-    noItemsDesc: "Try adjusting your tab filter or search keyword.",
-    btnRemove: "Remove",
-    btnExplore: "Explore",
-    tabAll: "All",
-    tabProduct: "Products",
-    tabArticle: "Articles",
-    tabVideo: "Videos",
-    loading: "Loading your collections...",
-    defaultTitle: "Saved Item",
-    defaultVendor: "Wellness Hub"
-  },
-  id: {
-    restrictedTitle: "Akses Terbatas",
-    restrictedDesc: "Silakan masuk log terlebih dahulu untuk mengelola item tersimpan Anda.",
-    pageTitle: "Koleksi Tersimpan",
-    pageDesc: "Simpan referensi, alat bantu, dan produk pendukung untuk gaya hidup senior Anda.",
-    searchPlaceholder: "Cari item...",
-    noItemsTitle: "Tidak ada item ditemukan",
-    noItemsDesc: "Coba sesuaikan tab filter atau kata kunci pencarian Anda.",
-    btnRemove: "Hapus",
-    btnExplore: "Explore",
-    tabAll: "Semua",
-    tabProduct: "Produk",
-    tabArticle: "Artikel",
-    tabVideo: "Video",
-    loading: "Memuat koleksi Anda...",
-    defaultTitle: "Item Tersimpan",
-    defaultVendor: "Wellness Hub"
-  }
+  restrictedTitle: "Restricted Access",
+  restrictedDesc: "Please sign in first to manage your saved items.",
+  pageTitle: "Saved Collection",
+  pageDesc: "Save calculators, articles, and product guides supporting your senior lifestyle.",
+  searchPlaceholder: "Search items...",
+  noItemsTitle: "No items found",
+  noItemsDesc: "Try adjusting your tab filter or search keyword.",
+  btnRemove: "Remove",
+  btnExplore: "Explore",
+  tabAll: "All",
+  tabProduct: "Products",
+  tabArticle: "Articles",
+  tabVideo: "Videos",
+  loading: "Loading your collections...",
+  defaultTitle: "Saved Item",
+  defaultVendor: "Wellness Hub"
 };
 
 export default function SavedItemsPage() {
@@ -50,8 +29,7 @@ export default function SavedItemsPage() {
   const { savedItems, loading, toggleSaveItem } = useSavedItems();
   const [activeTab, setActiveTab] = useState<"all" | "product" | "article" | "video">("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const locale = useLocale() as keyof typeof TRANSLATIONS;
-  const t = TRANSLATIONS[locale] || TRANSLATIONS.en;
+  const t = TRANSLATIONS;
 
   if (loading) {
     return (

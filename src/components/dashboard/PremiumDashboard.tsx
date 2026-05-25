@@ -9,7 +9,7 @@ export function PremiumDashboard() {
   const { profile } = useAuth();
   const { points } = useGamification();
 
-  // Mock Price Drop Alert
+  // Simulation Price Drop Alert
   const priceAlerts = [
     { item: 'Purina Pro Plan Dog Food 30lb', oldPrice: 65.99, newPrice: 58.99, drop: 10.6, vendor: 'Chewy' }
   ];

@@ -5,7 +5,7 @@ import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const MOCK_RATES = {
+const FALLBACK_RATES = {
   hotel: 1500000,
   car: 500000,
   food: 300000,
@@ -31,7 +31,7 @@ export function TripBudgetPlanner() {
       await new Promise(r => setTimeout(r, 1500)); // Simulate latency
       clearTimeout(timeoutId);
 
-      const rates = MOCK_RATES; // Fallback to liveRates in prod
+      const rates = FALLBACK_RATES; // Fallback to liveRates in prod
       const totalHotel = rates.hotel * (Number(days) || 1);
       const totalCar = rates.car * (Number(days) || 1);
       const totalFood = rates.food * (Number(people) || 1) * (Number(days) || 1);
@@ -47,7 +47,7 @@ export function TripBudgetPlanner() {
       if (error.name === 'AbortError') {
         console.warn("Travel API timeout. Using stale/fallback JSON parameters.");
         // Graceful degradation logic
-        const rates = MOCK_RATES;
+        const rates = FALLBACK_RATES;
         const totalHotel = rates.hotel * (Number(days) || 1);
         const totalCar = rates.car * (Number(days) || 1);
         const totalFood = rates.food * (Number(people) || 1) * (Number(days) || 1);

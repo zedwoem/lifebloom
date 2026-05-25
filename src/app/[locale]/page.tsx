@@ -11,7 +11,7 @@ import { GlobalSearch } from '@/components/ui/global-search';
 export default function HomePage() {
   const params = useParams();
   const locale = params.locale as string;
-  const { user, profile, mockLogin, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const router = useRouter();
 
   const t = useTranslations('HomePage');

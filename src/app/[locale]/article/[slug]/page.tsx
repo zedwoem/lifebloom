@@ -41,7 +41,7 @@ async function getArticleData(slug: string, locale: string) {
   const geminiKey = process.env.GEMINI_API_KEY;
   if (geminiKey) {
     try {
-      const prompt = `Write a highly informative, detailed, 600-word professional article in ${locale === 'id' ? 'Indonesian' : 'English'} for senior citizens about the topic: "${decodedSlug}". Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, bullet lists, and a bold 'Key Expert Tip' block. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
+      const prompt = `Write a highly informative, detailed, 600-word professional article in ${locale === 'id' ? 'Indonesian' : 'English'} for senior citizens about the topic: "${decodedSlug}". Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, bullet lists, and a bold 'Key Expert Tip' block. End the article with a 'Sources & References' section (using an <h2>) listing 2-3 real, authoritative sources (e.g., AARP, NIH, SSA.gov) with HTML links. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
       
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
@@ -86,6 +86,12 @@ async function getArticleData(slug: string, locale: string) {
         <strong class="text-brand-blue uppercase tracking-wider text-xs block mb-1">Key Expert Tip from Michael Chen, CFP:</strong>
         <p class="text-slate-600 text-sm mb-0">"Coordinate claiming strategies as a household. Typically, the highest earner should delay benefits until age 70 to maximize the guaranteed survivor benefit, while the lower earner can claim earlier to provide essential liquidity."</p>
       </div>
+
+      <h2 class="mt-8 border-t border-slate-200 pt-6">Sources & References</h2>
+      <ul class="text-sm text-slate-500">
+        <li><a href="https://www.ssa.gov/benefits/retirement/planner/claiming.html" target="_blank" class="text-brand-blue hover:underline">Social Security Administration: Starting Your Retirement Benefits Early</a></li>
+        <li><a href="https://www.aarp.org/retirement/social-security/" target="_blank" class="text-brand-blue hover:underline">AARP Social Security Resource Center</a></li>
+      </ul>
     `;
   } else if (slug.includes("wheelchair") || slug.includes("europe")) {
     articleDetails.content = `
@@ -104,6 +110,12 @@ async function getArticleData(slug: string, locale: string) {
         <strong class="text-brand-blue uppercase tracking-wider text-xs block mb-1">Key Travel Tip:</strong>
         <p class="text-slate-600 text-sm mb-0">"Always request an 'Accessible/Barrier-Free Room' (sometimes called a roll-in shower room) in writing directly from the hotel, as European definitions of 'accessible' can vary widely from standard ADA specifications."</p>
       </div>
+
+      <h2 class="mt-8 border-t border-slate-200 pt-6">Sources & References</h2>
+      <ul class="text-sm text-slate-500">
+        <li><a href="https://www.ricksteves.com/travel-tips/trip-planning/travelers-with-disabilities" target="_blank" class="text-brand-blue hover:underline">Rick Steves: Traveling with Disabilities</a></li>
+        <li><a href="https://tfl.gov.uk/transport-accessibility/" target="_blank" class="text-brand-blue hover:underline">Transport for London: Accessibility Information</a></li>
+      </ul>
     `;
   } else if (slug.includes("medicare")) {
     articleDetails.content = `
@@ -124,6 +136,12 @@ async function getArticleData(slug: string, locale: string) {
         <strong class="text-brand-blue uppercase tracking-wider text-xs block mb-1">Key Health Tip from Dr. Sarah Jenkins, MD:</strong>
         <p class="text-slate-600 text-sm mb-0">"Always enroll during your Initial Enrollment Period (IEP)—the 7-month window surrounding your 65th birthday. Failing to do so triggers a lifetime 10% penalty on your Part B premiums for every 12-month period you delayed."</p>
       </div>
+
+      <h2 class="mt-8 border-t border-slate-200 pt-6">Sources & References</h2>
+      <ul class="text-sm text-slate-500">
+        <li><a href="https://www.medicare.gov/basics/get-started-with-medicare" target="_blank" class="text-brand-blue hover:underline">Medicare.gov: Get Started with Medicare</a></li>
+        <li><a href="https://www.kff.org/medicare/" target="_blank" class="text-brand-blue hover:underline">KFF: Medicare Policy & Data</a></li>
+      </ul>
     `;
   } else {
     // Elegant Generalized Informative Article Template
@@ -144,6 +162,12 @@ async function getArticleData(slug: string, locale: string) {
         <strong class="text-brand-blue uppercase tracking-wider text-xs block mb-1">Key Editorial Guidance:</strong>
         <p class="text-slate-600 text-sm mb-0">"Always cross-reference calculations with your family doctor or licensed financial advisor to customize recommendations to your unique circumstances."</p>
       </div>
+
+      <h2 class="mt-8 border-t border-slate-200 pt-6">Sources & References</h2>
+      <ul class="text-sm text-slate-500">
+        <li><a href="https://www.nia.nih.gov/" target="_blank" class="text-brand-blue hover:underline">National Institute on Aging (NIH)</a></li>
+        <li><a href="https://www.ncoa.org/" target="_blank" class="text-brand-blue hover:underline">National Council on Aging (NCOA)</a></li>
+      </ul>
     `;
   }
 

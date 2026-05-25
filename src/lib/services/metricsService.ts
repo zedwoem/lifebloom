@@ -19,9 +19,7 @@ export const MetricsService = {
    * Uses RPC to handle upsert logic and bypass RLS for inserts securely.
    */
   async recordView(slug: string, type: ContentType, title: string, category: string, userId?: string) {
-    if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true') {
-      return; // Skip DB call in mock mode
-    }
+
 
     const supabase = createClient();
     
@@ -40,9 +38,7 @@ export const MetricsService = {
   },
 
   async getTrending(limit: number = 5): Promise<ContentMetric[]> {
-    if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true') {
-      return []; // Return empty in mock mode, global-search fallback will handle it
-    }
+
 
     try {
       const supabase = createClient();
@@ -64,9 +60,7 @@ export const MetricsService = {
   },
 
   async getPopular(limit: number = 5): Promise<ContentMetric[]> {
-    if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true') {
-      return []; 
-    }
+
 
     try {
       const supabase = createClient();
@@ -88,9 +82,7 @@ export const MetricsService = {
   },
 
   async getRandom(limit: number = 5): Promise<ContentMetric[]> {
-    if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true') {
-      return []; 
-    }
+
 
     try {
       const supabase = createClient();

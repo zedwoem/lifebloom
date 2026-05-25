@@ -3,54 +3,30 @@
 import React, { useState } from "react";
 import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
-import { useLocale } from "next-intl";
 
 const TRANSLATIONS = {
-  en: {
-    title: "Pet Matchmaker",
-    subtitle: "Find the ideal dog breed based on your lifestyle, living space, and daily availability.",
-    labelSpace: "Your Living Space",
-    spaceSmall: "Small (Apartment)",
-    spaceLarge: "Large (House with Yard)",
-    labelTime: "Daily Free Time for Pet Activity",
-    timeLow: "Low (< 1 Hour)",
-    timeMedium: "Medium (1 - 2 Hours)",
-    timeHigh: "High (> 2 Hours)",
-    btnSubmit: "Analyze Match",
-    btnSubmitLoading: "Analyzing Match...",
-    resultsTitle: "Recommended Breeds:",
-    seeInsurance: "View Pet Insurance Options →",
-    breeds: [
-      { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Very friendly and requires plenty of exercise." },
-      { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Perfect for apartments, moderate energy level." },
-      { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Fast runner but loves to lounge around the house." }
-    ]
-  },
-  id: {
-    title: "Pet Matchmaker (Kecocokan Ras)",
-    subtitle: "Temukan ras anjing yang ideal berdasarkan gaya hidup, luas hunian, dan ketersediaan waktu luang Anda.",
-    labelSpace: "Luas Hunian Anda",
-    spaceSmall: "Kecil (Apartemen)",
-    spaceLarge: "Besar (Rumah dengan Halaman)",
-    labelTime: "Waktu Luang Harian untuk Aktivitas Anjing",
-    timeLow: "Sedikit (< 1 Jam)",
-    timeMedium: "Sedang (1 - 2 Jam)",
-    timeHigh: "Banyak (> 2 Jam)",
-    btnSubmit: "Lihat Hasil Kecocokan",
-    btnSubmitLoading: "Menganalisis Kecocokan...",
-    resultsTitle: "Rekomendasi Ras:",
-    seeInsurance: "Lihat Opsi Asuransi Hewan Peliharaan →",
-    breeds: [
-      { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Sangat bersahabat dan butuh banyak aktivitas." },
-      { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Cocok untuk apartemen, aktivitas sedang." },
-      { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Cepat namun suka bersantai di rumah." }
-    ]
-  }
+  title: "Pet Matchmaker",
+  subtitle: "Find the ideal dog breed based on your lifestyle, living space, and daily availability.",
+  labelSpace: "Your Living Space",
+  spaceSmall: "Small (Apartment)",
+  spaceLarge: "Large (House with Yard)",
+  labelTime: "Daily Free Time for Pet Activity",
+  timeLow: "Low (< 1 Hour)",
+  timeMedium: "Medium (1 - 2 Hours)",
+  timeHigh: "High (> 2 Hours)",
+  btnSubmit: "Analyze Match",
+  btnSubmitLoading: "Analyzing Match...",
+  resultsTitle: "Recommended Breeds:",
+  seeInsurance: "View Pet Insurance Options →",
+  breeds: [
+    { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Very friendly and requires plenty of exercise." },
+    { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Perfect for apartments, moderate energy level." },
+    { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Fast runner but loves to lounge around the house." }
+  ]
 };
 
 export function PetMatchmaker() {
-  const locale = useLocale() as keyof typeof TRANSLATIONS;
-  const t = TRANSLATIONS[locale] || TRANSLATIONS.en;
+  const t = TRANSLATIONS;
 
   const [space, setSpace] = useState<"small" | "large" | "">("");
   const [time, setTime] = useState<"low" | "medium" | "high" | "">("");

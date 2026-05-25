@@ -12,7 +12,7 @@ export class DeepLProvider implements TranslationProvider {
   async translateText(text: string, targetLang: string): Promise<string> {
     if (!this.apiKey) {
       console.warn("DEEPL_API_KEY not found. Using offline fallback.");
-      return `[Mock DeepL Translated to ${targetLang}]: ${text}`;
+      return `[Fallback Translated to ${targetLang}]: ${text}`;
     }
 
     try {

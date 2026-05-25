@@ -132,9 +132,6 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {/* Render the Yield Radar component here for standard users */}
-          <YieldRadar />
-
         </main>
       </div>
     </div>

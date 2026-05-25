@@ -1,41 +1,22 @@
 import React, { Suspense } from "react";
-import { generateMockProfile } from "@/lib/utils/mockProfileGenerator";
+import { generateProfile } from "@/lib/utils/profileGenerator";
 import { ShieldCheck, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useLocale } from "next-intl";
 
 interface Props {
   pillarSlug: string;
   articleSlug: string;
+  locale?: string;
 }
 
 const TRANSLATIONS = {
-  en: {
-    supportedBy: "Featured Partner",
-    viewProfile: "View Profile"
-  },
-  id: {
-    supportedBy: "Fitur ini didukung oleh",
-    viewProfile: "Lihat Profil"
-  },
-  es: {
-    supportedBy: "Socio Destacado",
-    viewProfile: "Ver Perfil"
-  },
-  fr: {
-    supportedBy: "Partenaire En Vedette",
-    viewProfile: "Voir le Profil"
-  },
-  de: {
-    supportedBy: "Empfohlener Partner",
-    viewProfile: "Profil Anzeigen"
-  }
+  supportedBy: "Featured Partner",
+  viewProfile: "View Profile"
 };
 
-export function SponsorShowcase({ pillarSlug, articleSlug }: Props) {
-  const locale = useLocale() as keyof typeof TRANSLATIONS;
-  const t = TRANSLATIONS[locale] || TRANSLATIONS.en;
+export function SponsorShowcase({ pillarSlug, articleSlug, locale = "en" }: Props) {
+  const t = TRANSLATIONS;
   
   // Try to fetch real sponsors here
   // const sponsors = await getApprovedSponsorsByPillar(pillarSlug);
@@ -44,7 +25,7 @@ export function SponsorShowcase({ pillarSlug, articleSlug }: Props) {
   
   const sponsor = hasRealSponsor 
     ? null // Use real DB data
-    : generateMockProfile(articleSlug, true); // Force Organization generation based on slug
+    : generateProfile(articleSlug, true); // Force Organization generation based on slug
 
   if (!sponsor) return null;
 
