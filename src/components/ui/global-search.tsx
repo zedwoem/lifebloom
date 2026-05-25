@@ -45,6 +45,17 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
 
   // Initial fetch of dynamic trending data
   useEffect(() => {
+    // Prevent 404 errors in console if we know the DB table isn't created yet
+    if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true') {
+      setTrending([
+        { title: "Medicare Part D Changes", url: `/${locale}/article/the-new-medicare-part-d-changes-explained` },
+        { title: "Accessible European Cities", url: `/${locale}/article/the-10-most-wheelchair-accessible-cities-in-europe` },
+        { title: "Retirement Planner", url: `/${locale}/money-future/retirement-planner` }
+      ]);
+      setIsLoadingDynamic(false);
+      return;
+    }
+
     import('@/lib/services/metricsService').then(({ MetricsService }) => {
       MetricsService.getTrending(4).then(data => {
         if (data && data.length > 0) {
@@ -133,6 +144,8 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
         </div>
         <input 
           ref={inputRef}
+          id={`search-input-${variant}`}
+          name="searchQuery"
           type="text"
           value={query}
           onChange={(e) => {
