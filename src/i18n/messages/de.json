@@ -1,0 +1,16 @@
+{
+  "Navigation": {
+    "home": "Startseite",
+    "money": "Geld",
+    "pet": "Haustiere",
+    "senior": "Senioren Wellness",
+    "travel": "Reisen",
+    "login": "Anmelden",
+    "dashboard": "Dashboard"
+  },
+  "HomePage": {
+    "title": "Willkommen bei LifeBloom Hub",
+    "subtitle": "Ihr zuverlässiger Führer für einen dynamischen und sicheren Lebensstil.",
+    "cta": "Jetzt Entdecken"
+  }
+}

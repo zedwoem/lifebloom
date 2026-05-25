@@ -1,0 +1,33 @@
+# /public/robots.txt
+
+# ========================================================
+# 1. SPECIFIC COMMERCIAL AI SCRAPERS & TRAINING BOTS (BLOCKED)
+# ========================================================
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+# ========================================================
+# 2. REFERRAL / CITATION AI SEARCH ENGINES (ALLOWED)
+# ========================================================
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# ========================================================
+# 3. GENERAL SEARCH ENGINES & FALLBACK
+# ========================================================
+User-agent: *
+Disallow: /api/
+Disallow: /admin/
+Allow: /

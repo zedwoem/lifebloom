@@ -1,0 +1,21 @@
+{
+  "name": "LifeBloom Hub",
+  "short_name": "LifeBloom",
+  "description": "Your centralized hub for senior wellness, home prep, financial planning, pet care, and accessible travel.",
+  "start_url": "/en",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#1E3A8A",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

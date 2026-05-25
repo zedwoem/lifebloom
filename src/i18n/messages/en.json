@@ -1,0 +1,20 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "money": "Money & Retirement",
+    "pet": "Pet Companions",
+    "senior": "Senior Wellness",
+    "travel": "Accessible Travel",
+    "login": "Sign In",
+    "dashboard": "Dashboard"
+  },
+  "HomePage": {
+    "title": "Everyday Technology That Understands You.",
+    "subtitle": "Plan your retirement, save on household expenses, and care for your family's health with our ad-free, privacy-first tools.",
+    "search_placeholder": "Search retirement calculators, senior nutrition, etc...",
+    "search_button": "Search",
+    "categories_title": "Core Pillars",
+    "categories_subtitle": "Specialized solutions for every aspect of your life.",
+    "explore": "Explore"
+  }
+}

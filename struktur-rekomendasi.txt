@@ -1,0 +1,154 @@
+lifebloom-hub/
+│
+├── .cursorrules                  # Dokumen regulasi absolut AI untuk gaya kode & arsitektur
+├── next.config.ts                # Konfigurasi Next.js 15 (PPR Enabled)
+├── tailwind.config.ts            # Konfigurasi token desain visual universal
+├── tsconfig.json                 # Mode TypeScript Strict (No Any Policy)
+├── package.json                  # Manifest dependensi & skrip eksekusi
+├── vercel.json                   # Konfigurasi Vercel Edge & batasan Cron Jobs
+├── components.json               # Konfigurasi internal komponen shadcn/ui
+├── .env.example                  # Template variabel lingkungan proyek
+├── .env.local                    # Variabel lingkungan lokal (Rahasia & Diabaikan Git)
+├── README.md                     # Panduan singkat onboarding & inisialisasi lokal
+│
+├── docs/                         # KONTEN RELEVAN AI (Otak & Pusat Pengetahuan Proyek)
+│   ├── 1_RULES.md                # Aturan main absolut tim pengembang
+│   ├── 2_README.md               # Detail setup database & penanganan multi-bahasa
+│   ├── 3_PRD_Detailed.md         # Spesifikasi detail fitur 5 pilar & logika bisnis MVP
+│   ├── 4_ARCHITECTURE.md         # Diagram aliran data, keamanan RLS, & strategi caching
+│   ├── 5_COMPONENT_PLAN.md      # Konvensi penamaan komponen & standar aksesibilitas WCAG
+│   ├── 6_SESSION_STARTER.md      # Brief pemulihan memori AI di awal setiap sesi coding
+│   ├── Growth_Engine_Blueprint.md # Algoritma GEO/AEO, RAG scraper, & sistem virality
+│   ├── DASHBOARD_PANELS.md       # Spesifikasi UI panel akun & komponen gamifikasi
+│   ├── FRONTEND_SPEC.md          # Hierarki routing halaman & strategi pengambilan data
+│   ├── MODULES_STRUCTURE.md      # Pemetaan dependensi modul & arsitektur impor aman
+│   └── PROMPT_LIBRARY.md         # Pustaka instruksi generatif untuk penanganan kasus khusus
+│
+├── supabase/                     # ARSITEKTUR BACKEND AUTOPILOT
+│   ├── migrations/               # Skrip migrasi SQL berversi (Tabel, Indeks, Kebijakan RLS)
+│   │   ├── 001_initial_schema.sql
+│   │   ├── 002_add_growth_tables.sql
+│   │   └── 003_add_subscriptions.sql
+│   └── functions/                # Supabase Edge Functions (TypeScript Runtime)
+│       ├── price-sync/           # Ingest otomatis pelacakan harga afiliasi
+│       ├── rss-ingest/           # Agregasi artikel RSS + Pipa Terjemahan Claude API
+│       ├── affiliate-url-rewrite/# Router pengalihan cerdas & optimasi komisi
+│       └── award-points/         # Penanganan backend penambahan Bloom Points secara otonom
+│
+├── i18n/                         # STRATEGI INTERNASIONALISASI (next-intl)
+│   ├── messages/                 # Kamus kamus lokalisasi UI tekstual murni
+│   │   ├── en.json               # Bahasa Inggris (Default Fallback Core)
+│   │   ├── id.json               # Bahasa Indonesia
+│   │   ├── es.json               # Bahasa Spanyol
+│   │   ├── fr.json               # Bahasa Prancis
+│   │   └── de.json               # Bahasa Jerman
+│   ├── routing.ts                # Konfigurasi deteksi rute dynamic locale
+│   └── request.ts                # Penanganan pembuatan request berbasis bahasa pengguna
+│
+├── public/                       # ASET STATIS APLIKASI (Diakses Publik)
+│   ├── images/                   # Galeri gambar statis, ilustrasi, & placeholder
+│   ├── fonts/                    # Koleksi font sans-serif ramah lansia
+│   └── icons/                    # Ikon pilar kehidupan & simbol pencapaian
+│
+├── styles/                       # SETUP VISUAL GLOBAL
+│   └── globals.css               # CSS Tailwind + Injeksi token ukuran teks besar lansia
+│
+└── src/                          # JANTUNG KODE SUMBER JALUR UTAMA
+    │
+    ├── app/                      # NEXT.JS 15 APP ROUTER LAYER
+    │   └── [locale]/             # Prefix Bahasa Dinamis (Dynamic Routing)
+    │       ├── layout.tsx        # Shell global pembungkus Header & Footer
+    │       ├── page.tsx          # Main Homepage Platform
+    │       │
+    │       ├── (auth)/           # Grup Rute Otentikasi (Frictionless Login)
+    │       │   ├── login/        # Halaman pengiriman Magic Link
+    │       │   ├── signup/       # Halaman pendaftaran & persetujuan privasi
+    │       │   └── callback/     # Handler jembatan OAuth pihak ketiga
+    │       │
+    │       ├── (account)/        # Grup Rute Dasbor Pengguna (Protected Context)
+    │       │   ├── layout.tsx    # Tata letak khusus dasbor (Sidebar terintegrasi)
+    │       │   ├── dashboard/    # Panel tinjauan ringkasan aktivitas pengguna
+    │       │   ├── saved/        # Manajer koleksi item wishlist tersimpan
+    │       │   ├── profile/      # Pengaturan data personal & preferensi bahasa
+    │       │   ├── subscription/ # Panel penawaran peningkatan keanggotaan Premium
+    │       │   └── calculations/ # Histori penyimpanan hasil kalkulator finansial
+    │       │
+    │       ├── (home)/           # Pilar Kehidupan: Rumah (Home Improvement & Safety)
+    │       │   ├── page.tsx      # Hub eksplorasi pilar Rumah
+    │       │   ├── products/[slug]/  # Detail produk furnitur ergonomis
+    │       │   ├── articles/[slug]/  # Artikel panduan rumah aman lansia
+    │       │   └── videos/[slug]/    # Video demonstrasi rumah pintar
+    │       │
+    │       ├── (money)/          # Pilar Kehidupan: Uang (Financial Planning & Planning)
+    │       │   ├── page.tsx      
+    │       │   ├── products/[slug]/  
+    │       │   ├── articles/[slug]/  
+    │       │   ├── videos/[slug]/    
+    │       │   └── calculators/  # Sub-folder kalkulator khusus finansial
+    │       │       ├── retirement/    # Kalkulator simulasi dana pensiun
+    │       │       └── social-security/ # Estimator tunjangan jaminan sosial
+    │       │
+    │       ├── (pet)/            # Pilar Kehidupan: Hewan Peliharaan (Senior Care Companion)
+    │       │   └── ...           # Struktur internal serupa (Halaman Hub, Detail Konten, Kalkulator)
+    │       │
+    │       ├── (senior)/         # Pilar Kehidupan: Kesehatan Lansia (Wellness & Telehealth)
+    │       │   └── ...           # Struktur internal serupa (Halaman Hub, Detail Konten, Kalkulator)
+    │       │
+    │       ├── (travel)/         # Pilar Kehidupan: Perjalanan (Accessible Senior Tour)
+    │       │   └── ...           # Struktur internal serupa (Halaman Hub, Detail Konten, Kalkulator)
+    │       │
+    │       ├── embed/            # Modul Widget Eksternal (Viral Backlink Engine)
+    │       │   └── calculator/[slug]/ # Iframe ringan siap pakai untuk dipasang di blog luar
+    │       │
+    │       └── api/              # HANDLER RUTE BACKEND API (Next.js Serverless)
+    │           ├── affiliate/[provider]/[sku]/ # Wrapper pengalihan tautan afiliasi
+    │           ├── auth/callback/              # Pengendali callback otentikasi internal
+    │           ├── revalidate/                 # Webhook pemicu pembersihan cache CDN (ISR)
+    │           ├── social/pinterest-pin/       # Endpoint otomasi pengiriman gambar infografis
+    │           ├── webhooks/                   # Penerima data aktivitas eksternal (Resend/Stripe)
+    │           └── cron/                       # Endpoint verifikasi keamanan tugas terjadwal
+    │               ├── price-sync/             # Pembaruan basis data matriks harga
+    │               ├── rss-ingest/             # Handler penyerapan data berkala feed artikel
+    │               └── affiliate-refresh/      # Penyegaran persentase nilai komisi harian
+    │
+    ├── components/               # ARSITEKTUR REUSABLE COMPONENT LAYERS
+    │   ├── ui/                   # Pabrik Komponen Atom Terisolasi (shadcn/ui re-exports)
+    │   │   ├── button.tsx, card.tsx, input.tsx, select.tsx, dialog.tsx, progress.tsx
+    │   ├── layout/               # Komponen Struktural Pembentuk Kerangka Utama
+    │   │   ├── header.tsx, footer.tsx, sidebar.tsx, locale-switcher.tsx
+    │   ├── pillar/               # Kartu Komponen Presentasional Spesifik Makro Pilar
+    │   │   ├── pillar-grid.tsx, product-card.tsx, article-card.tsx, video-card.tsx
+    │   ├── features/             # Komponen Interaktif Kompleks dengan Logika Sesi
+    │   │   ├── video-player.tsx, transcript-sidebar.tsx, saved-items-manager.tsx
+    │   ├── calculators/          # Komponen Form & Logika Visual Hitung-Hitungan
+    │   │   ├── retirement-calculator.tsx, home-budget-calculator.tsx, calculator-wrapper.tsx
+    │   ├── growth/               # Senjata Utama Mesin Pertumbuhan Otonom Aplikasi
+    │   │   ├── llm-anchor.tsx          # Jangkar semantik tak terlihat khusus AI Scraper
+    │   │   ├── cross-pillar-rec.tsx    # Generator otomatis tautan internal lintas pilar
+    │   │   ├── visual-saver.tsx        # Canvas pengubah hasil chart ke infografis Pinterest
+    │   │   ├── embed-widget-generator.tsx # Modul penyedia salinan kode penyisipan iframe
+    │   │   └── seasonal-banner.tsx     # Spanduk adaptif pengubah tema berbasis liburan otomatis
+    │   ├── seo/                  # Generator Injeksi Data Terstruktur Googlebot
+    │   │   └── json-ld-product.tsx, json-ld-article.tsx, json-ld-breadcrumb.tsx
+    │   └── premium/              # Kontrol Modal & Hambatan Akses Fitur Berbayar
+    │       └── upgrade-modal.tsx
+    │
+    ├── lib/                      # PUSAT FUNGSI LOGIKA MURNI (Mekanika Internal)
+    │   ├── supabase/             # Inisialisasi Klien Database Berbasis Konteks
+    │   │   ├── client.ts         # Panggilan browser dengan proteksi kebijakan RLS bawaan
+    │   │   ├── server.ts         # Akses server-side Next.js dengan penanganan kuki aman
+    │   │   ├── admin.ts          # Bypass RLS khusus (Hanya untuk skrip cron internal rahasia)
+    │   │   └── types.ts          # Pemetaan tipe database TypeScript otomatis
+    │   ├── hooks/                # Kumpulan React Custom Hooks Pengikat State Sesi
+    │   │   ├── useAuth.ts, useSavedItems.ts, useGamification.ts, useMounted.ts
+    │   ├── services/             # Abstraksi Pengambilan Data Pihak Ketiga & Backend API
+    │   │   └── productService.ts, articleService.ts, affiliateService.ts
+    │   ├── utils/                # Fungsi Helper Pemformat Data Kecil
+    │   │   ├── cn.ts             # Penggabung class Tailwind CSS dinamis (clsx + twMerge)
+    │   │   ├── priceFormatter.ts # Pemformat mata uang adaptif berbasis bahasa pengguna
+    │   │   ├── seoHelpers.ts     # Pengolah meta-title & deskripsi ramah mesin pencari
+    │   │   └── telegramAlerts.ts # Pengirim pesan otomatis jika sistem mendeteksi kegagalan
+    │   ├── constants/            # Pusat Data Statis Penyetel Aturan Aplikasi
+    │   │   └── pillars.ts, badges.ts, affiliate.ts, routes.ts
+    │   └── calculators/          # Kelas Blueprint Rumus Matematika Perhitungan Murni
+    │       └── base-calculator.ts

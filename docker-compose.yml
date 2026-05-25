@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # LIBRETRANSLATE - Local Hosted Translation
+  # ==========================================
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: lifebloom_libretranslate
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      # Hanya memuat bahasa yang didukung (English, Indonesian, Spanish, French, German) ke RAM
+      - LT_LOAD_ONLY=en,id,es,fr,de
+      
+      # Batasi penggunaan core CPU untuk mencegah spike tagihan VPS/Railway
+      - LT_THREADS=2
+      
+      # Aktifkan kewajiban API KEY (sangat direkomendasikan jika diekspos ke publik)
+      - LT_API_KEYS=true
+      
+      # Batas Request (60 permintaan per menit per IP)
+      - LT_REQ_LIMIT=60
+    
+    # Argumen eksekusi untuk memastikan API Keys ditagih
+    command: ["--api-keys"]
+    
+    volumes:
+      - libretranslate_data:/home/libretranslate/.local/share/argos-translate
+      - libretranslate_keys:/app/db
+
+volumes:
+  libretranslate_data:
+    name: lifebloom_lt_data
+  libretranslate_keys:
+    name: lifebloom_lt_keys
+
+# PANDUAN:
+# 1. Jalankan `docker-compose up -d`
+# 2. Masuk ke container untuk membuat API KEY:
+#    `docker exec -it lifebloom_libretranslate ./venv/bin/ltmanage keys --add 100`
+# 3. Masukkan hasil API Key ke `LIBRETRANSLATE_API_KEY` di `.env.local` Next.js

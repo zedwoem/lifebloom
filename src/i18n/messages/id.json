@@ -1,0 +1,20 @@
+{
+  "Navigation": {
+    "home": "Rumah",
+    "money": "Keuangan Pensiun",
+    "pet": "Hewan Peliharaan",
+    "senior": "Kesehatan Lansia",
+    "travel": "Perjalanan",
+    "login": "Masuk",
+    "dashboard": "Dasbor"
+  },
+  "HomePage": {
+    "title": "Teknologi Harian yang Memahami Anda.",
+    "subtitle": "Rencanakan pensiun, hemat pengeluaran rumah, dan pelihara kesehatan keluarga Anda dengan alat bantu yang bebas iklan dan ramah privasi.",
+    "search_placeholder": "Cari kalkulator pensiun, nutrisi lansia, dll...",
+    "search_button": "Cari",
+    "categories_title": "Kategori Utama",
+    "categories_subtitle": "Solusi terspesialisasi untuk setiap aspek kehidupan.",
+    "explore": "Jelajahi"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "Navigation": {
+    "home": "Accueil",
+    "money": "Argent",
+    "pet": "Animaux",
+    "senior": "Bien-être Senior",
+    "travel": "Voyage",
+    "login": "Connexion",
+    "dashboard": "Tableau de Bord"
+  },
+  "HomePage": {
+    "title": "Bienvenue sur LifeBloom Hub",
+    "subtitle": "Votre guide de confiance pour un style de vie dynamique et sûr.",
+    "cta": "Explorer"
+  }
+}

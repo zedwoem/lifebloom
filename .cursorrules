@@ -1,0 +1,37 @@
+# LifeBloom Hub - Vibe Coding Rules
+
+**Target IDE:** Gemini Antigravity IDE (primary) | Cursor / Continue.dev (compatible)
+**Stack Context:** Next.js 15 (App Router, PPR), React 19, Supabase (RLS, Edge Functions), TailwindCSS, Vibe Coding paradigm 2026
+**Target User:** Seniors (65+). UI must be accessible (WCAG 2.1 AA), large text (16px+ default), high contrast (AAA), minimal cognitive load, no fast animations/autoplay.
+
+## AI Rules and Absolute Constraints
+
+1. **Client-Side First:** Maximize client-side computation. Minimize API calls; batch requests where necessary. Use React Query/SWR for data fetching only on critical endpoints.
+2. **Hybrid Rendering (PPR + ISR):** 
+   - PPR (`experimental_ppr = true`) for Product pages, comparison tables. 
+   - ISR for calculators/guides (`revalidate = 86400`).
+3. **Database Security (Supabase):** 
+   - RLS (Row-Level Security) MUST be enabled. User data protected by auth context.
+   - Use Service Role Key ONLY in server-side & edge functions. NEVER expose it to the client.
+4. **Multi-Language (i18n):**
+   - Single database source of truth with separate `*_translations` tables.
+   - next-intl middleware for route-based locale switching (5 languages: en, id, es, fr, de; EN = default).
+   - always `useTranslations()`, never hardcode strings.
+5. **No Heavy Computation on SSR:** Pre-compute & cache. Edge Functions for real-time price updates and affiliate URL rewrites.
+6. **Autopilot Scheduling (Vercel Cron):**
+   - `/api/cron/price-sync` (every 6 hours)
+   - `/api/cron/rss-ingest` (every 8 hours)
+   - `/api/cron/affiliate-refresh` (daily 2am UTC)
+7. **Strict Typings and Error Handling:**
+   - TypeScript strict mode, **no `any`**.
+   - Always use `Sentry.captureException()`, never silent failure.
+8. **Growth Engine Integration:**
+   - Implement `<LLMAnchor />` for GEO/AEO optimization.
+   - Implement `<CrossPillarRec />` via internal_link_matrix.
+   - Implement `<VisualSaver />` + Pinterest API for viral distribution.
+
+## Prompting Guidelines (for AI Agents)
+- Spatially declare files, e.g., "Create file at `components/growth/LLMAnchor.tsx`".
+- Ensure full outputs, no truncation, no placeholders (NO `// ...rest of the code`).
+- One task per prompt to maintain code quality. 
+- Use the `.cursorrules` as absolute truth for architecture and constraints.
