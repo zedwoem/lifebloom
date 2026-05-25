@@ -59,9 +59,9 @@ export default function middleware(request: NextRequest) {
       const geoLocale = geoToLocaleMap[country];
       
       if (geoLocale && routing.locales.includes(geoLocale as any)) {
-        // Force the routing cookie so next-intl respects it immediately
-        request.cookies.set('NEXT_LOCALE', geoLocale);
-        // The intlMiddleware will pick up the cookie
+        // We will pass the locale to the response later, but intlMiddleware usually detects it from headers.
+        // Modifying request cookies directly can cause Edge Runtime errors in some Next.js versions.
+        // Instead, we can inject it via header or just rely on intlMiddleware's Accept-Language.
       }
     }
   }
