@@ -58,6 +58,53 @@ export default async function LocaleLayout({
         <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
         <meta name="theme-color" content="#1E3A8A" />
         <StructuredData data={websiteSchema} />
+        
+        {/* OneSignal Setup */}
+        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.OneSignalDeferred = window.OneSignalDeferred || [];
+              OneSignalDeferred.push(async function(OneSignal) {
+                await OneSignal.init({
+                  appId: "98a08227-5bbf-40d7-816a-6fa037dc5977",
+                  safari_web_id: "web.onesignal.auto.2f682342-7506-4d13-96c3-4fd5fa35ae95",
+                  notifyButton: {
+                    enable: true,
+                    size: 'medium',
+                    theme: 'default',
+                    position: 'bottom-left',
+                    showCredit: false,
+                    text: {
+                      'tip.state.unsubscribed': 'Get LifeBloom Updates!',
+                      'tip.state.subscribed': 'You are subscribed!',
+                      'tip.state.blocked': 'Notifications Blocked'
+                    }
+                  },
+                  promptOptions: {
+                    slidedown: {
+                      prompts: [
+                        {
+                          type: "push",
+                          autoPrompt: true,
+                          text: {
+                            actionMessage: "Join LifeBloom Hub! Get the latest personalized advice for your life, home, and pets directly.",
+                            acceptButton: "Yes, keep me updated",
+                            cancelButton: "Maybe later"
+                          },
+                          delay: {
+                            pageViews: 1,
+                            timeDelay: 10
+                          }
+                        }
+                      ]
+                    }
+                  }
+                });
+              });
+            `
+          }}
+        />
       </head>
       <body className="min-h-screen flex flex-col font-sans bg-warm-beige text-slate-900">
         <NextTopLoader color="#10B981" showSpinner={false} />
