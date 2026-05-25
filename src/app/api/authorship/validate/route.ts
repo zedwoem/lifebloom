@@ -24,7 +24,6 @@ export async function POST(request: Request) {
     const orcidId = data.orcid ? data.orcid.replace("https://orcid.org/", "") : null;
 
     // Update Supabase
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const expertProfilesTable = supabase.from("expert_profiles") as any;
     const { error: updateError } = await expertProfilesTable
       .update({
