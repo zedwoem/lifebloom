@@ -29,5 +29,14 @@
     "embed_copied": "Tersalin!",
     "embed_copy": "Salin Kode",
     "embed_hide": "Sembunyikan Panel"
+  },
+  "SmartHomeMatcher": {
+    "title": "Smart Home Matcher (Matter Standard)",
+    "description": "Temukan perangkat rumah pintar yang kompatibel dengan Matter dan hemat energi tanpa memerlukan Hub tambahan.",
+    "search_placeholder": "Cari perangkat (misal: Lampu, Termostat...)",
+    "search_button": "Cari",
+    "searching": "Mencari...",
+    "results_title": "Rekomendasi Perangkat (Matter Certified)",
+    "rating": "Rating"
   }
 }

@@ -11,7 +11,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https' as const, hostname: 'm.media-amazon.com' },
       { protocol: 'https' as const, hostname: 'images.unsplash.com' },
-      { protocol: 'https' as const, hostname: 'api.qrserver.com' }
+      { protocol: 'https' as const, hostname: 'api.qrserver.com' },
+      { protocol: 'https' as const, hostname: 'ui-avatars.com' }
     ],
   },
 };

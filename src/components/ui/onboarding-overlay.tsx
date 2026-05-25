@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { Check, Heart, Smile, Wind, HelpCircle, ArrowRight } from "lucide-react";
+import { useLocale } from "next-intl";
 
 export default function OnboardingOverlay() {
+  const locale = useLocale();
   const [isOpen, setIsOpen] = useState(false);
   const [nickname, setNickname] = useState("");
   const [mood, setMood] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export default function OnboardingOverlay() {
                 />
               </div>
               <label htmlFor="consent" className="ml-3 text-xs text-emerald-100/60 leading-tight">
-                I agree to the <a href="/en/support/terms" className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Terms of Service</a> and <a href="/en/support/privacy" className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Privacy Policy</a>, and consent to the use of cookies to enhance my experience.
+                I agree to the <a href={locale === 'en' ? '/support/terms' : `/${locale}/support/terms`} className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Terms of Service</a> and <a href={locale === 'en' ? '/support/privacy' : `/${locale}/support/privacy`} className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Privacy Policy</a>, and consent to the use of cookies to enhance my experience.
               </label>
             </div>
 

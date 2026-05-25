@@ -73,7 +73,7 @@ export default async function LocaleLayout({
                     enable: true,
                     size: 'medium',
                     theme: 'default',
-                    position: 'bottom-left',
+                    position: 'bottom-right',
                     showCredit: false,
                     text: {
                       'tip.state.unsubscribed': 'Get LifeBloom Updates!',
@@ -163,7 +163,7 @@ export default async function LocaleLayout({
             <footer className="bg-white border-t border-slate-200 py-12 mt-20">
               <div className="container mx-auto px-6 text-center text-slate-500 text-sm">
                 &copy; {new Date().getFullYear()} LifeBloom Hub. All rights reserved. <br/>
-                <Link href={`/${locale}/support/terms`} className="hover:text-brand-green transition-colors">Terms of Service</Link> | <Link href={`/${locale}/support/privacy`} className="hover:text-brand-green transition-colors">Privacy Policy</Link>
+                <Link href={locale === 'en' ? '/support/terms' : `/${locale}/support/terms`} className="hover:text-brand-green transition-colors">Terms of Service</Link> | <Link href={locale === 'en' ? '/support/privacy' : `/${locale}/support/privacy`} className="hover:text-brand-green transition-colors">Privacy Policy</Link>
               </div>
             </footer>
           </AuthProvider>

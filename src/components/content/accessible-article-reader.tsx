@@ -13,6 +13,7 @@ import { RelatedPostsWidget } from '@/components/content/related-posts-widget';
 export function AccessibleArticleReader({ article, locale, slug }: { article: any, locale: string, slug: string }) {
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [highContrast, setHighContrast] = useState(false);
+  const [reactionState, setReactionState] = useState<string[]>([]);
   
   // TTS State
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -132,7 +133,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         utterance.onerror = (e) => {
           if (e.error !== 'interrupted' && e.error !== 'canceled') {
             console.error("Native Speech Error:", e);
-            toast.error(locale === 'id' ? "Gagal memutar suara." : "Voice synthesis failed.");
+            // Silenced the toast as it often triggers incorrectly on manual stops
           }
           setIsSpeaking(false);
           setIsPaused(false);
@@ -349,14 +350,38 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
         {/* Reaction Emojis */}
         <div className="mt-12 flex justify-center gap-4 animate-fade-in print:hidden">
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
-            <ThumbsUp className="w-4 h-4" /> Helpful
+          <button 
+            onClick={() => {
+              if (!reactionState.includes('helpful')) {
+                setReactionState(prev => [...prev, 'helpful']);
+                toast.success("Glad you found this helpful!", { icon: "👍" });
+              }
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 ${reactionState.includes('helpful') ? 'bg-brand-green border-brand-green text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}
+          >
+            <ThumbsUp className={`w-4 h-4 ${reactionState.includes('helpful') ? 'animate-bounce' : ''}`} /> Helpful
           </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
-            <Lightbulb className="w-4 h-4" /> Insightful
+          <button 
+            onClick={() => {
+              if (!reactionState.includes('insightful')) {
+                setReactionState(prev => [...prev, 'insightful']);
+                toast.success("Thanks for your feedback!", { icon: "💡" });
+              }
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 ${reactionState.includes('insightful') ? 'bg-brand-blue border-brand-blue text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-blue hover:text-brand-blue'}`}
+          >
+            <Lightbulb className={`w-4 h-4 ${reactionState.includes('insightful') ? 'animate-pulse' : ''}`} /> Insightful
           </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
-            <Heart className="w-4 h-4" /> Love it
+          <button 
+            onClick={() => {
+              if (!reactionState.includes('love')) {
+                setReactionState(prev => [...prev, 'love']);
+                toast.success("We love that you love it!", { icon: "❤️" });
+              }
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 ${reactionState.includes('love') ? 'bg-rose-500 border-rose-500 text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-rose-500 hover:text-rose-500'}`}
+          >
+            <Heart className={`w-4 h-4 ${reactionState.includes('love') ? 'animate-ping' : ''}`} /> Love it
           </button>
         </div>
 

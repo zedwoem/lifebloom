@@ -29,5 +29,14 @@
     "embed_copied": "Copied!",
     "embed_copy": "Copy Code",
     "embed_hide": "Hide Panel"
+  },
+  "SmartHomeMatcher": {
+    "title": "Smart Home Matcher (Matter Standard)",
+    "description": "Find smart devices that are Matter-compatible, energy-efficient, and don't require an extra bridge.",
+    "search_placeholder": "Search devices (e.g., Bulbs, Thermostats...)",
+    "search_button": "Search",
+    "searching": "Searching...",
+    "results_title": "Recommended Devices (Matter Certified)",
+    "rating": "Rating"
   }
 }
