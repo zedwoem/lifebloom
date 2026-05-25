@@ -57,7 +57,7 @@ export default function OnboardingOverlay() {
         <div className="relative z-10 text-center">
           <h2 className="text-3xl font-extrabold text-white tracking-tight mb-2">Welcome to LifeBloom Hub</h2>
           <p className="text-emerald-50 mb-8 text-sm opacity-80">
-            A safe space tailored to your well-being. Let's personalize your experience.
+            A safe space tailored to your well-being. Let&apos;s personalize your experience.
           </p>
 
           <form onSubmit={handleComplete} className="space-y-6 text-left">

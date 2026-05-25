@@ -13,7 +13,7 @@ export default async function JoinUsPage({ params }: { params: Promise<{ locale:
           Welcome to the LifeBloom Family
         </h1>
         <p className="text-xl text-slate-600 mb-12 leading-relaxed">
-          We're thrilled you're here. LifeBloom Hub is dedicated to empowering your journey with expertly curated advice on health, wealth, and lifestyle. By joining our community, you help shape the future of our platform.
+          We&apos;re thrilled you&apos;re here. LifeBloom Hub is dedicated to empowering your journey with expertly curated advice on health, wealth, and lifestyle. By joining our community, you help shape the future of our platform.
         </p>
         
         <div className="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 mb-12 text-left">
