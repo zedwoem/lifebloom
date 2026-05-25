@@ -15,6 +15,19 @@
     "search_button": "Search",
     "categories_title": "Core Pillars",
     "categories_subtitle": "Specialized solutions for every aspect of your life.",
-    "explore": "Explore"
+    "explore": "Explore",
+    "videos": "Masterclasses",
+    "budget_calculator_title": "Renovation Budget Calculator",
+    "budget_calculator_desc": "Calculate your home remodeling costs accurately with a built-in 15% contingency buffer.",
+    "budget_calculator_pdf_header": "Home Renovation Budget Plan",
+    "budget_calculator_total": "Total Estimated Budget",
+    "embed_calculator_title": "Embed This Calculator",
+    "embed_calculator_desc": "Share this helpful tool with your audience by pasting the iframe widget on your blog.",
+    "embed_button_get": "Get Embed Code",
+    "embed_color_label": "Iframe Theme Color:",
+    "embed_color_hint": "Choose a brand color that matches your blog",
+    "embed_copied": "Copied!",
+    "embed_copy": "Copy Code",
+    "embed_hide": "Hide Panel"
   }
 }

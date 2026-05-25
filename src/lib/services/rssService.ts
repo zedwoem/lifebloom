@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import nlp from 'compromise';
 import { PILLARS } from '@/lib/constants/pillars';
 import { translationAdapter } from '@/lib/services/translationAdapter';
 
@@ -7,7 +6,10 @@ export interface RSSItem {
   title: string;
   link: string;
   description: string;
+  content: string;
+  imageUrl: string;
   pubDate: string;
+  source: string;
 }
 
 export interface IngestedArticle extends RSSItem {
@@ -20,79 +22,64 @@ export interface IngestedArticle extends RSSItem {
 // In-memory static database to demonstrate "ON CONFLICT DO NOTHING"
 const articleDatabase = new Set<string>();
 
-const FEED_URLS = [
-  'https://www.mayoclinic.org/rss/health-information',
-  'https://www.health.harvard.edu/blog/feed',
-  'https://tools.cdc.gov/api/v2/resources/media/404952.rss',
-  'https://www.kiplinger.com/rss'
+const GNEWS_API_KEY = process.env.GNEWS_API_KEY || "fb981b557612c4b76c126c9ed4e40ea5";
+
+const PILLAR_QUERIES = [
+  { pillar: PILLARS.MONEY.slug, query: "retirement OR pension OR personal finance" },
+  { pillar: PILLARS.PET.slug, query: "pets OR dog care OR cat health" },
+  { pillar: PILLARS.TRAVEL.slug, query: "\"accessible travel\" OR \"wheelchair travel\" OR senior travel" },
+  { pillar: PILLARS.SENIOR.slug, query: "\"senior wellness\" OR aging health OR medicare" },
+  { pillar: PILLARS.HOME.slug, query: "\"smart home\" OR home accessibility renovation" }
 ];
 
-/**
- * Generates a SHA-256 hash from the title and link to prevent duplicates.
- */
 function generateHash(title: string, link: string): string {
   return crypto.createHash('sha256').update(`${title}|${link}`).digest('hex');
 }
 
-/**
- * Uses Compromise NLP to analyze keywords and categorize the article.
- */
-function categorizeArticle(title: string, description: string): string {
-  const text = `${title} ${description}`;
-  const doc = nlp(text);
-
-  if (doc.match('(money|finance|budget|retirement|investment|tax|kiplinger)').found) {
-    return PILLARS.MONEY.slug;
-  }
-  if (doc.match('(pet|dog|cat|vet|animal|canine|feline)').found) {
-    return PILLARS.PET.slug;
-  }
-  if (doc.match('(travel|flight|hotel|trip|accessible|wheelchair)').found) {
-    return PILLARS.TRAVEL.slug;
-  }
-  if (doc.match('(health|senior|medication|wellness|disease|cdc|clinic)').found) {
-    return PILLARS.SENIOR.slug;
-  }
-  
-  return PILLARS.HOME.slug;
-}
-
-export async function ingestRSSFeeds(targetLang: string = 'id'): Promise<IngestedArticle[]> {
+export async function ingestRSSFeeds(targetLang: string = 'en'): Promise<IngestedArticle[]> {
   const newArticles: IngestedArticle[] = [];
 
-  for (const url of FEED_URLS) {
+  for (const { pillar, query } of PILLAR_QUERIES) {
     try {
-      // Fetching RSS feed (Fallback XML parsing for MVP)
-      // In production, we would use an XML parser like fast-xml-parser
-      const staticItems: RSSItem[] = [
-        {
-          title: `Latest Health Alert from ${new URL(url).hostname}`,
-          link: `${url}/article-${Math.floor(Math.random() * 1000)}`,
-          description: "This is a detailed description of the latest news about retirement planning and health.",
-          pubDate: new Date().toISOString()
-        }
-      ];
+      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&max=5&apikey=${GNEWS_API_KEY}`;
+      const response = await fetch(url, { next: { revalidate: 3600 } });
+      
+      if (!response.ok) {
+        console.error(`[GNews] Failed to fetch for ${pillar}: ${response.statusText}`);
+        continue;
+      }
 
-      for (const item of staticItems) {
-        const hashId = generateHash(item.title, item.link);
+      const data = await response.json();
+      const articles = data.articles || [];
+
+      for (const item of articles) {
+        const hashId = generateHash(item.title, item.url);
 
         // Deduplication Check (ON CONFLICT DO NOTHING)
         if (articleDatabase.has(hashId)) {
-          console.log(`[RSS] Duplicate skipped: ${hashId}`);
           continue;
         }
 
         articleDatabase.add(hashId);
 
-        // NLP Categorization
-        const pillar = categorizeArticle(item.title, item.description);
+        // We skip translation API calls here if targetLang is 'en' to save resources,
+        // but for 'id', we would call the translation adapter.
+        let translatedTitle = item.title;
+        let translatedDescription = item.description;
 
-        // Translation Pipeline
-        const translatedTitle = await translationAdapter.translate(item.title, targetLang);
-        const translatedDescription = await translationAdapter.translate(item.description, targetLang);
+        if (targetLang !== 'en') {
+          translatedTitle = await translationAdapter.translate(item.title, targetLang);
+          translatedDescription = await translationAdapter.translate(item.description, targetLang);
+        }
 
         newArticles.push({
-          ...item,
+          title: item.title,
+          link: item.url,
+          description: item.description,
+          content: item.content || item.description,
+          imageUrl: item.image || "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
+          pubDate: item.publishedAt,
+          source: item.source?.name || "News Feed",
           hashId,
           pillar,
           translatedTitle,
@@ -100,7 +87,7 @@ export async function ingestRSSFeeds(targetLang: string = 'id'): Promise<Ingeste
         });
       }
     } catch (error) {
-      console.error(`[RSS] Error ingesting feed ${url}:`, error);
+      console.error(`[GNews] Error ingesting feed for ${pillar}:`, error);
     }
   }
 

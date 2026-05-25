@@ -21,7 +21,7 @@ export default async function PillarPage({
 
   return (
     <div className="min-h-screen bg-warm-beige relative overflow-hidden pb-20">
-      <div className="absolute top-0 left-0 w-full h-80 bg-brand-blue rounded-b-[3rem] shadow-xl z-0"></div>
+      <div className="absolute top-0 left-0 w-full h-[28rem] md:h-80 bg-brand-blue rounded-b-[3rem] shadow-xl z-0"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-brand-green/20 rounded-full blur-3xl z-0 -translate-y-1/2 translate-x-1/3"></div>
 
       <div className="container mx-auto px-6 pt-10 max-w-5xl relative z-10 animate-fade-in">

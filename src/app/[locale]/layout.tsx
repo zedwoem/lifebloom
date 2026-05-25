@@ -21,6 +21,7 @@ import { LayoutDashboard } from 'lucide-react';
 import OnboardingOverlay from '@/components/ui/onboarding-overlay';
 import { NavbarUserStatus } from '@/components/ui/navbar-user-status';
 import NextTopLoader from 'nextjs-toploader';
+import { Toaster } from 'sonner';
 
 export default async function LocaleLayout({
   children,
@@ -60,10 +61,11 @@ export default async function LocaleLayout({
       </head>
       <body className="min-h-screen flex flex-col font-sans bg-warm-beige text-slate-900">
         <NextTopLoader color="#10B981" showSpinner={false} />
+        <Toaster position="bottom-right" richColors />
         <div className="gtranslate_wrapper"></div>
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.gtranslateSettings = {"default_language":"en","native_language_names":true,"detect_browser_language":true,"languages":["en","fr","it","es","id","hi","zh-CN","ja","kn","de","ar"],"wrapper_selector":".gtranslate_wrapper","switcher_horizontal_position":"inline","float_switcher_open_direction":"bottom","alt_flags":{"en":"usa"}};`
+            __html: `window.gtranslateSettings = {"default_language":"en","native_language_names":true,"languages":["en","fr","it","es","id","hi","zh-CN","ja","kn","de","ar"],"wrapper_selector":".gtranslate_wrapper","float_switcher_open_direction":"bottom","alt_flags":{"en":"usa"}}`
           }}
         />
         <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
@@ -86,9 +88,9 @@ export default async function LocaleLayout({
           <AuthProvider>
             <header className="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 border-b border-slate-200">
               <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-                <Link href={`/${locale}`} className="flex items-center gap-2 text-brand-blue font-black text-xl font-display">
-                  <Image src="/logo.png" width={32} height={32} alt="LifeBloom Logo" className="rounded-xl object-contain" />
-                  LifeBloom Hub
+                <Link href={`/${locale}`} className="flex items-center gap-2 text-brand-blue font-black text-lg md:text-xl font-display shrink-0 min-w-0">
+                  <Image src="/logo.png" width={32} height={32} alt="LifeBloom Logo" className="rounded-xl object-contain shrink-0" />
+                  <span className="truncate hidden sm:block md:hidden lg:block max-w-[150px] md:max-w-none">LifeBloom Hub</span>
                 </Link>
                 <div className="flex-1 max-w-md mx-6 hidden md:block">
                   <GlobalSearch />

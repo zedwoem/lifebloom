@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, Share2, Printer, Contrast, Play, Square, Pause } from 'lucide-react';
+import { ChevronLeft, Share2, Printer, Contrast, Play, Square, Pause, ThumbsUp, Lightbulb, Heart } from 'lucide-react';
+import { toast } from 'sonner';
 import { EmbedGenerator } from '@/components/ui/embed-generator';
 import { SponsorShowcase } from '@/components/content/sponsor-showcase';
 import { generateProfile } from '@/lib/utils/profileGenerator';
@@ -19,19 +20,14 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const isNativeSpeechRef = useRef(false);
 
-  // Dynamic status/alert state to replace raw browser pop-up alerts
-  const [statusMsg, setStatusMsg] = useState("");
-
   const handleCopy = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    setStatusMsg("Copying disabled. Please use the Share & Embed widget below.");
-    setTimeout(() => setStatusMsg(""), 4000);
+    toast.warning("Copying disabled. Please use the Share & Embed widget below.");
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    setStatusMsg("Right-click disabled to protect our expert content.");
-    setTimeout(() => setStatusMsg(""), 4000);
+    toast.warning("Right-click disabled to protect our expert content.");
   };
 
   const processedContent = article?.content ? article.content.replace(
@@ -58,8 +54,8 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
   }, []);
 
   const handleSpeech = async () => {
-    // Clear status
-    setStatusMsg("");
+    // Dismiss existing toasts
+    toast.dismiss();
 
     // Handle cancel/stop
     if (isSpeaking) {
@@ -134,20 +130,20 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         };
         
         utterance.onerror = (e) => {
-          console.error("Native Speech Error:", e);
+          if (e.error !== 'interrupted' && e.error !== 'canceled') {
+            console.error("Native Speech Error:", e);
+            toast.error(locale === 'id' ? "Gagal memutar suara." : "Voice synthesis failed.");
+          }
           setIsSpeaking(false);
           setIsPaused(false);
-          setStatusMsg(locale === 'id' ? "Gagal memutar suara." : "Voice synthesis failed.");
         };
 
         window.speechSynthesis.speak(utterance);
-        setStatusMsg(locale === 'id' ? "Memutar audio menggunakan suara sistem..." : "Playing audio using system voice...");
+        toast.info(locale === 'id' ? "Memutar audio menggunakan suara sistem..." : "Playing audio using system voice...");
         
-        // Auto clear status banner after 3s
-        setTimeout(() => setStatusMsg(""), 3000);
       } else {
         setIsSpeaking(false);
-        setStatusMsg(locale === 'id' ? "Layanan suara tidak didukung di browser ini." : "Speech service is not supported in this browser.");
+        toast.error(locale === 'id' ? "Layanan suara tidak didukung di browser ini." : "Speech service is not supported in this browser.");
       }
     }
   };
@@ -220,13 +216,6 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
       onCopy={handleCopy}
       onContextMenu={handleContextMenu}
     >
-      {/* Toast status message for native Speech Synthesis */}
-      {statusMsg && (
-        <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-2xl shadow-xl border animate-bounce ${highContrast ? 'bg-yellow-300 text-black border-yellow-300' : 'bg-slate-900 text-white border-slate-800'} text-sm font-semibold flex items-center gap-2`}>
-          <div className="w-2.5 h-2.5 rounded-full bg-brand-green animate-ping" />
-          <span>{statusMsg}</span>
-        </div>
-      )}
       
       {/* Top Navigation Bar with Accessibility Controls - HIDDEN ON PRINT */}
       <div className={`sticky top-0 w-full z-50 print:hidden ${stickyHeaderClasses}`}>
@@ -360,11 +349,15 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
         {/* Reaction Emojis */}
         <div className="mt-12 flex justify-center gap-4 animate-fade-in print:hidden">
-          {['👍 Helpful', '💡 Insightful', '❤️ Love it'].map((reaction) => (
-            <button key={reaction} className={`px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
-              {reaction}
-            </button>
-          ))}
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
+            <ThumbsUp className="w-4 h-4" /> Helpful
+          </button>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
+            <Lightbulb className="w-4 h-4" /> Insightful
+          </button>
+          <button className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-transform hover:scale-110 ${highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}>
+            <Heart className="w-4 h-4" /> Love it
+          </button>
         </div>
 
         {/* Related Posts Widget */}

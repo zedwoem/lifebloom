@@ -15,6 +15,19 @@
     "search_button": "Cari",
     "categories_title": "Kategori Utama",
     "categories_subtitle": "Solusi terspesialisasi untuk setiap aspek kehidupan.",
-    "explore": "Jelajahi"
+    "explore": "Jelajahi",
+    "videos": "Masterclass Edukasi",
+    "budget_calculator_title": "Kalkulator Anggaran Renovasi",
+    "budget_calculator_desc": "Hitung estimasi biaya perombakan atau renovasi hunian Anda secara presisi dengan keamanan penyangga dana tak terduga (kontinjensi 15%).",
+    "budget_calculator_pdf_header": "Rencana Anggaran Renovasi Rumah",
+    "budget_calculator_total": "Total Estimasi Anggaran",
+    "embed_calculator_title": "Pasang Kalkulator Ini di Website Anda",
+    "embed_calculator_desc": "Bagikan kalkulator bermanfaat ini kepada khalayak ramai dengan menempelkan widget iframe di blog Anda.",
+    "embed_button_get": "Dapatkan Kode Embed",
+    "embed_color_label": "Warna Tema Iframe:",
+    "embed_color_hint": "Pilih warna branding yang cocok dengan blog Anda",
+    "embed_copied": "Tersalin!",
+    "embed_copy": "Salin Kode",
+    "embed_hide": "Sembunyikan Panel"
   }
 }

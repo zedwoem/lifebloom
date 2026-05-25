@@ -46,8 +46,8 @@ export default function SupportLayout({ children }: { children: React.ReactNode 
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="md:col-span-3">
-          <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-sm min-h-[600px]">
+        <main className="md:col-span-3 min-w-0">
+          <div className="bg-white rounded-3xl p-6 md:p-12 border border-slate-200 shadow-sm min-h-[600px] overflow-hidden break-words">
             {children}
           </div>
         </main>

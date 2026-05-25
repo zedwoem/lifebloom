@@ -24,11 +24,13 @@ export default function OnboardingOverlay() {
 
   const handleComplete = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nickname.trim() || !mood || !consent) return;
+    if (!consent) return;
+
+    const finalNickname = nickname.trim() || "our family";
 
     const userProfile = {
-      nickname: nickname.trim(),
-      mood,
+      nickname: finalNickname,
+      mood: mood || "neutral",
       joinedAt: new Date().toISOString()
     };
 
@@ -62,22 +64,24 @@ export default function OnboardingOverlay() {
 
           <form onSubmit={handleComplete} className="space-y-6 text-left">
             <div>
-              <label className="block text-sm font-medium text-emerald-100 mb-2">
-                What should we call you?
+              <label className="block text-sm font-medium text-emerald-100 mb-2" htmlFor="nickname-input">
+                What should we call you? <span className="opacity-50 text-xs font-normal">(Optional)</span>
               </label>
               <input 
+                id="nickname-input"
+                name="nickname"
                 type="text" 
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="Enter your nickname..."
+                autoComplete="nickname"
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-emerald-100/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 transition-all"
-                required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-emerald-100 mb-3">
-                How are you feeling today?
+                How are you feeling today? <span className="opacity-50 text-xs font-normal">(Optional)</span>
               </label>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {moods.map((m) => {
@@ -88,13 +92,13 @@ export default function OnboardingOverlay() {
                       key={m.id}
                       type="button"
                       onClick={() => setMood(m.id)}
-                      className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-300 ${
+                      className={`group flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-300 hover:scale-105 active:scale-95 ${
                         isSelected 
-                          ? "bg-emerald-500/20 border-emerald-400 text-white shadow-[0_0_15px_rgba(52,211,153,0.3)]" 
+                          ? "bg-emerald-500/20 border-emerald-400 text-white shadow-[0_0_15px_rgba(52,211,153,0.3)] scale-105" 
                           : "bg-white/5 border-white/10 text-emerald-100/70 hover:bg-white/10 hover:border-white/20"
                       }`}
                     >
-                      <Icon className={`w-6 h-6 mb-2 ${isSelected ? "text-emerald-400" : ""}`} />
+                      <Icon className={`w-6 h-6 mb-2 transition-transform duration-300 group-hover:scale-110 ${isSelected ? "text-emerald-400 scale-110" : ""}`} />
                       <span className="text-xs font-medium">{m.label}</span>
                     </button>
                   );
@@ -120,7 +124,7 @@ export default function OnboardingOverlay() {
 
             <button
               type="submit"
-              disabled={!nickname.trim() || !mood || !consent}
+              disabled={!consent}
               className="w-full flex items-center justify-center gap-2 py-3.5 px-4 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
             >
               Start Exploring

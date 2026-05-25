@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlayCircle, Tv, Heart } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { getAllVideos, VideoItem } from '@/lib/services/videoService';
 
 const VideoPlayer = dynamic(() => import('@/components/features/video-player'), {
   loading: () => (
@@ -13,50 +14,31 @@ const VideoPlayer = dynamic(() => import('@/components/features/video-player'), 
   ssr: false
 });
 
-const VIDEOS = [
-  {
-    id: 'bKk_7NIKY3Y',
-    title: 'Medicare Part D Changes (2025)',
-    category: 'Finance & Health',
-    description: 'Learn exactly what to expect with the new changes in Medicare Part D, including the out-of-pocket cap and how it affects your prescriptions.',
-    transcripts: [
-      { time: 0, text: "Welcome to this complete guide on Medicare Part D for the upcoming year." },
-      { time: 15, text: "The biggest change is the introduction of a new $2000 out-of-pocket maximum." },
-      { time: 45, text: "This means once you hit $2000, your covered prescriptions are free for the rest of the year." },
-      { time: 80, text: "Let's talk about the 'donut hole' or coverage gap, which is finally going away." },
-      { time: 120, text: "You will also have the option to smooth out your payments across the year." }
-    ]
-  },
-  {
-    id: 't-eYqYVzGQA',
-    title: '5 Easy Exercises for Joint Mobility',
-    category: 'Senior Wellness',
-    description: 'A gentle, follow-along routine perfect for mornings to keep your joints healthy, lubricated, and pain-free.',
-    transcripts: [
-      { time: 0, text: "Good morning! Today we are doing a gentle joint mobility routine." },
-      { time: 20, text: "Let's start with neck circles. Nice and slow, breathing deeply." },
-      { time: 50, text: "Now moving to shoulder rolls. Backward first, opening up the chest." },
-      { time: 90, text: "Next, we'll do some seated hip rotations to loosen the lower back." },
-      { time: 150, text: "Remember to only go as far as feels comfortable. No pain." }
-    ]
-  },
-  {
-    id: 'uQ7gmUB_iQc',
-    title: 'Smart Home Automation for Aging in Place',
-    category: 'Home & Tech',
-    description: 'Discover how smart lights, voice assistants, and sensors can make your home safer and more comfortable as you age.',
-    transcripts: [
-      { time: 0, text: "Aging in place is easier than ever thanks to smart home technology." },
-      { time: 30, text: "First, let's look at smart lighting and motion sensors." },
-      { time: 65, text: "These can automatically illuminate pathways at night, preventing falls." },
-      { time: 100, text: "Voice assistants like Alexa or Google Home let you control everything without getting up." },
-      { time: 140, text: "We'll also cover smart thermostats for consistent comfort." }
-    ]
-  }
-];
-
 export default function VideoHubPage() {
-  const [activeVideo, setActiveVideo] = useState(VIDEOS[0]);
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      const data = await getAllVideos();
+      setVideos(data);
+      if (data.length > 0) {
+        setActiveVideo(data[0]);
+      }
+    };
+    fetchVideos();
+  }, []);
+
+  if (!activeVideo) {
+    return (
+      <div className="min-h-screen bg-warm-beige py-12 flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <Tv className="w-12 h-12 text-brand-green/50 mb-4" />
+          <p className="text-brand-blue font-bold">Loading Masterclasses...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-warm-beige py-12">
@@ -100,7 +82,7 @@ export default function VideoHubPage() {
             More Masterclasses
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {VIDEOS.filter(v => v.id !== activeVideo.id).map(video => (
+            {videos.filter(v => v.id !== activeVideo.id).map(video => (
               <div 
                 key={video.id}
                 onClick={() => setActiveVideo(video)}
