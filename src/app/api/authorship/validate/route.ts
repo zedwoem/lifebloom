@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     // Update Supabase
     const { error: updateError } = await supabase
-      .from("expert_profiles")
+      .from("expert_profiles" as any)
       .update({
         h_index: hIndex,
         citation_count: citationCount,

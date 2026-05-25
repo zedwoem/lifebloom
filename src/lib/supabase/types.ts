@@ -67,6 +67,77 @@ export interface Database {
           updated_at?: string
         }
       }
+      expert_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          display_name: string
+          title: string | null
+          bio: string | null
+          orcid_id: string | null
+          wikidata_id: string | null
+          google_scholar_url: string | null
+          h_index: number
+          citation_count: number
+          last_verified_at: string | null
+          created_at: string
+          updated_at: string
+          entity_type: 'individual' | 'organization' | 'brand' | 'institution'
+          status: 'pending' | 'approved' | 'rejected'
+          logo_url: string | null
+          website_url: string | null
+          pillar_specialty: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          display_name: string
+          title?: string | null
+          bio?: string | null
+          orcid_id?: string | null
+          wikidata_id?: string | null
+          google_scholar_url?: string | null
+          h_index?: number
+          citation_count?: number
+          last_verified_at?: string | null
+          created_at?: string
+          updated_at?: string
+          entity_type?: 'individual' | 'organization' | 'brand' | 'institution'
+          status?: 'pending' | 'approved' | 'rejected'
+          logo_url?: string | null
+          website_url?: string | null
+          pillar_specialty?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          display_name?: string
+          title?: string | null
+          bio?: string | null
+          orcid_id?: string | null
+          wikidata_id?: string | null
+          google_scholar_url?: string | null
+          h_index?: number
+          citation_count?: number
+          last_verified_at?: string | null
+          created_at?: string
+          updated_at?: string
+          entity_type?: 'individual' | 'organization' | 'brand' | 'institution'
+          status?: 'pending' | 'approved' | 'rejected'
+          logo_url?: string | null
+          website_url?: string | null
+          pillar_specialty?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       badges: {
         Row: {
           id: string

@@ -66,10 +66,24 @@ When starting development, you may not have active Supabase connections. Setting
 - It disables network fetches for `content_metrics` and returns localized mock data arrays instead.
 - **WARNING:** Ensure this is set to `false` in Vercel Production Settings.
 
-### 3.2. AI API Pipeline (Grok & Gemini)
-LifeBloom Hub heavily relies on AI as a background autopilot:
-- **Primary AI (Grok):** We utilize xAI's Grok API via `XAI_API_KEY`. It serves as the primary engine for RSS feed categorization, detecting semantic pillars (Home, Money, Pet, etc.) in raw articles instantly, and rewriting titles for AEO (AI Engine Optimization) efficiently at scale.
-- **Advanced AI (Gemini via AI Studio):** For complex tasks requiring multi-modal reasoning or highly structured long-form extraction, we use `GEMINI_API_KEY`. It acts as a resilient fallback and reasoning engine when lightweight NLP is insufficient.
+### 3.2. 4-Tier AI Engine Architecture
+LifeBloom Hub heavily relies on AI as a background autopilot, utilizing a 4-tier provider strategy to balance speed, reasoning, and cost.
+
+**1. Primary Real-Time Engine (Grok by xAI):**
+- **Sistem & Cara Kerja:** Grok is integrated via the `XAI_API_KEY` configuration. It is exceptionally fast and has real-time context capabilities.
+- **Kegunaan:** Digunakan sebagai mesin utama untuk NLP ringan yang butuh kecepatan tinggi: kategorisasi RSS feed instan, deteksi pilar semantik (Home, Money, Pet), sentiment analysis, dan penulisan ulang judul untuk AEO (AI Engine Optimization).
+
+**2. Primary Advanced Engine (Gemini by Google AI Studio):**
+- **Sistem & Cara Kerja:** Gemini integrated via `GEMINI_API_KEY`.
+- **Kegunaan:** Digunakan sebagai AI utama kedua untuk tugas analitis yang lebih mendalam, penalaran *multi-modal* (gambar & teks), atau ekstraksi data terstruktur panjang (*long-form extraction*) seperti mengubah hasil *scrape* halaman penuh menjadi objek JSON yang siap masuk ke Supabase.
+
+**3. Algorithmic & Backend Engine (Anthropic Claude):**
+- **Sistem & Cara Kerja:** Claude (via `ANTHROPIC_API_KEY`) sangat unggul dalam logika *coding* dan penjadwalan kompleks.
+- **Saran Penggunaan (Sistem & Operasi):** Sangat disarankan untuk memproses tugas internal *backend*: penyusunan algoritma *feed ranking* yang dinamis, orkestrasi *workflow* (memutuskan urutan tugas AI lain), audit keamanan konten, dan ekstraksi *knowledge graph* secara periodik.
+
+**4. Operations & Fallback Engine (OpenAI):**
+- **Sistem & Cara Kerja:** OpenAI (via `OPENAI_API_KEY`) digunakan sebagai pilar stabilitas.
+- **Saran Penggunaan:** Operasi sinkronisasi data skala besar, pembuatan *embedding vectors* untuk pencarian semantik (menggunakan `text-embedding-3-small`), dan operasi *fallback* jika penyedia lain sedang *downtime*.
 
 ### 3.3. Translation Adapter Architecture
 The `TranslationService` in `/src/lib/services/translationAdapter.ts` dynamically routes requests:
