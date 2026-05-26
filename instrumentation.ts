@@ -18,3 +18,13 @@ export async function register() {
     });
   }
 }
+
+// Capture errors from nested React Server Components
+export const onRequestError = async (
+  err: unknown,
+  request: { path: string },
+  context: { routerKind: string }
+) => {
+  const Sentry = await import('@sentry/nextjs');
+  Sentry.captureRequestError(err, request, context);
+};

@@ -9,3 +9,6 @@ Sentry.init({
     Sentry.breadcrumbsIntegration({ console: true }),
   ],
 });
+
+// Required by Sentry SDK to instrument client-side navigations in Next.js 15
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
