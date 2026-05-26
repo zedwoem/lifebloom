@@ -34,3 +34,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Google Cloud Service Accounts
+keys/
+*.json.key
+
+
+# Excluded internal documentation
+docs/
+

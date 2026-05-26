@@ -38,5 +38,27 @@
     "searching": "Mencari...",
     "results_title": "Rekomendasi Perangkat (Matter Certified)",
     "rating": "Rating"
+  },
+  "Community": {
+    "comments_title": "Diskusi & Komentar",
+    "comments_subtitle": "Bagikan pendapat Anda atau ajukan pertanyaan kepada pakar terverifikasi kami.",
+    "write_comment": "Tulis komentar...",
+    "reply": "Balas",
+    "name_label": "Nama Anda",
+    "email_label": "Alamat Email (tidak akan dipublikasikan)",
+    "submit_comment": "Kirim Komentar",
+    "pending_review": "Komentar Anda telah terkirim dan akan muncul setelah disetujui oleh moderator.",
+    "verified_expert": "Pakar Terverifikasi",
+    "guestbook_title": "Dinding Penyemangat",
+    "guestbook_subtitle": "Tinggalkan pesan hangat untuk mendukung komunitas multigenerasional kami.",
+    "guestbook_placeholder": "Tulis pesan harapan atau panduan...",
+    "post_message": "Kirim Pesan",
+    "signin_prompt": "Silakan masuk untuk mengirimkan pesan penyemangat.",
+    "contact_title": "Terhubung Dengan Kami",
+    "contact_subtitle": "Kirim pertanyaan umum, lamaran pakar, atau proposal sponsor.",
+    "tab_contact": "Hubungi Kami",
+    "tab_partner": "Kemitraan & Sponsor",
+    "send_inquiry": "Kirim Proposal",
+    "inquiry_success": "Proposal Anda berhasil dikirim! Tim kami akan segera menanggapi."
   }
 }

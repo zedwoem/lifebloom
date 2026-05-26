@@ -2,52 +2,39 @@
 
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useRouter, useParams } from "next/navigation";
-import { useState, useEffect, FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, Mail, ShieldAlert, CheckCircle2, Lock, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { ShieldAlert, Lock, ChevronRight } from "lucide-react";
 
 export default function LoginPage() {
-  const { user, signInWithMagicLink, loading } = useAuth();
+  const { user, signInWithGoogle, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale as string;
+  const locale = params.locale as string || 'en';
 
-  // Form States
-  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
+      // Role routing is handled by the callback, but as a fallback:
       router.push(`/${locale}/dashboard`);
     }
   }, [user, loading, router, locale]);
 
-  const handleMagicLinkSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setErrorMsg("");
-    setSuccessMsg("");
-
-    if (!email || !email.includes("@")) {
-      setErrorMsg("Please enter a valid email address.");
-      return;
-    }
-
+  const handleGoogleLogin = async () => {
     setIsSubmitting(true);
+    setErrorMsg("");
     try {
-      const { error } = await signInWithMagicLink(email, locale);
+      const { error } = await signInWithGoogle();
       if (error) {
-        setErrorMsg(error.message || "Failed to send magic link. Please try again.");
-      } else {
-        setSuccessMsg("Success! We've sent a secure sign-in link to your email. Please check your inbox (and spam folder) to log in.");
+        setErrorMsg(error.message || "Gagal menghubungi Google SSO. Coba lagi.");
+        setIsSubmitting(false);
       }
+      // If success, Supabase will redirect to the OAuth provider
     } catch (err: any) {
-      setErrorMsg("An unexpected error occurred. Please try again.");
-      console.error(err);
-    } finally {
+      setErrorMsg("Terjadi kesalahan sistem. Silakan coba lagi.");
       setIsSubmitting(false);
     }
   };
@@ -56,93 +43,70 @@ export default function LoginPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-500 font-bold">Verifying secure session...</p>
+          <div className="w-12 h-12 border-4 border-[#006948] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-500 font-bold" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Verifikasi Sesi...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[75vh] flex items-center justify-center p-4">
-      <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-lg w-full border border-slate-100 animate-slide-up">
+    <div className="min-h-[75vh] flex items-center justify-center p-4 bg-[#FFFDF5]">
+      <div className="bg-white p-8 md:p-12 rounded-3xl shadow-soft-ambient max-w-[480px] w-full border border-slate-100/80 animate-in fade-in slide-in-from-bottom-4">
         
         {/* Brand Icon and Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-            <Lock className="w-8 h-8 text-brand-blue" />
+        <div className="text-center mb-10">
+          <div className="w-16 h-16 bg-[#eef0ff] rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#dae2fd]">
+            <Lock className="w-8 h-8 text-indigo-600" />
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-800">Secure Access Control</h1>
-          <p className="text-slate-500 mt-2 text-base">
-            Sign in to access your secure LifeBloom Hub profile, calculations, and active collections.
+          <h1 className="text-[28px] font-extrabold tracking-tight text-[#131b2e] mb-3" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+            Akses Aman
+          </h1>
+          <p className="text-slate-500 text-[18px] leading-relaxed">
+            Masuk untuk mengakses dasbor personalisasi, kalkulator terenkripsi, dan forum komunitas eksklusif.
           </p>
         </div>
 
         {/* Alert Notifications */}
         {errorMsg && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-start gap-3 text-sm font-semibold">
-            <ShieldAlert className="w-5 h-5 shrink-0 text-red-500" />
+          <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl flex items-start gap-3 text-[16px] font-semibold">
+            <ShieldAlert className="w-5 h-5 shrink-0 text-rose-500 mt-0.5" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        {successMsg && (
-          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-850 rounded-xl flex items-start gap-3 text-sm font-semibold">
-            <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-500" />
-            <span>{successMsg}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleMagicLinkSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="email-input" className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                id="email-input"
-                name="email"
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSubmitting || successMsg.length > 0}
-                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-base focus:outline-none focus:ring-2 focus:ring-brand-blue min-h-[50px] disabled:opacity-50"
-                required
-              />
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            disabled={isSubmitting || successMsg.length > 0}
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 text-base rounded-2xl min-h-[50px] flex items-center justify-center gap-2 shadow-md transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Requesting Secure Key...</span>
-              </>
-            ) : (
-              <>
-                <span>Send Passwordless Magic Link</span>
-                <ChevronRight className="w-4 h-4" />
-              </>
-            )}
-          </Button>
-        </form>
+        {/* Massive Accessible Google Button */}
+        <Button
+          onClick={handleGoogleLogin}
+          disabled={isSubmitting}
+          className="w-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-bold text-[18px] rounded-xl h-[60px] flex items-center justify-center gap-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+        >
+          {isSubmitting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
+              <span>Menghubungkan...</span>
+            </>
+          ) : (
+            <>
+              <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                <path fill="none" d="M0 0h48v48H0z"/>
+              </svg>
+              <span>Continue with Google</span>
+              <ChevronRight className="w-5 h-5 ml-auto text-slate-400" />
+            </>
+          )}
+        </Button>
 
         <div className="mt-8 text-center border-t border-slate-100 pt-6">
-          <p className="text-slate-500 text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href={`/${locale}/register`} className="font-bold text-brand-blue hover:text-brand-green transition-colors">
-              Create one now
-            </Link>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi kami. Data Anda tidak akan pernah dijual kepada pihak ketiga.
           </p>
         </div>
       </div>
     </div>
   );
 }
-

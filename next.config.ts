@@ -1,4 +1,5 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
@@ -15,6 +16,29 @@ const nextConfig = {
       { protocol: 'https' as const, hostname: 'ui-avatars.com' }
     ],
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' }
+        ]
+      }
+    ];
+  }
 };
 
-export default withNextIntl(nextConfig);
+export default withSentryConfig(
+  withNextIntl(nextConfig),
+  {
+    org: "zedwoem",
+    project: "javascript-nextjs",
+    silent: !process.env.CI,
+    widenClientFileUpload: true,
+    tunnelRoute: "/monitoring",
+    disableLogger: true,
+  }
+);

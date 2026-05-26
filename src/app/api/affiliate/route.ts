@@ -29,8 +29,36 @@ export async function GET(req: Request) {
     redirectUrl = `${supabaseUrl}/functions/v1/affiliate-url-rewrite?vendor=b2b&product_id=${productId}`;
     linkType = 'sponsored_placement';
   } else if (vendor === 'editorial' && productId) {
-    redirectUrl = productId; // Target URL is passed in product_id for outgoing links
-    linkType = 'editorial_outgoing';
+    // Prevent open redirect / SSRF by validating the redirect target
+    try {
+      const parsedUrl = new URL(productId);
+      const allowedDomains = [
+        'amazon.com',
+        'www.amazon.com',
+        'chewy.com',
+        'www.chewy.com',
+        'travelpayouts.com',
+        'www.travelpayouts.com'
+      ];
+      
+      if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
+        return NextResponse.json({ error: 'Invalid protocol' }, { status: 400 });
+      }
+      
+      const hostname = parsedUrl.hostname.toLowerCase();
+      const isAllowed = allowedDomains.some(domain => 
+        hostname === domain || hostname.endsWith('.' + domain)
+      );
+
+      if (!isAllowed) {
+        return NextResponse.json({ error: 'Domain is not in editorial allowlist' }, { status: 400 });
+      }
+
+      redirectUrl = productId;
+      linkType = 'editorial_outgoing';
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid destination URL format' }, { status: 400 });
+    }
   }
 
   // Record click event in affiliate_clicks table asynchronously (non-blocking)

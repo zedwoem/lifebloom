@@ -28,7 +28,12 @@ export async function POST(req: NextRequest) {
 
     // Call the corresponding Supabase edge function with cron token authorization
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pusqytkxmoytvmajjodb.supabase.co";
-    const cronSecret = process.env.CRON_SECRET || "lifebloom-cron-secret";
+    const cronSecret = process.env.CRON_SECRET;
+
+    if (!cronSecret) {
+      console.error("[Cron-Trigger] CRON_SECRET environment variable is not defined.");
+      return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+    }
 
     const functionUrl = `${supabaseUrl}/functions/v1/${job}`;
     const response = await fetch(functionUrl, {
@@ -44,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     // Record the execution log inside system_cron_logs
     const { createAdminClient } = await import("@/lib/supabase/admin");
-    const adminSupabase = createAdminClient() as any;
+    const adminSupabase = createAdminClient();
 
     // Parse processed count and deduplicated duplicates blocked count
     const processed = responseData.count || 0;

@@ -3,30 +3,55 @@
 import React, { useState } from "react";
 import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation";
 
 const TRANSLATIONS = {
-  title: "Pet Matchmaker",
-  subtitle: "Find the ideal dog breed based on your lifestyle, living space, and daily availability.",
-  labelSpace: "Your Living Space",
-  spaceSmall: "Small (Apartment)",
-  spaceLarge: "Large (House with Yard)",
-  labelTime: "Daily Free Time for Pet Activity",
-  timeLow: "Low (< 1 Hour)",
-  timeMedium: "Medium (1 - 2 Hours)",
-  timeHigh: "High (> 2 Hours)",
-  btnSubmit: "Analyze Match",
-  btnSubmitLoading: "Analyzing Match...",
-  resultsTitle: "Recommended Breeds:",
-  seeInsurance: "View Pet Insurance Options →",
-  breeds: [
-    { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Very friendly and requires plenty of exercise." },
-    { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Perfect for apartments, moderate energy level." },
-    { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Fast runner but loves to lounge around the house." }
-  ]
+  en: {
+    title: "Pet Matchmaker",
+    subtitle: "Find the ideal dog breed based on your lifestyle, living space, and daily availability.",
+    labelSpace: "Your Living Space",
+    spaceSmall: "Small (Apartment)",
+    spaceLarge: "Large (House with Yard)",
+    labelTime: "Daily Free Time for Pet Activity",
+    timeLow: "Low (< 1 Hour)",
+    timeMedium: "Medium (1 - 2 Hours)",
+    timeHigh: "High (> 2 Hours)",
+    btnSubmit: "Analyze Match",
+    btnSubmitLoading: "Analyzing Match...",
+    resultsTitle: "Recommended Breeds:",
+    seeInsurance: "View Pet Insurance Options →",
+    breeds: [
+      { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Very friendly and requires plenty of exercise." },
+      { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Perfect for apartments, moderate energy level." },
+      { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Fast runner but loves to lounge around the house." }
+    ]
+  },
+  id: {
+    title: "Pencocok Hewan Peliharaan",
+    subtitle: "Temukan ras anjing ideal berdasarkan gaya hidup, ruang tinggal, dan ketersediaan aktivitas harian Anda.",
+    labelSpace: "Ruang Tinggal Anda",
+    spaceSmall: "Kecil (Apartemen)",
+    spaceLarge: "Besar (Rumah dengan Halaman)",
+    labelTime: "Waktu Luang Harian untuk Aktivitas Hewan",
+    timeLow: "Sedikit (< 1 Jam)",
+    timeMedium: "Sedang (1 - 2 Jam)",
+    timeHigh: "Banyak (> 2 Jam)",
+    btnSubmit: "Analisis Kecocokan",
+    btnSubmitLoading: "Menganalisis Kecocokan...",
+    resultsTitle: "Ras yang Direkomendasikan:",
+    seeInsurance: "Lihat Opsi Asuransi Hewan →",
+    breeds: [
+      { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Sangat bersahabat dan membutuhkan banyak aktivitas fisik." },
+      { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Sempurna untuk apartemen, tingkat energi sedang." },
+      { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Pelari cepat tetapi sangat suka bersantai di dalam rumah." }
+    ]
+  }
 };
 
 export function PetMatchmaker() {
-  const t = TRANSLATIONS;
+  const params = useParams();
+  const locale = (params?.locale as string) === "id" ? "id" : "en";
+  const t = TRANSLATIONS[locale];
 
   const [space, setSpace] = useState<"small" | "large" | "">("");
   const [time, setTime] = useState<"low" | "medium" | "high" | "">("");
@@ -44,13 +69,19 @@ export function PetMatchmaker() {
       await new Promise(r => setTimeout(r, 1000));
       clearTimeout(timeoutId);
 
-      // Offline JSON fallback filtering
-      const matched = t.breeds.filter(b => b.space === space || b.time === time);
+      // Offline JSON fallback filtering - strict matching (AND) with loose fallback (OR)
+      let matched = t.breeds.filter(b => b.space === space && b.time === time);
+      if (matched.length === 0) {
+        matched = t.breeds.filter(b => b.space === space || b.time === time);
+      }
       setResults(matched.length > 0 ? matched : t.breeds);
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.warn("Petfinder API timeout. Using local fallback JSON.");
-        const matched = t.breeds.filter(b => b.space === space || b.time === time);
+        let matched = t.breeds.filter(b => b.space === space && b.time === time);
+        if (matched.length === 0) {
+          matched = t.breeds.filter(b => b.space === space || b.time === time);
+        }
         setResults(matched.length > 0 ? matched : t.breeds);
       }
     } finally {
@@ -72,7 +103,7 @@ export function PetMatchmaker() {
                 id="space-small-btn"
                 name="space-option"
                 variant={space === "small" ? "primary" : "outline"}
-                className={`min-h-[48px] px-6 text-lg ${space === "small" ? "bg-brand-blue text-white" : ""}`}
+                className={`min-h-[52px] px-6 text-lg ${space === "small" ? "bg-brand-blue text-white" : ""}`}
                 onClick={() => setSpace("small")}
               >
                 {t.spaceSmall}
@@ -81,7 +112,7 @@ export function PetMatchmaker() {
                 id="space-large-btn"
                 name="space-option"
                 variant={space === "large" ? "primary" : "outline"}
-                className={`min-h-[48px] px-6 text-lg ${space === "large" ? "bg-brand-blue text-white" : ""}`}
+                className={`min-h-[52px] px-6 text-lg ${space === "large" ? "bg-brand-blue text-white" : ""}`}
                 onClick={() => setSpace("large")}
               >
                 {t.spaceLarge}
@@ -96,7 +127,7 @@ export function PetMatchmaker() {
                 id="time-low-btn"
                 name="time-option"
                 variant={time === "low" ? "primary" : "outline"}
-                className={`min-h-[48px] px-6 text-lg ${time === "low" ? "bg-brand-green text-white" : ""}`}
+                className={`min-h-[52px] px-6 text-lg ${time === "low" ? "bg-brand-green text-white" : ""}`}
                 onClick={() => setTime("low")}
               >
                 {t.timeLow}
@@ -105,7 +136,7 @@ export function PetMatchmaker() {
                 id="time-medium-btn"
                 name="time-option"
                 variant={time === "medium" ? "primary" : "outline"}
-                className={`min-h-[48px] px-6 text-lg ${time === "medium" ? "bg-brand-green text-white" : ""}`}
+                className={`min-h-[52px] px-6 text-lg ${time === "medium" ? "bg-brand-green text-white" : ""}`}
                 onClick={() => setTime("medium")}
               >
                 {t.timeMedium}
@@ -114,7 +145,7 @@ export function PetMatchmaker() {
                 id="time-high-btn"
                 name="time-option"
                 variant={time === "high" ? "primary" : "outline"}
-                className={`min-h-[48px] px-6 text-lg ${time === "high" ? "bg-brand-green text-white" : ""}`}
+                className={`min-h-[52px] px-6 text-lg ${time === "high" ? "bg-brand-green text-white" : ""}`}
                 onClick={() => setTime("high")}
               >
                 {t.timeHigh}
@@ -127,7 +158,7 @@ export function PetMatchmaker() {
           id="pet-match-submit-btn"
           onClick={handleMatch}
           disabled={!space || !time || isLoading}
-          className="w-full min-h-[48px] text-lg bg-slate-800 text-white font-bold"
+          className="w-full min-h-[52px] text-lg bg-slate-800 text-white font-bold"
         >
           {isLoading ? t.btnSubmitLoading : t.btnSubmit}
         </Button>

@@ -1,6 +1,7 @@
 "use server";
 
 import * as cheerio from 'cheerio';
+import { Redis } from '@upstash/redis';
 
 export interface ScrapedDeal {
   bankName: string;
@@ -14,6 +15,17 @@ export interface ScrapedDeal {
  * Fetches live CD rates. We use a mock-fallback pattern in case the target site blocks the scraper.
  */
 export async function scrapeLiveCDRates(): Promise<ScrapedDeal[]> {
+  // Try to load from Upstash Redis cache first to prevent IP bans / Cloudflare blocks
+  try {
+    const redis = Redis.fromEnv();
+    const cached = await redis.get<ScrapedDeal[]>("cache:scraped_cd_rates");
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      return cached;
+    }
+  } catch (e) {
+    console.warn("[Scraper Cache] Failed to load cached CD rates from Redis:", e);
+  }
+
   try {
     // We target a generic finance informational page or simulate the request
     // For MVP demonstration, we will try to scrape a standard table structure.
@@ -66,8 +78,19 @@ export async function scrapeLiveCDRates(): Promise<ScrapedDeal[]> {
     // If scraper succeeded but DOM changed, provide our dynamic fallback 
     // to ensure the UI demonstration works flawlessly for the MVP
     if (deals.length === 0) {
-      return getFallbackDeals();
+      const fallback = getFallbackDeals();
+      try {
+        const redis = Redis.fromEnv();
+        await redis.set("cache:scraped_cd_rates", fallback, { ex: 86400 }); // Cache fallback for 24h
+      } catch (e) {}
+      return fallback;
     }
+
+    // Cache successfully scraped deals in Redis for 24 hours
+    try {
+      const redis = Redis.fromEnv();
+      await redis.set("cache:scraped_cd_rates", deals, { ex: 86400 });
+    } catch (e) {}
 
     return deals;
 

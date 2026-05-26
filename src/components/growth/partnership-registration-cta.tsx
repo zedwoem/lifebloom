@@ -31,15 +31,16 @@ export function PartnershipRegistrationCTA() {
             LifeBloom Hub membuka pintu kemitraan resmi untuk Pakar Medis, Penasihat Finansial, Organisasi Nirlaba, hingga *Brand* Inklusif. Daftarkan profil entitas Anda untuk diverifikasi oleh sistem.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="min-h-[56px] px-8 text-lg bg-brand-green hover:bg-brand-green-dark text-white shadow-lg shadow-brand-green/20 rounded-xl font-bold flex items-center justify-center transition-all hover:scale-105">
-              <UserCircle2 className="w-5 h-5 mr-2" />
-              Daftar sebagai Pakar
-            </Button>
-            <Button variant="outline" className="min-h-[56px] px-8 text-lg bg-white/5 hover:bg-white/10 text-white border-white/20 backdrop-blur-sm rounded-xl font-bold flex items-center justify-center transition-all">
-              <Building2 className="w-5 h-5 mr-2" />
-              Registrasi Institusi/Brand
-            </Button>
+          <div className="w-full mt-6 bg-white/10 rounded-xl p-4 border border-white/20 backdrop-blur-sm">
+            <iframe 
+              data-tally-src="https://tally.so/embed/mrxG7p?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" 
+              loading="lazy" 
+              width="100%" 
+              height="200" 
+              style={{ border: "none" }}
+              title="Partnership Registration">
+            </iframe>
+            <script dangerouslySetInnerHTML={{ __html: `var d=document,w="https://tally.so/widgets/embed.js",v=function(){"undefined"!=typeof Tally?Tally.loadEmbeds():d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach((function(e){e.src=e.dataset.tallySrc}))};if("undefined"!=typeof Tally)v();else if(d.querySelector('script[src="'+w+'"]')==null){var s=d.createElement("script");s.src=w,s.onload=v,s.onerror=v,d.body.appendChild(s);}` }} />
           </div>
         </div>
 

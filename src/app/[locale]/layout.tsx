@@ -17,7 +17,7 @@ import { WebSite, WithContext } from 'schema-dts';
 
 import { GlobalSearch } from '@/components/ui/global-search';
 import Link from 'next/link';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Home, Search, LifeBuoy } from 'lucide-react';
 import OnboardingOverlay from '@/components/ui/onboarding-overlay';
 import { NavbarUserStatus } from '@/components/ui/navbar-user-status';
 import NextTopLoader from 'nextjs-toploader';
@@ -58,6 +58,21 @@ export default async function LocaleLayout({
         <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
         <meta name="theme-color" content="#1E3A8A" />
         <StructuredData data={websiteSchema} />
+        
+        {/* Affiliate Marketing Verification & Scripts */}
+        {process.env.IMPACT_VERIFICATION_TAG && (
+          <meta name="impact-site-verification" content={process.env.IMPACT_VERIFICATION_TAG} />
+        )}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Travelpayouts Integration
+              window.travelpayoutsConfig = { enable: true };
+              // Partnerize Cryptographic Tag
+              window.partnerizeConfig = { enabled: true };
+            `
+          }}
+        />
         
         {/* OneSignal Setup */}
         <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -106,7 +121,7 @@ export default async function LocaleLayout({
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col font-sans bg-warm-beige text-slate-900">
+      <body className="min-h-screen flex flex-col font-sans bg-background text-slate-900">
         <NextTopLoader color="#10B981" showSpinner={false} />
         <Toaster position="bottom-right" richColors />
         <div className="gtranslate_wrapper"></div>
@@ -133,39 +148,78 @@ export default async function LocaleLayout({
         />
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
-            <header className="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 border-b border-slate-200">
-              <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-                <Link href={`/${locale}`} className="flex items-center gap-2 text-brand-blue font-black text-lg md:text-xl font-display shrink-0 min-w-0">
+            <header className="sticky top-0 z-40 w-full bg-[#FFFDF5]/95 border-b border-slate-200 shadow-sm backdrop-blur-md">
+              <div className="max-w-[1120px] mx-auto px-6 h-[72px] flex items-center justify-between">
+                <Link href={`/${locale}`} className="flex items-center gap-2 text-[#006948] font-black text-xl hover:scale-[1.02] transition-transform duration-200" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
                   <Image src="/logo.png" width={32} height={32} alt="LifeBloom Logo" className="rounded-xl object-contain shrink-0" />
-                  <span className="truncate hidden sm:block md:hidden lg:block max-w-[150px] md:max-w-none">LifeBloom Hub</span>
+                  <span className="truncate hidden sm:block">LifeBloom Hub</span>
                 </Link>
-                <div className="flex-1 max-w-md mx-6 hidden md:block">
-                  <GlobalSearch />
-                </div>
-                <nav className="flex items-center gap-6">
-                  <Link href={`/${locale}`} className="hidden md:block text-sm font-semibold text-slate-600 hover:text-brand-blue transition-colors">
+                
+                {/* Desktop Linear Nav */}
+                <nav className="hidden md:flex items-center gap-8">
+                  <Link href={`/${locale}`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
                     Home
                   </Link>
-                  <Link href={`/${locale}/support`} className="hidden md:block text-sm font-semibold text-slate-600 hover:text-brand-blue transition-colors">
+                  <Link href={`/${locale}/senior`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
+                    Senior Care
+                  </Link>
+                  <Link href={`/${locale}/money-future`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
+                    Wealth
+                  </Link>
+                  <Link href={`/${locale}/support`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
                     Helpdesk
                   </Link>
+                  <div className="h-6 w-px bg-slate-200 mx-2"></div>
                   <NavbarUserStatus />
-                  <div className="md:hidden">
-                    <GlobalSearch />
-                  </div>
                 </nav>
+
+                <div className="md:hidden flex items-center gap-3">
+                  <GlobalSearch />
+                </div>
               </div>
             </header>
+
             <OnboardingOverlay />
-            <main className="flex-grow">
+
+            <main className="flex-grow pb-24 md:pb-0 bg-[#FFFDF5]">
               {children}
             </main>
-            <footer className="bg-white border-t border-slate-200 py-12 mt-20">
-              <div className="container mx-auto px-6 text-center text-slate-500 text-sm">
-                &copy; {new Date().getFullYear()} LifeBloom Hub. All rights reserved. <br/>
-                <Link href={locale === 'en' ? '/support/terms' : `/${locale}/support/terms`} className="hover:text-brand-green transition-colors">Terms of Service</Link> | <Link href={locale === 'en' ? '/support/privacy' : `/${locale}/support/privacy`} className="hover:text-brand-green transition-colors">Privacy Policy</Link>
+
+            <footer className="bg-white border-t border-slate-200 py-16 mt-12 pb-32 md:pb-16">
+              <div className="max-w-[1120px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+                <div>
+                  <h4 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>LifeBloom Hub</h4>
+                  <p className="text-sm text-slate-500 max-w-sm">
+                    A safe, ad-free harbor. We don’t track your cookies, and we don’t sell your data. We build tools for those who depend on you.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-6 text-sm font-bold text-slate-600">
+                  <Link href={`/${locale}/join-us`} className="hover:text-[#006948] min-h-[44px] flex items-center justify-center">Partner With Us</Link>
+                  <Link href={`/${locale}/support/privacy`} className="hover:text-[#006948] min-h-[44px] flex items-center justify-center">Privacy Policy</Link>
+                  <Link href={`/${locale}/support/terms`} className="hover:text-[#006948] min-h-[44px] flex items-center justify-center">Terms of Service</Link>
+                </div>
               </div>
             </footer>
+
+            {/* Mobile Bottom Navbar (Web-App Native Experience) */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-slate-200 shadow-[0_-4px_24px_rgba(15,23,42,0.08)] backdrop-blur-md flex items-center justify-around h-[72px] pb-[env(safe-area-inset-bottom)] px-2">
+              <Link href={`/${locale}`} className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#006948] transition-colors w-[64px] h-[52px] shrink-0">
+                <Home className="w-6 h-6" />
+                <span className="text-[10px] font-bold">Home</span>
+              </Link>
+              <Link href={`/${locale}/search`} className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#006948] transition-colors w-[64px] h-[52px] shrink-0">
+                <Search className="w-6 h-6" />
+                <span className="text-[10px] font-bold">Search</span>
+              </Link>
+              <Link href={`/${locale}/dashboard`} className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#006948] transition-colors w-[64px] h-[52px] shrink-0">
+                <LayoutDashboard className="w-6 h-6" />
+                <span className="text-[10px] font-bold">Portal</span>
+              </Link>
+              <Link href={`/${locale}/support`} className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#006948] transition-colors w-[64px] h-[52px] shrink-0">
+                <LifeBuoy className="w-6 h-6" />
+                <span className="text-[10px] font-bold">Help</span>
+              </Link>
+            </div>
           </AuthProvider>
         </NextIntlClientProvider>
         <Analytics />

@@ -31,7 +31,7 @@ export default function VideoHubPage() {
 
   if (!activeVideo) {
     return (
-      <div className="min-h-screen bg-warm-beige py-12 flex items-center justify-center">
+      <div className="min-h-screen bg-background py-12 flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
           <Tv className="w-12 h-12 text-brand-green/50 mb-4" />
           <p className="text-brand-blue font-bold">Loading Masterclasses...</p>
@@ -41,7 +41,7 @@ export default function VideoHubPage() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-beige py-12">
+    <div className="min-h-screen bg-background py-12">
       <div className="container mx-auto px-6 max-w-6xl">
         <div className="flex items-center gap-4 mb-10">
           <div className="p-4 bg-emerald-100 rounded-2xl text-emerald-600">

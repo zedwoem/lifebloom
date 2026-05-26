@@ -9,10 +9,25 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: authData, error } = await supabase.auth.exchangeCodeForSession(code)
     
-    if (!error) {
-      return NextResponse.redirect(`${requestUrl.origin}/${locale}/dashboard`)
+    if (!error && authData?.user) {
+      // Determine Role for Redirect
+      const { data: profile } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single();
+        
+      let redirectPath = `/${locale}/saved`; // Default for standard users
+      
+      if (profile?.role === 'admin') {
+        redirectPath = `/${locale}/admin`;
+      } else if (profile?.role === 'expert') {
+        redirectPath = `/${locale}/dashboard`;
+      }
+      
+      return NextResponse.redirect(`${requestUrl.origin}${redirectPath}`)
     } else {
       console.error("Auth callback error:", error)
     }

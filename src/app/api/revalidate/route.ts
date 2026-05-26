@@ -5,7 +5,12 @@ export async function POST(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const secret = searchParams.get("secret");
-    const token = process.env.REVALIDATE_TOKEN || "lifebloom-revalidate-secret";
+    const token = process.env.REVALIDATE_TOKEN;
+
+    if (!token) {
+      console.error("[Revalidate] REVALIDATE_TOKEN environment variable is not defined.");
+      return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+    }
 
     if (secret !== token) {
       return NextResponse.json({ error: "Invalid revalidation secret" }, { status: 401 });
@@ -42,7 +47,12 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const secret = searchParams.get("secret");
-    const token = process.env.REVALIDATE_TOKEN || "lifebloom-revalidate-secret";
+    const token = process.env.REVALIDATE_TOKEN;
+
+    if (!token) {
+      console.error("[Revalidate] REVALIDATE_TOKEN environment variable is not defined.");
+      return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
+    }
 
     if (secret !== token) {
       return NextResponse.json({ error: "Invalid revalidation secret" }, { status: 401 });

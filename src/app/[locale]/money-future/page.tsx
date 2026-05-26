@@ -1,6 +1,6 @@
 import { PILLARS } from '@/lib/constants/pillars';
 import { notFound } from 'next/navigation';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { RetirementCalculator } from "@/components/calculators/retirement-calculator";
 import { YieldRadar } from "@/components/calculators/yield-radar";
@@ -21,39 +21,55 @@ export default async function PillarPage({
   }
 
   return (
-    <div className="min-h-screen bg-warm-beige relative overflow-hidden pb-20">
-      <div className="absolute top-0 left-0 w-full h-[28rem] md:h-80 bg-brand-blue rounded-b-[3rem] shadow-xl z-0"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-green/20 rounded-full blur-3xl z-0 -translate-y-1/2 translate-x-1/3"></div>
+    <div className="relative min-h-screen bg-background pb-20 overflow-x-hidden">
+      
+      {/* Decorative Warm Ambient Background */}
+      <div className="ambient-bg" />
+      <div className="absolute top-0 left-0 w-full h-[32rem] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none z-0"></div>
 
-      <div className="container mx-auto px-6 pt-10 max-w-5xl relative z-10 animate-fade-in">
+      <div className="container mx-auto px-gutter-mobile md:px-margin-desktop pt-10 max-w-container-max relative z-10 animate-fade-in">
+        
+        {/* Navigation Breadcrumb */}
         <Link 
           href={`/${locale}`}
-          className="inline-flex items-center text-white/80 hover:text-white mb-10 transition-colors font-medium"
+          className="inline-flex items-center gap-2 text-primary hover:text-primary-container mb-8 transition-all font-bold group min-h-[52px]"
         >
-          <ChevronLeft className="w-5 h-5 mr-1" />
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           Back to Home
         </Link>
 
-        <header className="mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white border border-white/20 text-sm font-semibold mb-6 backdrop-blur-sm">
-            Core Category
+        {/* Dynamic Category Header */}
+        <header className="mb-12 max-w-article-max">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-bold mb-4">
+            Core Care Segment
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white font-display tracking-tight mb-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground font-display tracking-tight mb-4">
             {pillar.label}
           </h1>
-          <p className="text-xl text-brand-blue-light/90 text-white/80 max-w-2xl leading-relaxed">
-            A centralized hub of information and smart tools specifically designed to simplify your {pillar.label.toLowerCase()} needs.
+          <p className="text-body-lg text-on-surface-variant leading-relaxed">
+            A centralized secure financial planning hub designed to organize your retirement roadmap, family legacy, and yield optimization strategies gently.
           </p>
         </header>
 
-        <div className="mt-12 w-full max-w-4xl mx-auto space-y-8">
-          <RetirementCalculator />
-          <YieldRadar />
-        </div>
+        {/* Above-the-fold Interactive Widgets */}
+        <section className="w-full max-w-4xl mx-auto space-y-8 mb-12">
+          <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+            <RetirementCalculator />
+          </div>
+          <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+            <YieldRadar />
+          </div>
+        </section>
 
-        <div className="mt-12 w-full max-w-4xl mx-auto space-y-8">
-          <AccessibleNewsFeed pillarSlug={slug} />
-        </div>
+        {/* Contextual Articles & News Feed */}
+        <section className="w-full max-w-4xl mx-auto space-y-8">
+          <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+            <h2 className="text-2xl font-bold text-foreground mb-6 font-display border-b border-border pb-4">
+              Latest Insights & Expert Articles
+            </h2>
+            <AccessibleNewsFeed pillarSlug={slug} />
+          </div>
+        </section>
 
       </div>
     </div>

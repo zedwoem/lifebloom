@@ -24,8 +24,7 @@ export async function POST(request: Request) {
     const orcidId = data.orcid ? data.orcid.replace("https://orcid.org/", "") : null;
 
     // Update Supabase
-    const expertProfilesTable = supabase.from("expert_profiles") as any;
-    const { error: updateError } = await expertProfilesTable
+    const { error: updateError } = await supabase.from("expert_profiles")
       .update({
         h_index: hIndex,
         citation_count: citationCount,

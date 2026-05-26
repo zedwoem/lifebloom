@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   
   try {
     const { createAdminClient } = await import("@/lib/supabase/admin");
-    const adminSupabase = createAdminClient() as any;
+    const adminSupabase = createAdminClient();
     
     // Low-level reverse lookup / IP cloud range validation:
     // Exclude private/loopback addresses; in production this maps against known OpenAI/Perplexity CIDR ranges

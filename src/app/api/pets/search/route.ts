@@ -3,28 +3,34 @@ import { fetchWithTimeout } from '@/lib/utils/apiTimeout';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const location = searchParams.get('location') || '10001';
+  const animalType = searchParams.get('type') || 'dog'; // 'dog' or 'cat'
+  const limit = searchParams.get('limit') || '10';
 
   try {
-    const apiUrl = `https://api.petfinder.com/v2/animals?location=${location}&status=adoptable`;
+    let apiUrl = '';
+    let apiKey = '';
+
+    if (animalType === 'cat') {
+      apiUrl = `https://api.thecatapi.com/v1/images/search?limit=${limit}&has_breeds=1`;
+      apiKey = process.env.THECATAPI_KEY || '';
+    } else {
+      apiUrl = `https://api.thedogapi.com/v1/images/search?limit=${limit}&has_breeds=1`;
+      apiKey = process.env.THEDOGAPI_KEY || '';
+    }
     
-    // Fallback static JSON for strict timeout
-    const fallbackData = {
-      animals: [
-        { id: 1, name: 'Local Fallback Dog', type: 'Dog', breeds: { primary: 'Mixed' } },
-        { id: 2, name: 'Local Fallback Cat', type: 'Cat', breeds: { primary: 'Domestic Shorthair' } }
-      ]
-    };
+    const fallbackData = [
+      { id: 'fb1', url: '', breeds: [{ name: 'Local Fallback Dog', breed_group: 'Mixed', temperament: 'Friendly' }] }
+    ];
 
     const options = {
       headers: {
-        'Authorization': `Bearer ${process.env.PETFINDER_MOCK_TOKEN || 'mock-token'}`
+        'x-api-key': apiKey
       }
     };
 
     const data = await fetchWithTimeout<any>(apiUrl, options, 4000, fallbackData);
 
-    return NextResponse.json(data);
+    return NextResponse.json({ animals: data });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

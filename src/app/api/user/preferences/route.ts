@@ -26,10 +26,10 @@ export async function POST(request: Request) {
     const { userId, preferences } = await request.json();
     if (!userId) return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
 
-    const supabase = createAdminClient() as any;
+    const supabase = createAdminClient();
     const { error } = await supabase
       .from('users')
-      .update({ preferences } as any)
+      .update({ preferences })
       .eq('id', userId);
 
     if (error) throw error;

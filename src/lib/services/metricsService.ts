@@ -29,7 +29,7 @@ export const MetricsService = {
       p_type: type,
       p_title: title,
       p_category: category,
-      p_user_id: userId || null
+      p_user_id: userId || undefined
     });
 
     if (error) {

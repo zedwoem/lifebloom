@@ -9,7 +9,7 @@ export default async function SubroutePage({
 }) {
   const { locale } = await params;
   return (
-    <div className="min-h-screen bg-warm-beige p-6">
+    <div className="min-h-screen bg-background p-6">
       <Link href={`/${locale}`} className="inline-flex items-center text-brand-blue mb-6">
         <ChevronLeft className="w-5 h-5 mr-1" />
         Back

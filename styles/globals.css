@@ -1,68 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 44 33% 97%; /* warm-beige #fdfbf7 */
-    --foreground: 222.2 84% 4.9%;
+    --background: 48 40% 98%; /* #FFFDF5 Warm Soft Cream */
+    --foreground: 222 43% 13%; /* #131b2e Deep Charcoal */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 43% 13%;
  
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 43% 13%;
  
-    --primary: 226 71% 40%; /* brand-blue #1e40af */
-    --primary-foreground: 210 40% 98%;
+    --primary: 161 100% 21%; /* #006948 Warm Sage Green */
+    --primary-foreground: 0 0% 100%;
  
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 32 100% 28%; /* #904d00 Muted Clay Orange */
+    --secondary-foreground: 0 0% 100%;
  
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 228 100% 96%; /* #eaedff */
+    --muted-foreground: 146 8% 25%; /* #3d4a42 */
  
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 29 99% 58%; /* #fe932c */
+    --accent-foreground: 31 100% 20%; /* #663500 */
  
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 226 71% 40%;
+    --border: 146 12% 76%; /* #bccac0 */
+    --input: 228 100% 96%; /* #eaedff */
+    --ring: 161 100% 21%;
  
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* rounded-xl by default */
   }
- 
+
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* Safe-mode override: strictly Warm Light. No pure dark mode is supported per Design Mandate */
+    --background: 48 40% 98%;
+    --foreground: 222 43% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 43% 13%;
+    --primary: 161 100% 21%;
+    --primary-foreground: 0 0% 100%;
+    --border: 146 12% 76%;
+    --input: 228 100% 96%;
+    --ring: 161 100% 21%;
   }
 }
  
@@ -71,13 +56,66 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    font-size: 16px;
+    @apply bg-background text-foreground overflow-x-hidden min-h-screen flex flex-col relative;
+    font-family: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, sans-serif;
+    font-size: 18px;
     line-height: 1.6;
+    letter-spacing: -0.01em;
   }
   
-  /* Accessibility: Focus visible styling */
+  /* Accessibility: Focus visible styling - Transparent Emerald Halo */
   *:focus-visible {
-    @apply outline-none ring-4 ring-ring ring-offset-2 ring-offset-background;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 105, 72, 0.25);
   }
+}
+
+/* Custom design utilities */
+.soft-shadow {
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+}
+
+.focus-ring:focus-within {
+  box-shadow: 0 0 0 4px rgba(0, 105, 72, 0.25);
+  outline: none;
+  border-color: #006948;
+}
+
+/* Accessible Ambient Glows */
+.ambient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top right, rgba(226, 231, 255, 0.4), transparent 50%),
+              radial-gradient(circle at bottom left, rgba(218, 226, 253, 0.4), transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* High Contrast Cataract/Glaukoma Mode override */
+.high-contrast-mode {
+  --background: 0 0% 0% !important;
+  --foreground: 60 100% 50% !important; /* Yellow */
+  --card: 0 0% 0% !important;
+  --card-foreground: 60 100% 50% !important;
+  --primary: 60 100% 50% !important;
+  --primary-foreground: 0 0% 0% !important;
+  --border: 60 100% 50% !important;
+  --input: 0 0% 0% !important;
+  --ring: 60 100% 50% !important;
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+}
+
+.high-contrast-mode * {
+  border-color: #ffff00 !important;
+  color: #ffff00 !important;
+  background-color: transparent !important;
+}
+
+.high-contrast-mode button,
+.high-contrast-mode a {
+  outline: 2px solid #ffff00 !important;
 }

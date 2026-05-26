@@ -35,7 +35,7 @@ function SearchResultsContent() {
   }
 
   return (
-    <div className="min-h-[70vh] bg-warm-beige py-12">
+    <div className="min-h-[70vh] bg-background py-12">
       <div className="container mx-auto px-6 max-w-4xl">
         <div className="flex items-center gap-4 mb-10">
           <div className="p-4 bg-brand-blue/10 rounded-2xl text-brand-blue">

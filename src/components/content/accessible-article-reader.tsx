@@ -9,6 +9,7 @@ import { EmbedGenerator } from '@/components/ui/embed-generator';
 import { SponsorShowcase } from '@/components/content/sponsor-showcase';
 import { generateProfile } from '@/lib/utils/profileGenerator';
 import { RelatedPostsWidget } from '@/components/content/related-posts-widget';
+import { AccessibleReaderBar } from '@/components/content/accessible-reader-bar';
 
 export function AccessibleArticleReader({ article, locale, slug }: { article: any, locale: string, slug: string }) {
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
@@ -246,19 +247,19 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
   const containerClasses = highContrast 
     ? 'bg-black text-yellow-300' 
-    : 'bg-warm-beige/30 text-slate-800';
+    : 'bg-background text-foreground';
 
   const stickyHeaderClasses = highContrast
     ? 'bg-black border-b border-yellow-300'
-    : 'bg-white/80 backdrop-blur-md border-b border-slate-200';
+    : 'bg-white/95 backdrop-blur-md border-b border-border shadow-sm';
 
   const iconClasses = highContrast
     ? 'text-yellow-300 hover:text-white'
-    : 'text-slate-500 hover:text-brand-blue';
+    : 'text-on-surface-variant hover:text-primary';
 
   const proseClasses = highContrast
-    ? `prose ${proseSizeClasses[fontSize]} max-w-none prose-headings:text-yellow-300 prose-headings:font-bold prose-p:text-yellow-300 prose-p:leading-relaxed prose-p:mb-6 prose-a:text-yellow-400 prose-strong:text-yellow-300 animate-slide-up`
-    : `prose ${proseSizeClasses[fontSize]} prose-slate max-w-none prose-headings:text-brand-blue prose-headings:font-bold prose-p:leading-relaxed prose-p:mb-6 prose-a:text-brand-green animate-slide-up`;
+    ? `prose ${proseSizeClasses[fontSize]} max-w-[720px] mx-auto prose-headings:text-yellow-300 prose-headings:font-bold prose-p:text-yellow-300 prose-p:leading-relaxed prose-p:mb-6 prose-a:text-yellow-400 prose-strong:text-yellow-300 animate-slide-up`
+    : `prose ${proseSizeClasses[fontSize]} prose-slate max-w-[720px] mx-auto prose-headings:text-foreground prose-headings:font-bold prose-p:leading-relaxed prose-p:mb-6 prose-a:text-primary animate-slide-up`;
 
   const handlePrint = () => {
     window.print();
@@ -367,22 +368,24 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
                 {article.expertReviewer.name.charAt(0)}
               </div>
               <div className="text-sm">
-                <span className="opacity-70">Expert Reviewed By</span>
-                <br />
+                <span className="opacity-70 text-xs block">Verified Expert</span>
                 <span className="font-bold">{article.expertReviewer.name}</span>
               </div>
             </div>
           ) : (
-            <div className={`mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl ${highContrast ? 'bg-yellow-300/10 border border-yellow-300 text-yellow-300' : 'bg-slate-50 border border-slate-200 text-slate-700'}`}>
-              <div className="w-8 h-8 rounded-full bg-brand-green text-white flex items-center justify-center font-bold text-xs">
+            <Link 
+              href={`/${locale}/support`}
+              className={`mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-100/80 transition-colors ${highContrast ? 'bg-yellow-300/10 border border-yellow-300 text-yellow-300' : 'bg-slate-50 border border-slate-200 text-slate-700'}`}
+              title="Apply as a Verified Expert Reviewer"
+            >
+              <div className="w-8 h-8 rounded-full bg-[#006948] text-white flex items-center justify-center font-bold text-xs">
                 {generateProfile(slug, false).name.charAt(0)}
               </div>
               <div className="text-sm">
-                <span className="opacity-70">Expert Reviewed By</span>
-                <br />
+                <span className="opacity-70 text-xs block">Verification Pending • Apply Here</span>
                 <span className="font-bold">{generateProfile(slug, false).name}</span>
               </div>
-            </div>
+            </Link>
           )}
         </header>
 
@@ -465,12 +468,13 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         </div>
 
         {/* Footer Share & Embed - HIDDEN ON PRINT */}
-        <div className={`mt-8 pt-8 border-t print:hidden ${highContrast ? 'border-yellow-300/30' : 'border-slate-200'}`}>
+        <div className={`mt-8 pt-8 border-t print:hidden ${highContrast ? 'border-yellow-300/30' : 'border-border'}`}>
           <div className="flex flex-col gap-6">
             <EmbedGenerator slug={`article/${slug}`} title={article.title} type="article" />
           </div>
         </div>
       </div>
+      <AccessibleReaderBar />
     </article>
   );
 }

@@ -38,5 +38,27 @@
     "searching": "Searching...",
     "results_title": "Recommended Devices (Matter Certified)",
     "rating": "Rating"
+  },
+  "Community": {
+    "comments_title": "Discussion & Comments",
+    "comments_subtitle": "Share your thoughts or ask our verified experts questions.",
+    "write_comment": "Write a comment...",
+    "reply": "Reply",
+    "name_label": "Your Name",
+    "email_label": "Email Address (will not be published)",
+    "submit_comment": "Submit Comment",
+    "pending_review": "Your comment has been submitted and will appear once approved by a moderator.",
+    "verified_expert": "Verified Expert",
+    "guestbook_title": "Wall of Encouragement",
+    "guestbook_subtitle": "Leave a warm message to support our multigenerational community.",
+    "guestbook_placeholder": "Write a message of hope or guidance...",
+    "post_message": "Post Message",
+    "signin_prompt": "Please sign in to post a message of encouragement.",
+    "contact_title": "Connect With Us",
+    "contact_subtitle": "Submit general inquiries, expert applications, or sponsor proposals.",
+    "tab_contact": "Contact Us",
+    "tab_partner": "Partner With Us",
+    "send_inquiry": "Send Inquiry",
+    "inquiry_success": "Inquiry submitted successfully! Our team will respond shortly."
   }
 }

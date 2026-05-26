@@ -9,61 +9,91 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "#bccac0", // outline-variant
+        input: "#eaedff", // surface-container
+        ring: "#006948", // primary
+        background: "#FFFDF5", // Soft Cream canvas
+        foreground: "#131b2e", // Deep Charcoal neutral text
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#006948", // Sage Green accent
+          foreground: "#ffffff",
+          container: "#00855d",
+          'on-container': "#f5fff7",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#904d00", // Muted Clay Orange
+          foreground: "#ffffff",
+          container: "#fe932c",
+          'on-container': "#663500",
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+        tertiary: {
+          DEFAULT: "#585d60",
+          foreground: "#ffffff",
+          container: "#707579",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#eaedff",
+          foreground: "#3d4a42",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#fe932c",
+          foreground: "#663500",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#ffffff",
+          foreground: "#131b2e",
         },
-        'brand-blue': '#0F172A', // Slate 900
-        'brand-blue-hover': '#1E293B', // Slate 800
-        'brand-green': '#059669', // Emerald 600 (High contrast)
-        'brand-green-hover': '#047857', // Emerald 700
-        'brand-green-light': '#D1FAE5', // Emerald 100
-        'brand-slate': '#475569', // Slate 600
-        'brand-slate-light': '#F1F5F9', // Slate 100
-        'warm-beige': '#F8FAFC',
-        'premium-gold': '#D97706', // Amber 600
+        surface: {
+          DEFAULT: "#FFFDF5",
+          container: "#eaedff",
+          low: "#f2f3ff",
+          lowest: "#ffffff",
+          high: "#e2e7ff",
+          highest: "#dae2fd",
+          dim: "#d2d9f4",
+          bright: "#faf8ff",
+          variant: "#dae2fd",
+        },
+        'on-surface': "#131b2e",
+        'on-surface-variant': "#3d4a42",
+        'brand-blue': "#131b2e",
+        'brand-blue-dark': "#0a0e1a",
+        'brand-slate': "#585d60",
+        'brand-slate-light': "#f2f3ff",
+        'brand-green': "#006948",
+        'brand-green-dark': "#005238",
+        'brand-green-light': "#e6f4ef",
       },
-      fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'Playfair Display', 'serif'],
-      },
-      fontSize: {
-        base: ['16px', '24px'],
-        lg: ['18px', '28px'],
-        xl: ['20px', '28px'],
-        '2xl': ['24px', '32px'],
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        '2xl': "1rem",
+        '3xl': "1.5rem", // 24px pebble radius
+        full: "9999px",
       },
       spacing: {
-        12: '3rem', // 48px min touch target
+        'touch-target': "52px", // non-negotiable elder touch target
+        'gutter-mobile': "16px",
+        'gutter-desktop': "32px",
+        'margin-mobile': "20px",
+        'margin-desktop': "48px",
+        'container-max': "1120px",
+        'article-max': "720px",
+        unit: "4px",
+      },
+      fontFamily: {
+        sans: ['"Atkinson Hyperlegible Next"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        base: ['18px', '1.6'], // Dynamic baseline typography
+        lg: ['20px', '1.6'],
+        xl: ['24px', '1.3'],
+        '2xl': ['32px', '1.25'],
+        '3xl': ['48px', '1.2'],
+      },
+      boxShadow: {
+        'soft-ambient': "0 10px 30px -10px rgba(15, 23, 42, 0.08)",
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',

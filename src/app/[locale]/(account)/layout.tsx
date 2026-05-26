@@ -26,7 +26,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   if (!user) return null; // Will redirect
 
   return (
-    <div className="min-h-screen bg-warm-beige">
+    <div className="min-h-screen bg-background">
       <main>{children}</main>
     </div>
   );

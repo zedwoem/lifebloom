@@ -20,6 +20,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   signInWithMagicLink: (email: string, locale: string) => Promise<{ error: any }>;
+  signInWithGoogle: (locale?: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
 }
 
@@ -33,10 +34,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const getActiveSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (!error && user) {
+        setUser(user);
+        await fetchProfile(user.id);
       }
       setLoading(false);
     };
@@ -90,12 +91,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const signInWithGoogle = async (locale: string = "en") => {
+    const redirectUrl = `${window.location.origin}/${locale}/callback`;
+    return await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirectUrl,
+      },
+    });
+  };
+
   const signOut = async () => {
     return await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signInWithMagicLink, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signInWithMagicLink, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );

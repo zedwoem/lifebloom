@@ -3,164 +3,177 @@
 import React, { useState } from "react";
 import { useSavedItems } from "@/lib/hooks/useSavedItems";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { Heart, Search, Trash2, ExternalLink } from "lucide-react";
+import { Heart, Search, Trash2, ExternalLink, Activity, BookOpen, Download } from "lucide-react";
+import { HydrationGuard } from "@/components/ui/hydration-guard";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
-const TRANSLATIONS = {
-  restrictedTitle: "Restricted Access",
-  restrictedDesc: "Please sign in first to manage your saved items.",
-  pageTitle: "Saved Collection",
-  pageDesc: "Save calculators, articles, and product guides supporting your senior lifestyle.",
-  searchPlaceholder: "Search items...",
-  noItemsTitle: "No items found",
-  noItemsDesc: "Try adjusting your tab filter or search keyword.",
-  btnRemove: "Remove",
-  btnExplore: "Explore",
-  tabAll: "All",
-  tabProduct: "Products",
-  tabArticle: "Articles",
-  tabVideo: "Videos",
-  loading: "Loading your collections...",
-  defaultTitle: "Saved Item",
-  defaultVendor: "Wellness Hub"
-};
-
-export default function SavedItemsPage() {
+export default function UserWorkspacePage() {
   const { profile } = useAuth();
   const { savedItems, loading, toggleSaveItem } = useSavedItems();
-  const [activeTab, setActiveTab] = useState<"all" | "product" | "article" | "video">("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const t = TRANSLATIONS;
+  const params = useParams();
+  const locale = params.locale || "en";
+  
+  const [textSize, setTextSize] = useState<"A-" | "A" | "A+">("A");
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl text-center">
-        <div className="w-12 h-12 border-4 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-500 font-medium">{t.loading}</p>
+      <div className="min-h-screen bg-[#FFFDF5] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#006948] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl text-center">
-        <h2 className="text-2xl font-black text-slate-800">{t.restrictedTitle}</h2>
-        <p className="text-slate-500 mt-2">{t.restrictedDesc}</p>
+      <div className="min-h-screen bg-[#FFFDF5] flex items-center justify-center flex-col">
+        <h2 className="text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Restricted Access</h2>
+        <p className="text-slate-500 mt-2">Please sign in first to manage your saved items.</p>
       </div>
     );
   }
 
-  // Filter items dynamically based on tabs and searchQuery
-  const filteredItems = savedItems.filter((item) => {
-    const matchesTab = activeTab === "all" || item.item_type === activeTab;
-    const itemName = item.metadata?.name || item.metadata?.title || t.defaultTitle;
-    const matchesSearch = itemName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesTab && matchesSearch;
-  });
+  const calculators = savedItems.filter(item => item.item_type === "calculation");
+  const articles = savedItems.filter(item => item.item_type === "article");
 
-  const getTabLabel = (tab: "all" | "product" | "article" | "video") => {
-    if (tab === "all") return t.tabAll;
-    if (tab === "product") return t.tabProduct;
-    if (tab === "article") return t.tabArticle;
-    return t.tabVideo;
-  };
+  // Handle Text Size Scaling
+  let textClass = "text-base";
+  if (textSize === "A-") textClass = "text-sm";
+  if (textSize === "A+") textClass = "text-xl";
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl space-y-8 animate-fade-in">
-      <header>
-        <h1 className="text-3xl md:text-4xl font-black text-slate-900">{t.pageTitle}</h1>
-        <p className="text-slate-600 text-base mt-1">
-          {t.pageDesc}
-        </p>
-      </header>
-
-      {/* Control panel: tabs, search, and CSV export triggers */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white border border-slate-200 p-4 rounded-2xl shadow-sm">
-        {/* Horizontal Tab Controller */}
-        <div className="flex flex-wrap gap-1 bg-slate-100 p-1.5 rounded-xl w-full md:w-auto">
-          {(["all", "product", "article", "video"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg text-sm font-bold capitalize transition-all flex-grow md:flex-grow-0 min-h-[40px] ${
-                activeTab === tab
-                  ? "bg-white text-slate-800 shadow-sm"
-                  : "text-slate-500 hover:text-slate-700"
-              }`}
-            >
-              {getTabLabel(tab)}
-            </button>
-          ))}
-        </div>
-
-        {/* Client-Side search input */}
-        <div className="relative w-full md:w-72">
-          <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            id="search-input"
-            name="search"
-            type="text"
-            placeholder={t.searchPlaceholder}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue min-h-[48px]"
-          />
-        </div>
-      </div>
-
-      {/* Grid listing */}
-      {filteredItems.length === 0 ? (
-        <div className="bg-slate-50 border border-dashed border-slate-200 p-16 text-center rounded-3xl">
-          <Heart className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500 font-bold text-lg">{t.noItemsTitle}</p>
-          <p className="text-slate-400 text-sm mt-1">{t.noItemsDesc}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredItems.map((item) => {
-            const title = item.metadata?.name || item.metadata?.title || t.defaultTitle;
-            const subtitle = item.metadata?.vendor || item.metadata?.pillar || t.defaultVendor;
-
-            return (
-              <div
-                key={item.id}
-                className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow min-h-[180px]"
-              >
-                <div>
-                  <div className="flex justify-between items-start">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{subtitle}</span>
-                    <span className="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-1 rounded capitalize">
-                      {item.item_type}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-800 leading-snug line-clamp-2 mt-2">{title}</h3>
-                </div>
-
-                {/* Card CTA Controls */}
-                <div className="flex gap-3 mt-6 pt-4 border-t border-slate-100">
-                  <button
-                    onClick={() => toggleSaveItem(item.item_type, item.referenced_id)}
-                    className="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-red-50 hover:text-red-600 font-semibold text-xs flex items-center justify-center gap-1.5 min-h-[40px] transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span>{t.btnRemove}</span>
-                  </button>
-
-                  <a
-                    href={`/api/affiliate/${item.metadata?.slug || item.referenced_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 py-2.5 bg-brand-green text-white rounded-lg hover:bg-green-800 font-bold text-xs flex items-center justify-center gap-1.5 min-h-[40px] transition-colors"
-                  >
-                    <span>{t.btnExplore}</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
+    <HydrationGuard fallbackHeight="h-screen">
+      <div className={`bg-[#FFFDF5] min-h-screen pb-12 font-sans selection:bg-[#85f8c4] selection:text-[#002114] ${textClass}`}>
+        
+        {/* Header Area */}
+        <header className="border-b border-slate-200 bg-white">
+          <div className="max-w-[1120px] mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 bg-[#f5fff7] rounded-2xl flex items-center justify-center border border-[#006948]/20">
+                <span className="text-2xl">🧓</span>
               </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+                RUANG NYAMAN SAYA
+              </h1>
+            </div>
+            <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
+              <button 
+                onClick={() => setTextSize("A-")}
+                className={`px-4 py-2 rounded-lg font-bold min-h-[44px] transition-all ${textSize === "A-" ? "bg-white shadow-sm text-slate-900" : "text-slate-500"}`}
+              >
+                A-
+              </button>
+              <button 
+                onClick={() => setTextSize("A")}
+                className={`px-4 py-2 rounded-lg font-bold min-h-[44px] transition-all ${textSize === "A" ? "bg-white shadow-sm text-slate-900" : "text-slate-500"}`}
+              >
+                A
+              </button>
+              <button 
+                onClick={() => setTextSize("A+")}
+                className={`px-4 py-2 rounded-lg font-bold min-h-[44px] transition-all ${textSize === "A+" ? "bg-white shadow-sm text-slate-900" : "text-slate-500"}`}
+              >
+                A+
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-[1120px] mx-auto px-6 py-8 space-y-10">
+          
+          {/* Section 1: Calculators & Tools */}
+          <section>
+            <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+              PANDUAN & KALKULASI YANG SAYA SIMPAN:
+            </h2>
+            
+            {calculators.length === 0 ? (
+              <div className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center shadow-sm">
+                <Activity className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500 font-bold text-lg">Belum ada kalkulasi yang disimpan.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {calculators.map(item => {
+                  const title = item.metadata?.name || item.referenced_id.replace("-", " ");
+                  return (
+                    <div key={item.id} className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center border border-indigo-100 shrink-0">
+                          <span className="text-2xl">{item.metadata?.pillar === "pet" ? "🐾" : "🧓"}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-slate-900 leading-tight capitalize" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+                            {title}
+                          </h3>
+                          <p className="text-slate-500 mt-2">
+                            Terakhir Diperbarui: {new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
+                        <Link href={`/${locale}/${item.metadata?.pillar || "home"}`} className="flex-1">
+                          <button className="w-full px-5 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all outline-none focus:ring-4 focus:ring-[#68dba9]/30">
+                            Buka Hasil
+                          </button>
+                        </Link>
+                        {item.item_type === "calculation" && (
+                          <button className="px-5 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold min-h-[52px] transition-all flex items-center justify-center gap-2">
+                            <Download className="w-5 h-5" /> PDF
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => toggleSaveItem(item.item_type, item.referenced_id)}
+                          className="px-5 py-3 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl font-bold min-h-[52px] transition-all flex items-center justify-center"
+                          aria-label="Hapus Kalkulasi"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          {/* Section 2: Articles & Reading List */}
+          <section>
+            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+                <BookOpen className="w-6 h-6 text-[#006948]" /> ARTIKEL & BREADCRUMBS YANG SAYA IKUTI
+              </h2>
+              
+              {articles.length === 0 ? (
+                <p className="text-slate-500 text-center py-6 border-2 border-dashed border-slate-100 rounded-2xl">Belum ada artikel yang dibaca/disimpan.</p>
+              ) : (
+                <ul className="space-y-4">
+                  {articles.map(item => (
+                    <li key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-transparent hover:border-slate-200">
+                      <div className="flex items-start gap-3">
+                        <span className="text-[#006948] font-bold shrink-0 mt-1">-</span>
+                        <div>
+                          <Link href={`/${locale}/article/${item.referenced_id}`} className="hover:underline hover:text-[#006948] decoration-2 underline-offset-4">
+                            <h3 className="font-bold text-slate-900 text-lg">&quot;{item.metadata?.title || item.referenced_id}&quot;</h3>
+                          </Link>
+                          <p className="text-slate-500 mt-1">Disimpan pada {new Date(item.created_at).toLocaleDateString("id-ID")}</p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => toggleSaveItem(item.item_type, item.referenced_id)}
+                        className="px-4 py-2 text-rose-500 hover:bg-rose-50 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 shrink-0"
+                      >
+                        <Trash2 className="w-5 h-5" /> Hapus
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </section>
+
+        </main>
+      </div>
+    </HydrationGuard>
   );
 }
-

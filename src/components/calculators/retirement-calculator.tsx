@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Calculator, Save, Check } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -17,31 +17,47 @@ export function RetirementCalculator() {
   const [currentSavings, setCurrentSavings] = useState(50000);
   const [monthlyContribution, setMonthlyContribution] = useState(500);
 
-  const generateChartData = () => {
+  const chartData = useMemo(() => {
     const data = [];
-    const years = retireAge - currentAge;
     
-    let optVal = currentSavings;
-    let realVal = currentSavings;
-    let pessVal = currentSavings;
+    // Prevent infinite loop and invalid values
+    const safeCurrentAge = isNaN(currentAge) || currentAge < 0 ? 0 : currentAge;
+    const safeRetireAge = isNaN(retireAge) || retireAge < 0 ? 0 : retireAge;
+    const safeSavings = isNaN(currentSavings) || currentSavings < 0 ? 0 : currentSavings;
+    const safeContribution = isNaN(monthlyContribution) || monthlyContribution < 0 ? 0 : monthlyContribution;
+    
+    const years = Math.max(0, safeRetireAge - safeCurrentAge);
+    
+    // Safety cap to avoid infinite loops if difference is huge
+    const maxYears = Math.min(100, years);
+    
+    let optVal = safeSavings;
+    let realVal = safeSavings;
+    let pessVal = safeSavings;
 
-    for (let i = 0; i <= years; i++) {
+    for (let i = 0; i <= maxYears; i++) {
+      const currentOpt = isFinite(optVal) ? Math.round(optVal) : 0;
+      const currentReal = isFinite(realVal) ? Math.round(realVal) : 0;
+      const currentPess = isFinite(pessVal) ? Math.round(pessVal) : 0;
+
       data.push({
-        age: currentAge + i,
-        Optimistic: Math.round(optVal),
-        Realistic: Math.round(realVal),
-        Pessimistic: Math.round(pessVal)
+        age: safeCurrentAge + i,
+        Optimistic: currentOpt,
+        Realistic: currentReal,
+        Pessimistic: currentPess
       });
-      // Add annual contributions and returns (Compounded annually for simplicity)
-      // Optimistic (+7%), Realistic (+4.5% considering inflation), Pessimistic (+2% recession)
-      optVal = (optVal + monthlyContribution * 12) * 1.07;
-      realVal = (realVal + monthlyContribution * 12) * 1.045;
-      pessVal = (pessVal + monthlyContribution * 12) * 1.02;
+      
+      optVal = (optVal + safeContribution * 12) * 1.07;
+      realVal = (realVal + safeContribution * 12) * 1.045;
+      pessVal = (pessVal + safeContribution * 12) * 1.02;
+      
+      if (!isFinite(optVal)) optVal = 0;
+      if (!isFinite(realVal)) realVal = 0;
+      if (!isFinite(pessVal)) pessVal = 0;
     }
     return data;
-  };
+  }, [currentAge, retireAge, currentSavings, monthlyContribution]);
 
-  const chartData = generateChartData();
   const projectedAmount = chartData[chartData.length - 1]?.Realistic || 0;
 
   const handleSave = async () => {

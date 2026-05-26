@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function measurePing(url: string, headers: HeadersInit = {}): Promise<{ statusCode: number; latencyMs: number; errorPayload?: string }> {
   const start = performance.now();
@@ -39,10 +35,16 @@ async function measurePing(url: string, headers: HeadersInit = {}): Promise<{ st
 }
 
 export async function GET(req: Request) {
+  const supabase = createServiceClient();
   // Simple token authentication
   const { searchParams } = new URL(req.url);
   const secret = searchParams.get('secret');
-  const cronSecret = process.env.CRON_SECRET || 'lifebloom-cron-secret';
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (!cronSecret) {
+    console.error("[Health-Ping] CRON_SECRET environment variable is not defined.");
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 503 });
+  }
 
   if (secret !== cronSecret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -60,8 +62,7 @@ export async function GET(req: Request) {
     const check = await measurePing(api.url);
     
     // Log to Supabase
-    const { error } = await supabase
-      .from('api_health_logs')
+    const { error } = await supabase.from('api_health_logs')
       .insert({
         api_name: api.name,
         status_code: check.statusCode,

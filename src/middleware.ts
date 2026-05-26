@@ -26,16 +26,16 @@ export default function middleware(request: NextRequest) {
   const isProtectedRoute = /^\/[^\/]+\/(dashboard|saved)(\/.*)?$/.test(pathname);
   
   if (isProtectedRoute) {
-    // Check if user has Supabase auth cookie or mock auth cookie
-    // Supabase usually sets cookies starting with sb-
-    const hasAuthCookie = request.cookies.getAll().some(cookie => cookie.name.startsWith('sb-'));
+    // Check if user has Supabase auth cookie containing a valid-looking long JWT token
+    const hasAuthCookie = request.cookies.getAll().some(cookie => 
+      cookie.name.startsWith('sb-') && cookie.value && cookie.value.length > 20
+    );
     
     if (!hasAuthCookie) {
       const url = request.nextUrl.clone();
       // Extract locale from the pathname
       const locale = pathname.split('/')[1];
       url.pathname = `/${locale}/login`;
-      // Pass the original URL as a redirect parameter if needed, but for now just redirect
       return NextResponse.redirect(url);
     }
   }
@@ -45,11 +45,10 @@ export default function middleware(request: NextRequest) {
   // 1. Check if the user already has a NEXT_LOCALE cookie set (Tertiary: User Preference)
   const hasLocaleCookie = request.cookies.has('NEXT_LOCALE');
   
-  if (!hasLocaleCookie) {
-    // 2. Check Vercel Geo IP Header (Secondary)
+  if (!hasLocaleCookie && request.nextUrl.pathname === '/') {
+    // 2. Check Vercel Geo IP Header (Secondary) for root redirect
     const country = request.headers.get('x-vercel-ip-country');
     if (country) {
-      // Basic Country -> Locale mapping (can be expanded)
       const geoToLocaleMap: Record<string, string> = {
         'ID': 'id',
         'ES': 'es', 'MX': 'es', 'AR': 'es',
@@ -59,9 +58,9 @@ export default function middleware(request: NextRequest) {
       const geoLocale = geoToLocaleMap[country];
       
       if (geoLocale && routing.locales.includes(geoLocale as any)) {
-        // We will pass the locale to the response later, but intlMiddleware usually detects it from headers.
-        // Modifying request cookies directly can cause Edge Runtime errors in some Next.js versions.
-        // Instead, we can inject it via header or just rely on intlMiddleware's Accept-Language.
+        const url = request.nextUrl.clone();
+        url.pathname = `/${geoLocale}`;
+        return NextResponse.redirect(url);
       }
     }
   }
