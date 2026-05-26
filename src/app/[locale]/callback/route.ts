@@ -20,10 +20,11 @@ export async function GET(request: Request) {
         .single();
         
       let redirectPath = `/${locale}/saved`; // Default for standard users
+      const userRole = (profile as any)?.role;
       
-      if (profile?.role === 'admin') {
+      if (userRole === 'admin') {
         redirectPath = `/${locale}/admin`;
-      } else if (profile?.role === 'expert') {
+      } else if (userRole === 'expert') {
         redirectPath = `/${locale}/dashboard`;
       }
       
