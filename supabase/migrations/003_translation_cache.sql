@@ -3,7 +3,7 @@
 -- Features: Fast hash lookup, source/target indexing, strict RLS for security.
 
 CREATE TABLE IF NOT EXISTS public.translation_cache (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     content_hash TEXT NOT NULL, -- MD5 hash of (source_text + target_lang)
     source_text TEXT NOT NULL,
     translated_text TEXT NOT NULL,

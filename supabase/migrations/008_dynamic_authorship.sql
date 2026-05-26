@@ -54,7 +54,7 @@ ALTER TABLE products
     ADD COLUMN IF NOT EXISTS specs JSONB DEFAULT '{}'::jsonb;
 
 -- Optimasi indeks majemuk
-CREATE INDEX IF NOT EXISTS idx_products_slug_pillar ON products (slug, pillar_category);
+CREATE INDEX IF NOT EXISTS idx_products_slug_pillar ON products (slug, pillar);
 
 -- 5. Modifikasi `saved_items` untuk membatasi redundansi
 ALTER TABLE saved_items 

@@ -2,7 +2,7 @@
 -- Purpose: Creates a table to store RSS/API aggregated content (Articles, Deals) for the 5 Pillars
 
 CREATE TABLE IF NOT EXISTS public.aggregated_content (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     pillar TEXT NOT NULL,                  -- e.g., 'home', 'money', 'pet', 'senior', 'travel'
     source_type TEXT NOT NULL,             -- e.g., 'rss', 'api_fda', 'api_petfinder'
     source_name TEXT NOT NULL,             -- e.g., 'AARP', 'OpenFDA', 'Kiplinger'

@@ -1,15 +1,10 @@
 -- supabase/migrations/011_video_infrastructure.sql
 -- Create videos table for metadata management
 
-CREATE TABLE IF NOT EXISTS public.videos (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title TEXT NOT NULL,
-    embed_id TEXT UNIQUE NOT NULL,
-    provider TEXT NOT NULL CHECK (provider IN ('youtube', 'vimeo')),
-    pillar TEXT NOT NULL,
-    locale TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT now()
-);
+ALTER TABLE public.videos
+    ADD COLUMN IF NOT EXISTS embed_id TEXT UNIQUE,
+    ADD COLUMN IF NOT EXISTS provider TEXT CHECK (provider IN ('youtube', 'vimeo')),
+    ADD COLUMN IF NOT EXISTS locale TEXT DEFAULT 'en';
 
 -- Enable RLS
 ALTER TABLE public.videos ENABLE ROW LEVEL SECURITY;
@@ -21,6 +16,8 @@ TO public
 USING (true);
 
 -- Create RPC function get_latest_videos
+DROP FUNCTION IF EXISTS public.get_latest_videos;
+DROP FUNCTION IF EXISTS public.get_latest_videos(INT, TEXT, TEXT);
 CREATE OR REPLACE FUNCTION public.get_latest_videos(p_limit INT DEFAULT 3, p_locale TEXT DEFAULT 'en', p_pillar TEXT DEFAULT NULL)
 RETURNS TABLE (
     id UUID,

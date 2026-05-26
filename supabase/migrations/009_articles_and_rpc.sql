@@ -1,16 +1,10 @@
--- Create articles table for RSS ingestion & dynamic cards
-CREATE TABLE IF NOT EXISTS public.articles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    hash_id TEXT UNIQUE NOT NULL, -- SHA-256 deduplication
-    title TEXT NOT NULL,
-    description TEXT,
-    link TEXT NOT NULL,
-    pub_date TIMESTAMPTZ,
-    pillar TEXT NOT NULL,
-    view_count INTEGER DEFAULT 0,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Alter articles table for RSS ingestion & dynamic cards
+ALTER TABLE public.articles
+    ADD COLUMN IF NOT EXISTS hash_id TEXT UNIQUE, -- SHA-256 deduplication
+    ADD COLUMN IF NOT EXISTS link TEXT,
+    ADD COLUMN IF NOT EXISTS pub_date TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- Index for fast pillar lookups & ordering
 CREATE INDEX IF NOT EXISTS idx_articles_pillar ON public.articles(pillar);
