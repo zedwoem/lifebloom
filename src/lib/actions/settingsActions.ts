@@ -6,6 +6,10 @@ import { revalidatePath } from "next/cache";
 
 export async function getWebsiteSettings() {
   const supabase = await createClient();
+  const { data: isUserAdmin } = await supabase.rpc("is_admin");
+  if (!isUserAdmin) {
+    throw new Error("Unauthorized: Admin role required");
+  }
   const { data, error } = await supabase.from("website_settings").select("*");
   if (error) {
     console.error("Failed to fetch website settings:", error);

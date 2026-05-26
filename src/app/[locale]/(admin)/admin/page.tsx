@@ -156,9 +156,11 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>MODERASI KOMENTAR</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Tinjau, setujui, atau hapus komentar dari member komunitas sebelum tayang.</p>
               </div>
-              <button disabled className="self-start px-6 py-3 bg-slate-100 text-slate-400 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 outline-none cursor-not-allowed">
-                Cusdis Queue (Coming Soon)
-              </button>
+              <Link href={`/${locale}/admin/comments`}>
+                <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
+                  Moderator Panel: {pendingComments} Antrean
+                </button>
+              </Link>
             </div>
 
             {/* Box 2: Review Konten */}

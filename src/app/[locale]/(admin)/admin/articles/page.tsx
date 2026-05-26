@@ -19,13 +19,22 @@ export default function AdminArticlesPage() {
 
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
 
   useEffect(() => {
-    async function loadPendingArticles() {
-      if (profile?.role !== "admin") {
+    async function checkAdminAndLoadPendingArticles() {
+      const { data: adminCheck } = await supabase.rpc("is_admin");
+      const isUserAdmin = adminCheck === true;
+
+      if (!isUserAdmin) {
+        setIsAdmin(false);
+        toast.error("Akses Ditolak. Anda bukan Administrator.");
         router.push(`/${locale}/dashboard`);
         return;
       }
+
+      setIsAdmin(true);
       const { data, error } = await supabase
         .from("articles")
         .select("*")
@@ -35,7 +44,10 @@ export default function AdminArticlesPage() {
       if (data) setArticles(data);
       setLoading(false);
     }
-    if (profile) loadPendingArticles();
+    
+    if (profile !== undefined) {
+      checkAdminAndLoadPendingArticles();
+    }
   }, [profile, router, supabase, locale]);
 
   const handleReview = async (articleId: string, status: "approved" | "rejected") => {
@@ -46,13 +58,20 @@ export default function AdminArticlesPage() {
     if (res.success) {
       toast.success(`Artikel berhasil ${status === "approved" ? "disetujui" : "ditolak"}!`);
       setArticles((prev) => prev.filter((a) => a.id !== articleId));
+      if (selectedArticle?.id === articleId) {
+        setSelectedArticle(null);
+      }
     } else {
       toast.error(res.error || "Gagal memproses artikel");
     }
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#006948]"></div></div>;
+  if (isAdmin === null || loading) {
+    return <div className="min-h-screen bg-[#FFFDF5] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#006948]"></div></div>;
+  }
+
+  if (isAdmin === false) {
+    return null;
   }
 
   return (
@@ -97,7 +116,7 @@ export default function AdminArticlesPage() {
                   
                   <div className="flex flex-col sm:flex-row gap-3 items-start md:items-center">
                     <button 
-                      onClick={() => toast.info("Fitur Preview belum diimplementasi (Demo)")}
+                      onClick={() => setSelectedArticle(article)}
                       className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold transition-all hover:bg-slate-50 min-h-[52px] w-full sm:w-auto"
                     >
                       <Eye className="w-5 h-5" /> Baca
@@ -120,6 +139,64 @@ export default function AdminArticlesPage() {
             </div>
           )}
         </main>
+
+        {/* Dynamic Article Preview Modal */}
+        {selectedArticle && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 md:p-6 animate-fade-in" role="dialog" aria-modal="true">
+            <div className="bg-white w-full max-w-4xl h-[85vh] rounded-3xl border border-slate-200 shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+              
+              {/* Modal Header */}
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold uppercase tracking-wider">{selectedArticle.pillar}</span>
+                  <span className="ml-3 text-sm font-semibold text-slate-400">Oleh: {selectedArticle.author} ({selectedArticle.author_type})</span>
+                </div>
+                <button 
+                  onClick={() => setSelectedArticle(null)}
+                  className="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full flex items-center justify-center transition-colors font-bold text-lg"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 md:p-8 flex-1 overflow-y-auto space-y-6">
+                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">{selectedArticle.title}</h2>
+                <p className="text-xl text-slate-500 italic font-medium">{selectedArticle.description}</p>
+                <hr className="border-slate-100" />
+                <div className="prose max-w-none text-slate-800 text-lg leading-relaxed whitespace-pre-wrap font-medium">
+                  {selectedArticle.content || "Tidak ada konten artikel."}
+                </div>
+              </div>
+
+              {/* Modal Footer (Action Panel) */}
+              <div className="p-6 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <button 
+                  onClick={() => setSelectedArticle(null)}
+                  className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold min-h-[52px] w-full sm:w-auto hover:bg-slate-100 transition-colors"
+                >
+                  Tutup Pratinjau
+                </button>
+                
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button 
+                    onClick={() => handleReview(selectedArticle.id, "rejected")}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl font-bold transition-all hover:bg-rose-100 min-h-[52px]"
+                  >
+                    <XCircle className="w-5 h-5" /> Tolak Draf
+                  </button>
+                  <button 
+                    onClick={() => handleReview(selectedArticle.id, "approved")}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-[#006948] border border-[#004d35] text-white rounded-xl font-bold transition-all hover:bg-[#00855d] min-h-[52px]"
+                  >
+                    <CheckCircle2 className="w-5 h-5" /> Setujui & Terbitkan
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
       </div>
     </HydrationGuard>
   );

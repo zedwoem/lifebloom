@@ -1,22 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ingestVideoAction, fetchYouTubeMetadata } from "@/lib/actions/videoActions";
 import { useRouter, useParams } from "next/navigation";
 import { Activity, ArrowLeft, Search, PlusCircle, Video } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { PILLARS } from "@/lib/constants/pillars";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminVideosPage() {
+  const { profile } = useAuth();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string || "en";
+  const supabase = createClient();
 
   const [url, setUrl] = useState("");
   const [pillar, setPillar] = useState("home");
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<{ title: string; embedId: string; description: string } | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      const { data: adminCheck } = await supabase.rpc("is_admin");
+      const isUserAdmin = adminCheck === true;
+
+      if (!isUserAdmin) {
+        setIsAdmin(false);
+        toast.error("Akses Ditolak. Anda bukan Administrator.");
+        router.push(`/${locale}/dashboard`);
+        return;
+      }
+
+      setIsAdmin(true);
+    }
+
+    if (profile !== undefined) {
+      checkAdmin();
+    }
+  }, [profile, router, supabase, locale]);
 
   const handleFetchPreview = async () => {
     if (!url) return toast.error("Masukkan URL YouTube terlebih dahulu");
@@ -58,6 +83,14 @@ export default function AdminVideosPage() {
     }
     setLoading(false);
   };
+
+  if (isAdmin === null || loading && !preview) {
+    return <div className="min-h-screen bg-[#FFFDF5] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#006948]"></div></div>;
+  }
+
+  if (isAdmin === false) {
+    return null;
+  }
 
   return (
     <div className="bg-[#FFFDF5] text-slate-900 min-h-screen p-6 md:p-12 font-sans selection:bg-[#85f8c4] selection:text-[#002114]">

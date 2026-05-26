@@ -7,24 +7,47 @@ import { Globe, ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { HydrationGuard } from "@/components/ui/hydration-guard";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminSettingsPage() {
+  const { profile } = useAuth();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale || "en";
+  const supabase = createClient();
 
   const [settings, setSettings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
-    async function loadSettings() {
-      const data = await getWebsiteSettings();
-      setSettings(data);
+    async function checkAdminAndLoadSettings() {
+      const { data: adminCheck } = await supabase.rpc("is_admin");
+      const isUserAdmin = adminCheck === true;
+      
+      if (!isUserAdmin) {
+        setIsAdmin(false);
+        toast.error("Akses Ditolak. Anda bukan Administrator.");
+        router.push(`/${locale}/dashboard`);
+        return;
+      }
+      
+      setIsAdmin(true);
+      try {
+        const data = await getWebsiteSettings();
+        setSettings(data);
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
       setLoading(false);
     }
-    loadSettings();
-  }, []);
+    
+    if (profile !== undefined) {
+      checkAdminAndLoadSettings();
+    }
+  }, [profile, router, supabase, locale]);
 
   const handleUpdate = async (key: string, value: string) => {
     setSavingKey(key);
@@ -47,8 +70,12 @@ export default function AdminSettingsPage() {
     );
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#006948]"></div></div>;
+  if (isAdmin === null || loading) {
+    return <div className="min-h-screen bg-[#FFFDF5] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#006948]"></div></div>;
+  }
+
+  if (isAdmin === false) {
+    return null;
   }
 
   return (

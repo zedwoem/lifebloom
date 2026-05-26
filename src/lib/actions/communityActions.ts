@@ -268,3 +268,33 @@ export async function submitContactAction(payload: any) {
 
   return { success: true };
 }
+
+// 4. Comment Moderation Server Action
+export async function moderateCommentAction({ commentId, status }: { commentId: string; status: "approve" | "delete" }) {
+  const supabase = await createClient();
+  const { data: isUserAdmin } = await supabase.rpc("is_admin");
+
+  if (!isUserAdmin) {
+    return { success: false, error: "Access denied. Admin role required." };
+  }
+
+  if (status === "approve") {
+    const { error } = await supabase
+      .from("comments")
+      .update({ is_approved: true })
+      .eq("id", commentId);
+
+    if (error) return { success: false, error: error.message };
+  } else {
+    const { error } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id", commentId);
+
+    if (error) return { success: false, error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
