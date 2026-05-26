@@ -62,7 +62,7 @@ export default async function LocaleLayout({
         
         {/* Custom Meta & Scripts */}
         <meta name="impact-site-verification" content="c188c067-926f-4925-8c8b-e04b15769573" />
-        <meta name="google-site-verification" content="BJYm8JSKI4BDrYrkwuPrIEynUPXylZ52ziWOE7DrGDY" />
+        <meta name="google-site-verification" content="BsuKe58zHtvtyw7zN_tK9zTo_ZDK7qW533ds7-uoPEg" />
         <script
           {...{ nowprocket: "true" }}
           data-noptimize="1"
