@@ -7,7 +7,6 @@ import { z } from "zod";
 import { Redis } from '@upstash/redis';
 
 // Ensure this file executes on default Node.js runtime for TCP access
-export const runtime = "nodejs";
 
 // Rate Limit helper using Upstash Redis
 async function rateLimit(key: string, limit: number, durationSeconds: number): Promise<{ success: boolean; remaining: number }> {
