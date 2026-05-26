@@ -62,6 +62,7 @@ export default async function LocaleLayout({
         
         {/* Custom Meta & Scripts */}
         <meta name="impact-site-verification" content="c188c067-926f-4925-8c8b-e04b15769573" />
+        <meta name='impact-site-verification' value='ca6b1edc-0537-4c76-89fe-cbb058b59229'>
         <meta name="google-site-verification" content="BsuKe58zHtvtyw7zN_tK9zTo_ZDK7qW533ds7-uoPEg" />
         <script
           {...{ nowprocket: "true" }}
