@@ -17,14 +17,14 @@ export async function GET(request: Request) {
         .from('users')
         .select('role')
         .eq('id', authData.user.id)
+        .returns<{ role: string | null }>()
         .single();
         
       let redirectPath = `/${locale}/saved`; // Default for standard users
-      const userRole = (profile as any)?.role;
       
-      if (userRole === 'admin') {
+      if (profile?.role === 'admin') {
         redirectPath = `/${locale}/admin`;
-      } else if (userRole === 'expert') {
+      } else if (profile?.role === 'expert') {
         redirectPath = `/${locale}/dashboard`;
       }
       

@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
       .from("users")
       .select("role")
       .eq("id", user.id)
+      .returns<{ role: string | null }>()
       .maybeSingle();
 
     if (profileError || profile?.role !== "admin") {

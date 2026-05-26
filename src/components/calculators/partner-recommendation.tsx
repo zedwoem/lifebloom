@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 
@@ -21,6 +22,7 @@ export function PartnerRecommendation({ calculatorSlug }: PartnerRecommendationP
   const [placement, setPlacement] = useState<Placement | null>(null);
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
     async function fetchPlacement() {
@@ -59,16 +61,18 @@ export function PartnerRecommendation({ calculatorSlug }: PartnerRecommendationP
     >
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 p-2 flex items-center justify-center border border-slate-100 dark:border-slate-700/50 shadow-sm shrink-0">
-          {/* Using custom partner logo URL to avoid adblock patterns */}
-          <img 
-            src={placement.logo_url} 
-            alt={placement.partner_name} 
-            className="w-full h-full object-contain"
-            onError={(e) => {
-              // Fallback icon if image fails
-              (e.target as HTMLElement).style.display = "none";
-            }}
-          />
+          {/* Using next/image with unoptimized for arbitrary partner logo domains */}
+          {!logoError && (
+            <Image
+              src={placement.logo_url}
+              alt={placement.partner_name}
+              width={40}
+              height={40}
+              className="w-full h-full object-contain"
+              unoptimized
+              onError={() => setLogoError(true)}
+            />
+          )}
         </div>
         <div>
           <p className="text-xs uppercase font-extrabold tracking-widest text-emerald-600 dark:text-emerald-400">

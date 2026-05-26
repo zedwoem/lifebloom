@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { Building2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
@@ -10,14 +11,24 @@ interface PartnerStewardshipCardProps {
 }
 
 export function PartnerStewardshipCard({ sponsorName, sponsorLogoUrl, stewardshipMessage, websiteUrl }: PartnerStewardshipCardProps) {
+  const [logoError, setLogoError] = useState(false);
+
   return (
     <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 md:p-8 rounded-3xl border border-indigo-100 mt-12 mb-8">
       <div className="flex flex-col md:flex-row gap-6 items-center md:items-start text-center md:text-left">
         
         {/* Sponsor Logo / Avatar */}
         <div className="w-20 h-20 shrink-0 bg-white rounded-2xl shadow-sm border border-indigo-50 flex items-center justify-center overflow-hidden">
-          {sponsorLogoUrl ? (
-            <img src={sponsorLogoUrl} alt={`Logo ${sponsorName}`} className="w-full h-full object-contain p-2" />
+          {sponsorLogoUrl && !logoError ? (
+            <Image
+              src={sponsorLogoUrl}
+              alt={`Logo ${sponsorName}`}
+              width={72}
+              height={72}
+              className="w-full h-full object-contain p-2"
+              unoptimized
+              onError={() => setLogoError(true)}
+            />
           ) : (
             <Building2 className="w-8 h-8 text-indigo-300" />
           )}
@@ -53,3 +64,4 @@ export function PartnerStewardshipCard({ sponsorName, sponsorLogoUrl, stewardshi
     </div>
   );
 }
+

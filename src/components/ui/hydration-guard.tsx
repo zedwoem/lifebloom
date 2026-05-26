@@ -7,12 +7,14 @@ interface HydrationGuardProps {
   fallbackHeight?: string; // Tailwind class like "h-[200px]" or "h-[400px]"
 }
 
+// Inactivity timeout constant: 15 minutes (15 * 60 * 1000 ms)
+// Defined at module scope so it is stable across renders and satisfies
+// react-hooks/exhaustive-deps without triggering unnecessary re-renders.
+const INACTIVITY_LIMIT = 15 * 60 * 1000;
+
 export function HydrationGuard({ children, fallbackHeight = "h-48" }: HydrationGuardProps) {
   const [mounted, setMounted] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Inactivity timeout constant: 15 minutes (15 * 60 * 1000 ms)
-  const INACTIVITY_LIMIT = 15 * 60 * 1000;
 
   useEffect(() => {
     setMounted(true);
