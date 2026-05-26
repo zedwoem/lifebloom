@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { pdf, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { useTranslations } from 'next-intl';
+import { PartnerRecommendation } from "@/components/calculators/partner-recommendation";
 
 const styles = StyleSheet.create({
   page: { padding: 40, fontFamily: 'Helvetica' },
@@ -87,6 +88,10 @@ export function HomeBudgetCalculator() {
         <p className="text-lg text-slate-600 mb-6">
           {t('budget_calculator_desc')}
         </p>
+
+        <Suspense fallback={<div className="h-20 animate-pulse bg-slate-50 border border-slate-200 rounded-2xl mb-6" />}>
+          <PartnerRecommendation calculatorSlug="Home Budget Calculator" />
+        </Suspense>
 
         <div className="space-y-6">
           <div>

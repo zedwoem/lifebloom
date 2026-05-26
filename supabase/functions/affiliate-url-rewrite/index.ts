@@ -20,7 +20,7 @@ serve(async (req, connInfo) => {
   }
 
   // Rewrite logic based on vendor
-  let targetUrl = "https://lifebloomhub.com"; // default fallback
+  let targetUrl = Deno.env.get("NEXT_PUBLIC_APP_URL") || "https://lifebloomhub.vercel.app"; // default fallback
 
   if (vendor === "amazon") {
     const affiliateTag = Deno.env.get("AFFILIATE_AMAZON_PARTNER_TAG") || "lifebloom-20";
@@ -29,6 +29,29 @@ serve(async (req, connInfo) => {
     targetUrl = `https://www.chewy.com/dp/${productId}?aff=lifebloom`;
   } else if (vendor === "travelpayouts") {
     targetUrl = `https://search.jetradar.com/flights/${productId}?marker=lifebloom`;
+  } else if (vendor === "b2b") {
+    try {
+      const { data: placement, error } = await supabase
+        .from("b2b_placements")
+        .select("target_url, partner_name")
+        .eq("id", productId)
+        .maybeSingle();
+      
+      if (!error && placement) {
+        targetUrl = placement.target_url;
+        
+        // Audit log B2B click in activity_logs for RPM calculating
+        if (userId) {
+          await supabase.from("activity_logs").insert({
+            user_id: userId,
+            action_type: `b2b_click_${placement.partner_name.toLowerCase().replace(/\s+/g, '_')}`,
+            points_awarded: 5
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch B2B placement URL:", e);
+    }
   }
 
   // Non-blocking award points

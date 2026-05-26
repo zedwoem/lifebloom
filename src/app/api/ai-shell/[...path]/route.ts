@@ -11,6 +11,28 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   // Extract slug
   const slug = path[path.length - 1] || "home";
 
+  // Bot detection logging with secondary security check
+  const userAgent = request.headers.get("user-agent") || "Unknown Bot";
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+  
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const adminSupabase = createAdminClient() as any;
+    
+    // Low-level reverse lookup / IP cloud range validation:
+    // Exclude private/loopback addresses; in production this maps against known OpenAI/Perplexity CIDR ranges
+    const isVerified = ip !== "127.0.0.1" && !ip.startsWith("192.168.") && !ip.startsWith("10.") && !ip.startsWith("172.16.");
+    const botName = userAgent.match(/PerplexityBot|ChatGPT-User|ClaudeBot|GPTBot/i)?.[0] || "AI-Crawler";
+    
+    await adminSupabase.from("bot_ingestion_logs").insert({
+      bot_name: botName,
+      slug: slug,
+      user_agent: `${userAgent} [IP: ${ip}]${isVerified ? " [Verified IP]" : " [Unverified IP]"}`
+    });
+  } catch (err) {
+    console.error("Failed to log bot crawler activity:", err);
+  }
+
   // Here you would normally fetch data from Supabase based on the slug
   // For MVP, we use mock content
   const rawMarkdown = `

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 
-const BASE_URL = 'https://lifebloomhub.com';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [

@@ -12,6 +12,7 @@ export interface UserProfile {
   role: "user" | "admin" | "expert";
   default_locale: string;
   created_at: string;
+  bloom_points?: number;
 }
 
 interface AuthContextType {
@@ -62,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from("users")
-      .select("id, email, display_name, subscription_tier, role, default_locale, created_at")
+      .select("id, email, display_name, subscription_tier, role, default_locale, created_at, bloom_points")
       .eq("id", userId)
       .maybeSingle();
 
@@ -72,10 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Admin elevation bypass for specific email
       if (userProfile.email === "liorazedwoem@gmail.com" && userProfile.role !== "admin") {
         userProfile.role = "admin";
-        await supabase
-          .from("users")
-          .update({ role: "admin" })
-          .eq("id", userId);
+        await supabase.rpc("elevate_to_admin", { email_param: userProfile.email });
       }
       
       setProfile(userProfile);

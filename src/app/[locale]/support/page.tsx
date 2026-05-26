@@ -14,7 +14,7 @@ export default function HelpdeskPage() {
           <div>
             <h3 className="font-bold text-lg text-slate-800">Email Support</h3>
             <p className="text-slate-500 mt-1">Get a response within 24 hours.</p>
-            <p className="font-semibold text-brand-blue mt-2">support@lifebloomhub.com</p>
+            <p className="font-semibold text-brand-blue mt-2">support@lifebloomhub.vercel.app</p>
           </div>
         </div>
 

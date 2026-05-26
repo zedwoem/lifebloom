@@ -32,6 +32,10 @@ export function UnifiedStructuredData({
   entitySpecificData = {},
 }: StructuredDataProps) {
   
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://lifebloomhub.vercel.app";
+  const defaultImage = `${appUrl}/og-image.png`;
+  const finalImage = image === "https://lifebloomhub.com/og-image.png" ? defaultImage : image;
+
   // Single Root @id
   const urlId = currentUrl.endsWith("/") ? currentUrl : `${currentUrl}/`;
 
@@ -39,10 +43,10 @@ export function UnifiedStructuredData({
     "@type": "Organization",
     "@id": `${urlId}#organization`,
     "name": "LifeBloom Hub",
-    "url": "https://lifebloomhub.com",
+    "url": appUrl,
     "logo": {
       "@type": "ImageObject",
-      "url": "https://lifebloomhub.com/logo.png"
+      "url": `${appUrl}/logo.png`
     },
     "sameAs": [
       "https://twitter.com/lifebloomhub",
@@ -53,7 +57,7 @@ export function UnifiedStructuredData({
   const websiteNode = {
     "@type": "WebSite",
     "@id": `${urlId}#website`,
-    "url": "https://lifebloomhub.com",
+    "url": appUrl,
     "name": "LifeBloom Hub",
     "description": "Inclusive Automated High-Yield Utility Platform",
     "publisher": { "@id": `${urlId}#organization` },
@@ -70,7 +74,7 @@ export function UnifiedStructuredData({
     "about": { "@id": `${urlId}#organization` },
     "primaryImageOfPage": {
       "@type": "ImageObject",
-      "url": image
+      "url": finalImage
     },
     "datePublished": publishDate,
     "dateModified": modifiedDate || publishDate,
@@ -83,7 +87,7 @@ export function UnifiedStructuredData({
     "mainEntityOfPage": { "@id": `${urlId}#webpage` },
     "headline": pageTitle,
     "description": pageDescription,
-    "image": image,
+    "image": finalImage,
     ...entitySpecificData
   };
 

@@ -1,6 +1,12 @@
 import crypto from 'crypto';
 import { PILLARS } from '@/lib/constants/pillars';
 import { translationAdapter } from '@/lib/services/translationAdapter';
+import nlp from 'compromise';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface RSSItem {
   title: string;
@@ -19,9 +25,6 @@ export interface IngestedArticle extends RSSItem {
   translatedDescription?: string;
 }
 
-// In-memory static database to demonstrate "ON CONFLICT DO NOTHING"
-const articleDatabase = new Set<string>();
-
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || "fb981b557612c4b76c126c9ed4e40ea5";
 
 const PILLAR_QUERIES = [
@@ -33,7 +36,23 @@ const PILLAR_QUERIES = [
 ];
 
 function generateHash(title: string, link: string): string {
-  return crypto.createHash('sha256').update(`${title}|${link}`).digest('hex');
+  const normalizedStr = `${title.toLowerCase()}|${link.trim().toLowerCase()}`;
+  return crypto.createHash('sha256').update(normalizedStr).digest('hex');
+}
+
+function cleanContent(rawText: string): string {
+  if (!rawText) return '';
+  // Strip raw HTML tags first
+  const noHtml = rawText.replace(/<[^>]*>?/gm, '');
+  // NLP normalization
+  const doc = nlp(noHtml);
+  doc.normalize({
+    whitespace: true,
+    punctuation: true,
+    case: false,
+    unicode: true,
+  });
+  return doc.text();
 }
 
 export async function ingestRSSFeeds(targetLang: string = 'en'): Promise<IngestedArticle[]> {
@@ -55,36 +74,67 @@ export async function ingestRSSFeeds(targetLang: string = 'en'): Promise<Ingeste
       for (const item of articles) {
         const hashId = generateHash(item.title, item.url);
 
-        // Deduplication Check (ON CONFLICT DO NOTHING)
-        if (articleDatabase.has(hashId)) {
-          continue;
-        }
+        const cleanDesc = cleanContent(item.description);
+        const cleanBody = cleanContent(item.content || item.description);
 
-        articleDatabase.add(hashId);
-
-        // We skip translation API calls here if targetLang is 'en' to save resources,
-        // but for 'id', we would call the translation adapter.
         let translatedTitle = item.title;
-        let translatedDescription = item.description;
+        let translatedDescription = cleanDesc;
 
         if (targetLang !== 'en') {
           translatedTitle = await translationAdapter.translate(item.title, targetLang);
-          translatedDescription = await translationAdapter.translate(item.description, targetLang);
+          translatedDescription = await translationAdapter.translate(cleanDesc, targetLang);
         }
 
-        newArticles.push({
-          title: item.title,
-          link: item.url,
-          description: item.description,
-          content: item.content || item.description,
-          imageUrl: item.image || "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
-          pubDate: item.publishedAt,
-          source: item.source?.name || "News Feed",
-          hashId,
-          pillar,
-          translatedTitle,
-          translatedDescription
-        });
+        // Supabase Persistent Deduplication
+        // ON CONFLICT (content_hash) DO NOTHING
+        const { data: insertedData, error } = await supabase
+          .from('aggregated_content')
+          .upsert(
+            {
+              pillar: pillar,
+              source_type: 'rss',
+              source_name: item.source?.name || "News Feed",
+              original_url: item.url,
+              title_en: item.title,
+              title_id: targetLang === 'id' ? translatedTitle : null,
+              title_es: targetLang === 'es' ? translatedTitle : null,
+              title_fr: targetLang === 'fr' ? translatedTitle : null,
+              title_de: targetLang === 'de' ? translatedTitle : null,
+              summary_en: cleanDesc,
+              summary_id: targetLang === 'id' ? translatedDescription : null,
+              summary_es: targetLang === 'es' ? translatedDescription : null,
+              summary_fr: targetLang === 'fr' ? translatedDescription : null,
+              summary_de: targetLang === 'de' ? translatedDescription : null,
+              image_url: item.image || "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
+              content_hash: hashId,
+              published_at: item.publishedAt,
+              metadata: { content: cleanBody }
+            },
+            { onConflict: 'content_hash', ignoreDuplicates: true }
+          )
+          .select();
+
+        if (error) {
+          console.error(`[RSS Ingest] Supabase Upsert Error for ${hashId}:`, error.message);
+          continue;
+        }
+
+        // If data was returned, it means it was inserted (not ignored)
+        if (insertedData && insertedData.length > 0) {
+          newArticles.push({
+            title: item.title,
+            link: item.url,
+            description: cleanDesc,
+            content: cleanBody,
+            imageUrl: item.image || "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
+            pubDate: item.publishedAt,
+            source: item.source?.name || "News Feed",
+            hashId,
+            pillar,
+            translatedTitle,
+            translatedDescription
+          });
+        }
       }
     } catch (error) {
       console.error(`[GNews] Error ingesting feed for ${pillar}:`, error);

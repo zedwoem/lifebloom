@@ -1,39 +1,84 @@
 import { NextResponse } from 'next/server';
-
-// Mock DB for user calculations & points
-const mockDB = new Map();
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
   try {
-    const data = await req.json();
-    const { userId, calculatorSlug, inputParams, outputResults } = data;
+    const supabase = await createClient();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Save calculation history
-    const history = mockDB.get(`history_${userId}`) || [];
-    history.push({
-      calculatorSlug,
-      inputParams,
-      outputResults,
-      timestamp: new Date().toISOString()
-    });
-    mockDB.set(`history_${userId}`, history);
+    const data = await req.json();
+    const { calculatorSlug, inputParams, outputResults } = data;
 
-    // Trigger Gamification: awardPoints (+15 Bloom Points)
-    const points = mockDB.get(`points_${userId}`) || 0;
-    const newPoints = points + 15;
-    mockDB.set(`points_${userId}`, newPoints);
+    // Simpan riwayat kalkulasi secara asinkron (Save calculation history)
+    const { error: insertError } = await supabase
+      .from('calculations_history')
+      .insert({
+        user_id: user.id,
+        calculator_slug: calculatorSlug,
+        input_params: inputParams,
+        output_results: outputResults
+      });
+
+    if (insertError) {
+      throw insertError;
+    }
+
+    // Pemicu Gamifikasi: awardPoints (+15 Bloom Points)
+    // Dijalankan secara asinkron tanpa memblokir respon ke pengguna
+    const awardPointsPromise = (async () => {
+      const { error } = await supabase.rpc("award_points_secure", {
+        user_id_param: user.id,
+        amount: 15
+      });
+      if (error) {
+        console.error("[Calculations Gamification Error]:", error.message);
+      }
+    })();
+
+    if (typeof (req as any).waitUntil === 'function') {
+      (req as any).waitUntil(awardPointsPromise);
+    } else {
+      awardPointsPromise.catch(console.error);
+    }
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Calculation saved and 15 Bloom Points awarded!',
-      totalPoints: newPoints 
+      message: 'Calculation saved and 15 Bloom Points awarded!'
     });
 
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Calculations Save Error:", error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data, error } = await supabase
+      .from('calculations_history')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("Calculations Fetch Error:", error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

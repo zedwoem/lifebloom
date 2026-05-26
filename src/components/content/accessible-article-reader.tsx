@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, Share2, Printer, Contrast, Play, Square, Pause, ThumbsUp, Lightbulb, Heart } from 'lucide-react';
+import { ChevronLeft, Share2, Printer, Contrast, Play, Square, Pause, ThumbsUp, Lightbulb, Heart, Bookmark } from 'lucide-react';
 import { toast } from 'sonner';
 import { EmbedGenerator } from '@/components/ui/embed-generator';
 import { SponsorShowcase } from '@/components/content/sponsor-showcase';
@@ -14,12 +14,69 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [highContrast, setHighContrast] = useState(false);
   const [reactionState, setReactionState] = useState<string[]>([]);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   
   // TTS State
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const isNativeSpeechRef = useRef(false);
+
+  // Check if article is bookmarked on mount
+  useEffect(() => {
+    async function checkBookmark() {
+      try {
+        const res = await fetch("/api/user/saved-items");
+        if (res.ok) {
+          const items = await res.json();
+          const found = items.some((item: any) => item.referenced_id === slug && item.item_type === "article");
+          setIsBookmarked(found);
+        }
+      } catch (err) {
+        console.error("Failed to fetch bookmarks:", err);
+      }
+    }
+    if (slug) {
+      checkBookmark();
+    }
+  }, [slug]);
+
+  const handleBookmarkToggle = async () => {
+    try {
+      if (isBookmarked) {
+        const res = await fetch(`/api/user/saved-items?referenced_id=${slug}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          setIsBookmarked(false);
+          toast.success(locale === 'id' ? "Artikel dihapus dari simpanan." : "Article removed from saved items.");
+        }
+      } else {
+        const res = await fetch("/api/user/saved-items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            item_type: "article",
+            referenced_id: slug,
+            metadata: {
+              title: article.title,
+              pillar: article.pillar || "health",
+              source: article.source,
+              image_url: article.imageUrl
+            }
+          }),
+        });
+        if (res.ok) {
+          setIsBookmarked(true);
+          toast.success(locale === 'id' ? "Artikel berhasil disimpan!" : "Article saved to your dashboard!");
+        } else {
+          toast.error(locale === 'id' ? "Silakan masuk untuk menyimpan artikel." : "Please sign in to save articles.");
+        }
+      }
+    } catch (err) {
+      toast.error("Failed to update bookmark.");
+    }
+  };
 
   const handleCopy = (e: React.ClipboardEvent) => {
     e.preventDefault();
@@ -346,10 +403,16 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
           className={proseClasses}
           style={{ animationDelay: '0.2s' }}
           dangerouslySetInnerHTML={{ __html: processedContent }}
-        />
-
-        {/* Reaction Emojis */}
-        <div className="mt-12 flex justify-center gap-4 animate-fade-in print:hidden">
+        />        {/* Reaction Emojis & Bookmark */}
+        <div className="mt-12 flex flex-wrap justify-center gap-4 animate-fade-in print:hidden">
+          <button 
+            onClick={handleBookmarkToggle}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold transition-all hover:scale-110 min-h-[48px] ${isBookmarked ? 'bg-brand-green border-brand-green text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}
+          >
+            <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} /> 
+            {isBookmarked ? (locale === 'id' ? "Tersimpan" : "Saved") : (locale === 'id' ? "Simpan" : "Save")}
+          </button>
+          
           <button 
             onClick={() => {
               if (!reactionState.includes('helpful')) {
@@ -357,7 +420,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
                 toast.success("Glad you found this helpful!", { icon: "👍" });
               }
             }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 ${reactionState.includes('helpful') ? 'bg-brand-green border-brand-green text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 min-h-[48px] ${reactionState.includes('helpful') ? 'bg-brand-green/20 border-brand-green text-brand-green shadow-sm' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}
           >
             <ThumbsUp className={`w-4 h-4 ${reactionState.includes('helpful') ? 'animate-bounce' : ''}`} /> Helpful
           </button>
@@ -368,7 +431,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
                 toast.success("Thanks for your feedback!", { icon: "💡" });
               }
             }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 ${reactionState.includes('insightful') ? 'bg-brand-blue border-brand-blue text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-blue hover:text-brand-blue'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 min-h-[48px] ${reactionState.includes('insightful') ? 'bg-brand-blue/20 border-brand-blue text-brand-blue shadow-sm' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-blue hover:text-brand-blue'}`}
           >
             <Lightbulb className={`w-4 h-4 ${reactionState.includes('insightful') ? 'animate-pulse' : ''}`} /> Insightful
           </button>
@@ -379,7 +442,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
                 toast.success("We love that you love it!", { icon: "❤️" });
               }
             }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 ${reactionState.includes('love') ? 'bg-rose-500 border-rose-500 text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-rose-500 hover:text-rose-500'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold transition-all hover:scale-110 min-h-[48px] ${reactionState.includes('love') ? 'bg-rose-50 border-rose-500 text-rose-500 shadow-sm' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-rose-500 hover:text-rose-500'}`}
           >
             <Heart className={`w-4 h-4 ${reactionState.includes('love') ? 'animate-ping' : ''}`} /> Love it
           </button>

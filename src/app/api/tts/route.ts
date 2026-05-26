@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   // === SECURITY CHECK: Prevent external scraping ===
   const referer = request.headers.get("referer") || "";
   const origin = request.headers.get("origin") || "";
-  const allowedHost = process.env.NEXT_PUBLIC_BASE_URL || "lifebloomhub.com";
+  const allowedHost = process.env.NEXT_PUBLIC_APP_URL || "https://lifebloomhub.vercel.app";
   
   if (!referer.includes(allowedHost) && !origin.includes(allowedHost)) {
     console.warn(`[SECURITY] Blocked unauthorized TTS request from Origin: ${origin}, Referer: ${referer}`);
