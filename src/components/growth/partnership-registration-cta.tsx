@@ -33,7 +33,7 @@ export function PartnershipRegistrationCTA() {
 
           <div className="w-full mt-6 bg-white/10 rounded-xl p-4 border border-white/20 backdrop-blur-sm">
             <iframe 
-              data-tally-src="https://tally.so/embed/mrxG7p?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1" 
+              data-tally-src={process.env.NEXT_PUBLIC_TALLY_PARTNERSHIP_FORM_URL || "https://tally.so/embed/mrxG7p?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"} 
               loading="lazy" 
               width="100%" 
               height="200" 
