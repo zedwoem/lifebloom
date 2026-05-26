@@ -33,6 +33,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HydrationGuard } from "@/components/ui/hydration-guard";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { moderateCommentAction } from "@/lib/actions/communityActions";
+import { submitQuestionAnswer } from "@/lib/actions/userActions";
+import { updateWebsiteSetting, getWebsiteSettings } from "@/lib/actions/settingsActions";
 
 // Prevent Leaflet SSR crash by loading dynamically with ssr: false
 const DynamicTravelMap = dynamic(
@@ -51,11 +55,12 @@ export default function UnifiedMultiRoleDashboard() {
   const { profile, signOut } = useAuth();
   const params = useParams();
   const locale = params.locale || "en";
+  const supabase = createClient();
 
   // Role is strictly derived from verified server-side user profile
   const activeRole = profile?.role || "user";
 
-  // Telemetry Feature Flags State managed by Admin
+  // Telemetry Feature Flags State managed by Admin (loaded from DB/website_settings)
   const [featureFlags, setFeatureFlags] = useState({
     bigQueryPipeline: true,
     pageSpeedAudits: true,
@@ -66,49 +71,165 @@ export default function UnifiedMultiRoleDashboard() {
   });
 
   // Expert portal Q&A stream and TipTap modal
-  const [pendingQna, setPendingQna] = useState([
-    { id: "1", author: "Aisyah (User)", question: "Apakah obat ibuprofen aman diminum penderita asam lambung sebelum makan?" },
-    { id: "2", author: "Budi (User)", question: "Bawang merah masuk ke resep masakan, apakah uapnya berbahaya bagi mata kucing?" },
-    { id: "3", author: "Grandma Evelyn", question: "How often should a 72-year-old walk daily to maintain joint flexibility without strain?" }
-  ]);
+  const [pendingQna, setPendingQna] = useState<any[]>([]);
   const [activeAnswerId, setActiveAnswerId] = useState<string | null>(null);
   const [expertResponse, setExpertResponse] = useState("");
 
   // Admin portal comments moderation queue
-  const [pendingComments, setPendingComments] = useState([
-    { id: "1", author: "Rizal", email: "rizal@gmail.com", content: "Sangat membantu untuk kalkulasi yield pensiun saya!", article: "Panduan Slow-Travel 60+" },
-    { id: "2", author: "Clara", email: "clara@yahoo.com", content: "Apakah ada dosis alternatif untuk acetaminophen?", article: "Kitchen Medication Guard" }
-  ]);
+  const [pendingComments, setPendingComments] = useState<any[]>([]);
 
-  // Sync role with user profile is no longer needed as activeRole is directly derived
+  // Performance stats for Expert
+  const [expertStats, setExpertStats] = useState({
+    totalViews: 0,
+    fdaTerms: 88, // static index fallback
+    clinicalImpact: "Tinggi (E-E-A-T)"
+  });
 
-  // Toggle Feature Flag Handler
-  const handleToggleFlag = (flagKey: keyof typeof featureFlags, name: string) => {
-    const updatedFlags = { ...featureFlags, [flagKey]: !featureFlags[flagKey] };
+  // Load Database Values on Mount
+  useEffect(() => {
+    async function loadDashboardData() {
+      // 1. Fetch pending comments if Admin
+      if (activeRole === "admin") {
+        const { data: cData } = await supabase
+          .from("comments")
+          .select(`
+            id,
+            content,
+            author_name,
+            author_email,
+            articles ( title )
+          `)
+          .eq("is_approved", false)
+          .order("created_at", { ascending: false });
+          
+        if (cData) {
+          const mapped = cData.map(c => ({
+            id: c.id,
+            author: c.author_name,
+            email: c.author_email,
+            content: c.content,
+            article: (c.articles as any)?.title || "Artikel Tanpa Judul"
+          }));
+          setPendingComments(mapped);
+        }
+      }
+
+      // 2. Fetch pending QnA if Expert / Admin
+      if (activeRole === "expert" || activeRole === "admin") {
+        const { data: qData } = await supabase
+          .from("questions")
+          .select("*")
+          .eq("status", "pending")
+          .order("created_at", { ascending: false });
+
+        if (qData) {
+          setPendingQna(qData);
+        }
+
+        // Fetch total article views for this expert
+        const { data: viewsData } = await supabase
+          .from("content_metrics")
+          .select("total_views");
+        
+        if (viewsData) {
+          const sum = viewsData.reduce((acc, curr) => acc + (Number(curr.total_views) || 0), 0);
+          setExpertStats(prev => ({
+            ...prev,
+            totalViews: sum || 12420 // fallback if empty
+          }));
+        }
+      }
+
+      // 3. Load Feature Flags from website_settings Table
+      const settings = await getWebsiteSettings();
+      if (settings && settings.length > 0) {
+        const flags = {
+          bigQueryPipeline: settings.find(s => s.key === "feature_bigquery_pipeline")?.value === "true",
+          pageSpeedAudits: settings.find(s => s.key === "feature_pagespeed_audits")?.value === "true" || true,
+          openFdaVerification: settings.find(s => s.key === "feature_openFda")?.value === "true",
+          fredEconomicFeed: settings.find(s => s.key === "feature_fred_feed")?.value === "true",
+          usdaRecipeMatcher: settings.find(s => s.key === "feature_usda_recipe")?.value === "true" || true,
+          supportWallRealtime: settings.find(s => s.key === "feature_support_wall")?.value === "true",
+        };
+        setFeatureFlags(flags);
+      }
+    }
+
+    if (profile) {
+      loadDashboardData();
+    }
+  }, [profile, activeRole, supabase]);
+
+  // Toggle Feature Flag Handler (Saves to DB!)
+  const handleToggleFlag = async (flagKey: keyof typeof featureFlags, name: string) => {
+    const nextVal = !featureFlags[flagKey];
+    const updatedFlags = { ...featureFlags, [flagKey]: nextVal };
     setFeatureFlags(updatedFlags);
-    try {
-      localStorage.setItem("admin_feature_flags", JSON.stringify(updatedFlags));
-    } catch (e) {}
-    
-    toast.success(`${name} pipeline successfully ${updatedFlags[flagKey] ? "ENABLED" : "DISABLED"}.`);
+
+    // Map flag key to database website_settings key
+    const dbKeys: Record<string, string> = {
+      bigQueryPipeline: "feature_bigquery_pipeline",
+      pageSpeedAudits: "feature_pagespeed_audits",
+      openFdaVerification: "feature_openFda",
+      fredEconomicFeed: "feature_fred_feed",
+      usdaRecipeMatcher: "feature_usda_recipe",
+      supportWallRealtime: "feature_support_wall",
+    };
+
+    const dbKey = dbKeys[flagKey];
+    if (dbKey) {
+      toast.loading(`Menyinkronkan ${name}...`);
+      const res = await updateWebsiteSetting({
+        key: dbKey,
+        value: String(nextVal),
+        description: `Feature flag for ${name}`
+      });
+      toast.dismiss();
+      if (res.success) {
+        toast.success(`${name} pipeline successfully ${nextVal ? "ENABLED" : "DISABLED"}.`);
+      } else {
+        toast.error("Gagal menyinkronkan status ke database.");
+      }
+    }
   };
 
   // Submit Expert Response Handler
-  const handleSubmitAnswer = (id: string) => {
+  const handleSubmitAnswer = async (id: string) => {
     if (!expertResponse.trim()) {
       toast.error("Please enter a clinical verification message.");
       return;
     }
-    toast.success("Tanggapan pakar terverifikasi berhasil dikirim.");
-    setPendingQna(pendingQna.filter((q) => q.id !== id));
-    setActiveAnswerId(null);
-    setExpertResponse("");
+
+    toast.loading("Mengirim jawaban medis...");
+    const res = await submitQuestionAnswer({
+      questionId: id,
+      answerContent: expertResponse
+    });
+    toast.dismiss();
+
+    if (res.success) {
+      toast.success("Tanggapan pakar terverifikasi berhasil dikirim.");
+      setPendingQna(pendingQna.filter((q) => q.id !== id));
+      setActiveAnswerId(null);
+      setExpertResponse("");
+    } else {
+      toast.error(res.error || "Gagal menyimpan jawaban.");
+    }
   };
 
-  // Moderate Comment Handler
-  const handleModerateComment = (id: string, action: "approve" | "reject") => {
-    toast.success(`Komentar successfully ${action === "approve" ? "APPROVED and published" : "REJECTED and purged"}.`);
-    setPendingComments(pendingComments.filter((c) => c.id !== id));
+  // Moderate Comment Handler (Connects directly to DB Action!)
+  const handleModerateComment = async (id: string, action: "approve" | "reject") => {
+    toast.loading(`Memproses moderasi komentar...`);
+    const status = action === "approve" ? "approve" : "delete";
+    const res = await moderateCommentAction({ commentId: id, status });
+    toast.dismiss();
+
+    if (res.success) {
+      toast.success(`Komentar successfully ${action === "approve" ? "APPROVED and published" : "REJECTED and purged"}.`);
+      setPendingComments(pendingComments.filter((c) => c.id !== id));
+    } else {
+      toast.error(res.error || "Gagal memproses moderasi.");
+    }
   };
 
   return (
@@ -244,7 +365,7 @@ export default function UnifiedMultiRoleDashboard() {
           {/* ========================================== */}
           {/* 2. EXPERT PORTAL WORKSPACE                 */}
           {/* ========================================== */}
-          {activeRole === "expert" && (
+          {(activeRole === "expert" || activeRole === "admin") && (
             <div className="space-y-8 animate-fadeIn">
               
               {/* Citations & Performance Meters */}
@@ -256,7 +377,9 @@ export default function UnifiedMultiRoleDashboard() {
                   </div>
                   <div>
                     <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Pembaca Artikel</span>
-                    <strong className="text-2xl font-extrabold Atkinson-font">12,420 Warga</strong>
+                    <strong className="text-2xl font-extrabold Atkinson-font">
+                      {expertStats.totalViews.toLocaleString()} Warga
+                    </strong>
                   </div>
                 </Card>
 
@@ -266,7 +389,7 @@ export default function UnifiedMultiRoleDashboard() {
                   </div>
                   <div>
                     <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Verifikasi Istilah Obat</span>
-                    <strong className="text-2xl font-extrabold Atkinson-font">88 Istilah (FDA)</strong>
+                    <strong className="text-2xl font-extrabold Atkinson-font">{expertStats.fdaTerms} Istilah (FDA)</strong>
                   </div>
                 </Card>
 
@@ -276,13 +399,13 @@ export default function UnifiedMultiRoleDashboard() {
                   </div>
                   <div>
                     <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Indeks Dampak Klinis</span>
-                    <strong className="text-2xl font-extrabold Atkinson-font">Tinggi (E-E-A-T)</strong>
+                    <strong className="text-2xl font-extrabold Atkinson-font">{expertStats.clinicalImpact}</strong>
                   </div>
                 </Card>
 
               </div>
 
-              {/* Tiptap Article Editor Panel */}
+              {/* Tiptap Article Editor Panel (Visual Upgrade) */}
               <Card className="rounded-3xl bg-white border border-slate-100 shadow-soft-ambient p-8 space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-[#faf8ff] rounded-2xl flex items-center justify-center border border-slate-100">
@@ -296,89 +419,89 @@ export default function UnifiedMultiRoleDashboard() {
 
                 <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50 space-y-4">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">Format Penulisan Minimalis</span>
-                  <div className="h-32 bg-white rounded-xl border border-slate-100 p-4 font-mono text-sm text-slate-500">
-                    [Tulis panduan Anda di sini... Gunakan @ untuk memunculkan modal istilah obat terverifikasi FDA]
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <button className="px-5 py-3 bg-[#faf8ff] border border-slate-200 text-slate-700 rounded-xl font-bold text-sm min-h-[52px] hover:bg-slate-100 transition-all">
-                      Simpan Draf
-                    </button>
-                    <button 
-                      onClick={() => toast.success("Draft artikel diajukan untuk Peer-Review admin.")}
-                      className="px-5 py-3 bg-[#006948] hover:bg-[#005439] text-white rounded-xl font-bold text-sm min-h-[52px] transition-all"
-                    >
-                      Ajukan Review
+                  <textarea 
+                    className="w-full h-32 bg-white rounded-xl border border-slate-200 p-4 font-sans text-base text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#006948]/30 placeholder:text-slate-400 transition-all"
+                    placeholder="Tulis panduan Anda di sini... Gunakan @ untuk memunculkan modal istilah obat terverifikasi FDA"
+                  />
+                  <div className="flex justify-end">
+                    <button className="px-5 py-2.5 bg-[#006948] text-white font-bold rounded-xl text-sm transition-all hover:bg-[#005439] min-h-[44px]">
+                      Ajukan Artikel Reviewer
                     </button>
                   </div>
                 </div>
               </Card>
 
-              {/* Question Answering Stream */}
+              {/* Expert Q&A Clinical Stream */}
               <Card className="rounded-3xl bg-white border border-slate-100 shadow-soft-ambient p-8 space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center border border-rose-100">
-                      <MessageSquare className="w-6 h-6 text-rose-600" />
+                    <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100">
+                      <HelpCircle className="w-6 h-6 text-amber-600" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold tracking-tight Atkinson-font">Pertanyaan Warga Butuh Verifikasi Pakar</h3>
-                      <p className="text-slate-500 text-base">Berikan tanggapan ilmiah jargon-free untuk memberikan rasa aman kepada keluarga.</p>
+                      <h3 className="text-2xl font-bold tracking-tight Atkinson-font">Clinical Q&A Stream</h3>
+                      <p className="text-slate-500 text-base">Pertanyaan kesehatan dan gizi warga yang membutuhkan verifikasi klinis E-E-A-T.</p>
                     </div>
                   </div>
-                  <span className="px-3 py-1 bg-rose-50 text-rose-700 text-xs font-bold rounded-full border border-rose-100">
-                    {pendingQna.length} Pending
+                  <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-100">
+                    {pendingQna.length} Menunggu Jawaban
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   {pendingQna.map((q) => (
-                    <div key={q.id} className="border border-slate-100 rounded-2xl p-5 bg-slate-50/50 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <strong className="text-base text-slate-800 font-bold">{q.author} bertanya:</strong>
-                        <span className="text-xs text-slate-400">Baru saja</span>
+                    <div key={q.id} className="border border-slate-100 rounded-2xl p-6 bg-slate-50/50 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <strong className="text-slate-800 block text-lg font-bold">{q.author_name}</strong>
+                          <span className="text-xs text-indigo-600 font-bold uppercase bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 mt-1 inline-block">
+                            Pilar: {q.pillar || "Senior Living"}
+                          </span>
+                        </div>
+                        <span className="text-xs text-slate-400 font-medium">
+                          {new Date(q.created_at).toLocaleDateString()}
+                        </span>
                       </div>
-                      <p className="text-slate-600 text-lg leading-relaxed Atkinson-font italic">
-                        &ldquo;{q.question}&rdquo;
+                      <p className="text-slate-700 text-lg leading-relaxed font-medium">
+                        &ldquo;{q.content}&rdquo;
                       </p>
-                      
+
                       {activeAnswerId === q.id ? (
-                        <div className="mt-3 space-y-3">
-                          <textarea 
+                        <div className="space-y-3 pt-2">
+                          <textarea
                             value={expertResponse}
                             onChange={(e) => setExpertResponse(e.target.value)}
-                            placeholder="Tulis penjelasan klinis sederhana, ramah, dan jargon-free..."
-                            className="w-full h-24 p-3 border border-slate-200 rounded-xl font-sans text-sm focus:outline-[#006948]"
+                            placeholder="Tulis opini klinis, referensi FDA, atau saran medis aman Anda di sini..."
+                            className="w-full h-32 p-4 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006948]/30 text-slate-800 text-base transition-all font-sans"
                           />
-                          <div className="flex gap-2 justify-end">
+                          <div className="flex justify-end gap-2">
                             <button 
                               onClick={() => { setActiveAnswerId(null); setExpertResponse(""); }}
-                              className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg font-bold text-xs"
+                              className="px-4 py-2 text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold text-xs min-h-[44px] transition-all"
                             >
                               Batal
                             </button>
                             <button 
                               onClick={() => handleSubmitAnswer(q.id)}
-                              className="px-4 py-2 bg-[#006948] text-white rounded-lg font-bold text-xs"
+                              className="px-5 py-2.5 bg-[#006948] text-white hover:bg-[#005439] rounded-xl font-bold text-xs min-h-[44px] transition-all"
                             >
                               Kirim Tanggapan
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex justify-end">
-                          <button 
-                            onClick={() => { setActiveAnswerId(q.id); setExpertResponse(""); }}
-                            className="px-5 py-3 bg-white border border-slate-200 text-[#006948] hover:border-[#006948] rounded-xl font-bold text-sm min-h-[52px] transition-all"
-                          >
-                            Tanggapi Sebagai Pakar
-                          </button>
-                        </div>
+                        <button 
+                          onClick={() => { setActiveAnswerId(q.id); setExpertResponse(""); }}
+                          className="px-4 py-2.5 bg-white border border-slate-200 text-[#006948] hover:bg-[#faf8ff] hover:border-[#006948]/40 rounded-xl font-bold text-xs transition-all min-h-[44px] flex items-center gap-1.5"
+                        >
+                          <Edit3 className="w-4 h-4" /> Berikan Tanggapan Ahli
+                        </button>
                       )}
                     </div>
                   ))}
                   {pendingQna.length === 0 && (
                     <div className="text-center py-6 text-slate-400 font-sans">
-                      🎉 Tidak ada pertanyaan warga tertunda.
+                      🎉 Tidak ada pertanyaan warga tertunda saat ini.
                     </div>
                   )}
                 </div>
@@ -387,22 +510,21 @@ export default function UnifiedMultiRoleDashboard() {
             </div>
           )}
 
-
           {/* ========================================== */}
-          {/* 3. ADMIN PORTAL COMMAND CENTER             */}
+          {/* 3. ADMIN PORTAL WORKSPACE                  */}
           {/* ========================================== */}
           {activeRole === "admin" && (
             <div className="space-y-8 animate-fadeIn">
               
-              {/* Feature Toggles Section */}
+              {/* Telemetry Feature Flags Grid */}
               <Card className="rounded-3xl bg-white border border-slate-100 shadow-soft-ambient p-8 space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-[#faf8ff] rounded-2xl flex items-center justify-center border border-slate-100">
-                    <Settings className="w-6 h-6 text-[#006948]" />
+                    <Shield className="w-6 h-6 text-[#006948]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold tracking-tight Atkinson-font">Manajemen Fitur & Pipa Data Telemetri</h3>
-                    <p className="text-slate-500 text-base">Aktifkan atau matikan modul integrasi eksternal, telemetri GCP, dan pipa API demi performa dan privasi.</p>
+                    <h3 className="text-2xl font-bold tracking-tight Atkinson-font">Kontrol Feature Flags Telemetri & API</h3>
+                    <p className="text-slate-500 text-base">Aktifkan atau matikan pipeline integrasi pihak ketiga secara instan di database.</p>
                   </div>
                 </div>
 
@@ -411,11 +533,11 @@ export default function UnifiedMultiRoleDashboard() {
                   {/* Switch 1 */}
                   <div className="flex items-center justify-between p-5 border border-slate-100 rounded-2xl bg-[#faf8ff]/50 min-h-[72px]">
                     <div>
-                      <strong className="text-base text-slate-800 font-bold block">Pipa BigQuery Telemetry</strong>
-                      <span className="text-xs text-slate-400">Koleksi data anonim kalkulator pilar</span>
+                      <strong className="text-base text-slate-800 font-bold block">BigQuery Anonymous Pipeline</strong>
+                      <span className="text-xs text-slate-400">Stream data klik anonim & kalkulator ke GCP</span>
                     </div>
                     <button 
-                      onClick={() => handleToggleFlag("bigQueryPipeline", "GCP BigQuery Ingestion")}
+                      onClick={() => handleToggleFlag("bigQueryPipeline", "GCP BigQuery Streaming")}
                       className="focus:outline-none min-h-[52px] px-2 flex items-center"
                     >
                       {featureFlags.bigQueryPipeline ? (
@@ -429,11 +551,11 @@ export default function UnifiedMultiRoleDashboard() {
                   {/* Switch 2 */}
                   <div className="flex items-center justify-between p-5 border border-slate-100 rounded-2xl bg-[#faf8ff]/50 min-h-[72px]">
                     <div>
-                      <strong className="text-base text-slate-800 font-bold block">PageSpeed Audit Otomatis</strong>
-                      <span className="text-xs text-slate-400">Cron audit kecepatan mingguan di Vercel</span>
+                      <strong className="text-base text-slate-800 font-bold block">Google PageSpeed Insights Audits</strong>
+                      <span className="text-xs text-slate-400">Audit CWV harian otomatis via Google API</span>
                     </div>
                     <button 
-                      onClick={() => handleToggleFlag("pageSpeedAudits", "Google PageSpeed Audits")}
+                      onClick={() => handleToggleFlag("pageSpeedAudits", "Daily PageSpeed Audits")}
                       className="focus:outline-none min-h-[52px] px-2 flex items-center"
                     >
                       {featureFlags.pageSpeedAudits ? (

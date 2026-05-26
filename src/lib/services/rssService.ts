@@ -38,7 +38,7 @@ export const CONTENT_ENGINE_SOURCES: Record<string, { rss: string[]; youtubeChan
     ],
     youtubeChannels: [
       "UC9vUu4vlIlMC0dHQCTvQPbg",
-      "UCZ2s1q_6S2fUPn0E2p-B7fQ"
+      "UCVBkyXzDW4mixAFs2iWswXg"
     ]
   },
   "pet-family": {
