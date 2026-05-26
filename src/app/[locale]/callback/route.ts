@@ -13,12 +13,12 @@ export async function GET(request: Request) {
     
     if (!error && authData?.user) {
       // Determine Role for Redirect
-      const { data: profileData } = await supabase
+      const { data: profile } = (await supabase
         .from('users')
         .select('role')
         .eq('id', authData.user.id)
-        .single();
-      const profile = profileData as { role: string | null } | null;
+        .single()) as any;
+        
         
       let redirectPath = `/${locale}/saved`; // Default for standard users
       
