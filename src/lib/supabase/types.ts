@@ -7,6 +7,36 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       activity_logs: {
@@ -420,6 +450,45 @@ export type Database = {
           },
         ]
       }
+      canonical_articles: {
+        Row: {
+          content_html: string
+          id: string
+          image_url: string | null
+          ingested_at: string
+          pillar: string | null
+          published_at: string | null
+          slug: string
+          source_hash: string
+          source_url: string | null
+          title: string
+        }
+        Insert: {
+          content_html: string
+          id?: string
+          image_url?: string | null
+          ingested_at?: string
+          pillar?: string | null
+          published_at?: string | null
+          slug: string
+          source_hash: string
+          source_url?: string | null
+          title: string
+        }
+        Update: {
+          content_html?: string
+          id?: string
+          image_url?: string | null
+          ingested_at?: string
+          pillar?: string | null
+          published_at?: string | null
+          slug?: string
+          source_hash?: string
+          source_url?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           article_id: string | null
@@ -830,6 +899,73 @@ export type Database = {
         }
         Relationships: []
       }
+      translated_articles: {
+        Row: {
+          article_id: string | null
+          compiled_at: string
+          content_html_translated: string
+          id: string
+          locale: string
+          title_translated: string
+        }
+        Insert: {
+          article_id?: string | null
+          compiled_at?: string
+          content_html_translated: string
+          id?: string
+          locale: string
+          title_translated: string
+        }
+        Update: {
+          article_id?: string | null
+          compiled_at?: string
+          content_html_translated?: string
+          id?: string
+          locale?: string
+          title_translated?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translated_articles_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      translated_blocks: {
+        Row: {
+          locale: string
+          provider_used: string
+          text_hash: string
+          translated_text: string
+          updated_at: string
+        }
+        Insert: {
+          locale: string
+          provider_used: string
+          text_hash: string
+          translated_text: string
+          updated_at?: string
+        }
+        Update: {
+          locale?: string
+          provider_used?: string
+          text_hash?: string
+          translated_text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translated_blocks_text_hash_fkey"
+            columns: ["text_hash"]
+            isOneToOne: false
+            referencedRelation: "translation_memory"
+            referencedColumns: ["text_hash"]
+          },
+        ]
+      }
       translation_cache: {
         Row: {
           content_hash: string
@@ -863,6 +999,24 @@ export type Database = {
           source_text?: string
           target_lang?: string
           translated_text?: string
+        }
+        Relationships: []
+      }
+      translation_memory: {
+        Row: {
+          created_at: string
+          original_text: string
+          text_hash: string
+        }
+        Insert: {
+          created_at?: string
+          original_text: string
+          text_hash: string
+        }
+        Update: {
+          created_at?: string
+          original_text?: string
+          text_hash?: string
         }
         Relationships: []
       }
@@ -1024,17 +1178,16 @@ export type Database = {
         Args: { points_delta_param: number; user_id_param: string }
         Returns: undefined
       }
-      award_points_secure: {
-        Args: {
-          p_action_type?: string
-          p_points?: number
-          p_user_id?: string
-          amount?: number
-          user_id_param?: string
-        }
-        Returns: number | undefined
-      }
-      decay_trending_scores: { Args: Record<string, never>; Returns: undefined }
+      award_points_secure:
+        | {
+            Args: { p_action_type: string; p_points: number; p_user_id: string }
+            Returns: number
+          }
+        | {
+            Args: { amount: number; user_id_param: string }
+            Returns: undefined
+          }
+      decay_trending_scores: { Args: never; Returns: undefined }
       elevate_to_admin: { Args: { email_param: string }; Returns: undefined }
       get_approved_sponsors_by_pillar: {
         Args: { p_limit?: number; p_pillar: string }
@@ -1193,8 +1346,8 @@ export type Database = {
         Args: { amount: number; user_id_param: string }
         Returns: undefined
       }
-      is_admin: { Args: Record<string, never>; Returns: boolean }
-      prune_old_api_health_logs: { Args: Record<string, never>; Returns: undefined }
+      is_admin: { Args: never; Returns: boolean }
+      prune_old_api_health_logs: { Args: never; Returns: undefined }
       update_user_role_secure: {
         Args: { new_role_param: string; user_id_param: string }
         Returns: undefined
@@ -1220,7 +1373,7 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Database
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
@@ -1338,6 +1491,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       article_publishing_status: [

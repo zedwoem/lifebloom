@@ -77,42 +77,38 @@ export default function HomePage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#006948] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#006948]"></span>
             </span>
-            Safe Harbor For Families
+            {t('hero_badge')}
           </div>
           
           <h1 className="text-[42px] md:text-[64px] font-extrabold text-slate-900 leading-[1.1] tracking-tight max-w-4xl mx-auto" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-            UNSCROLL YOUR LIFE
+            {t('hero_title')}
           </h1>
           
           <p className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto font-medium">
-            Clarity Over Noise. Solutions Over Scrolls.
+            {t('hero_subtitle')}
           </p>
         </header>
 
         {/* MASSIVE PREDICTIVE SEARCH */}
         <section className="max-w-3xl mx-auto mb-24 relative z-30 group">
           <div className="absolute -inset-1 bg-gradient-to-r from-[#006948]/20 to-[#904d00]/20 rounded-[32px] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-          <div className="relative bg-white rounded-3xl p-3 border border-slate-200 shadow-sm focus-within:shadow-md focus-within:border-[#006948]/30 transition-all duration-300">
-            <div className="flex items-center gap-3 px-4">
-              <Search className="w-6 h-6 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="What can we calculate for your family today?" 
-                className="w-full h-[56px] text-lg bg-transparent border-none outline-none text-slate-900 placeholder:text-slate-400"
-              />
-              <button className="hidden sm:flex items-center justify-center px-6 min-h-[48px] bg-[#006948] hover:bg-[#00855d] text-white font-bold rounded-xl transition-colors">
-                Search
-              </button>
-            </div>
+          <div className="relative">
+            <GlobalSearch variant="hero" />
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-            <span className="text-sm font-bold text-slate-500">Popular:</span>
-            <button className="text-sm font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl text-slate-600 hover:text-[#006948] hover:border-[#006948]/30 transition-colors shadow-sm">
-              💰 Retirement Yield
-            </button>
-            <button className="text-sm font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl text-slate-600 hover:text-[#006948] hover:border-[#006948]/30 transition-colors shadow-sm">
-              💊 Parent&apos;s Drug Safety
-            </button>
+            <span className="text-sm font-bold text-slate-500">{t('popular')}</span>
+            <Link 
+              href={`/${locale}/money-future/retirement-planner`}
+              className="text-sm font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl text-slate-600 hover:text-[#006948] hover:border-[#006948]/30 transition-colors shadow-sm inline-flex items-center gap-1.5 min-h-[40px]"
+            >
+              <Wallet className="w-4 h-4 text-[#006948]" /> {t('popular_retire')}
+            </Link>
+            <Link 
+              href={`/${locale}/senior/drug-checker`}
+              className="text-sm font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl text-slate-600 hover:text-[#006948] hover:border-[#006948]/30 transition-colors shadow-sm inline-flex items-center gap-1.5 min-h-[40px]"
+            >
+              <HeartPulse className="w-4 h-4 text-[#006948]" /> {t('popular_drug')}
+            </Link>
           </div>
         </section>
 
@@ -120,10 +116,10 @@ export default function HomePage() {
         <section className="w-full">
           <div className="mb-10 text-center md:text-left">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-              YOUR LOGICAL PATHWAYS
+              {t('bento_title')}
             </h2>
             <p className="text-slate-500 mt-2 text-lg">
-              Select a pillar to explore step-by-step tools and verified resources.
+              {t('bento_subtitle')}
             </p>
           </div>
 
@@ -131,12 +127,12 @@ export default function HomePage() {
             {Object.values(PILLARS).map((pillar) => {
               const aesthetic = pillarAesthetic[pillar.id] || pillarAesthetic.home;
               
-              // Custom copy overrides based on blueprint
-              let desc = "Personalized tools and medical-grade guidance.";
-              if (pillar.id === "senior") desc = "Evaluate fall risks & check medication safety instantly.";
-              if (pillar.id === "pet") desc = "Canine symptoms & family matches.";
-              if (pillar.id === "money") desc = "Project compound yield & secure plans.";
-              if (pillar.id === "travel") desc = "Design itineraries without the adware or hidden fees.";
+              // Custom copy overrides based on translations
+              let desc = t('default_desc');
+              if (pillar.id === "senior") desc = t('senior_desc');
+              if (pillar.id === "pet") desc = t('pet_desc');
+              if (pillar.id === "money") desc = t('money_desc');
+              if (pillar.id === "travel") desc = t('travel_desc');
 
               return (
                 <Link 
@@ -182,10 +178,10 @@ export default function HomePage() {
 
               <div className="z-10 mt-auto">
                 <h3 className="text-2xl font-bold text-white group-hover:text-[#85f8c4] transition-colors" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                  Support Center
+                  {t('support_title')}
                 </h3>
                 <p className="text-base text-slate-400 mt-2">
-                  Knowledge base, privacy details, and contact forms.
+                  {t('support_desc')}
                 </p>
               </div>
             </Link>

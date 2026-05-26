@@ -2,11 +2,57 @@ import { notFound } from 'next/navigation';
 import { StructuredData } from '@/components/seo/StructuredData';
 import { Article, MedicalWebPage, WithContext } from 'schema-dts';
 import { AccessibleArticleReader } from '@/components/content/accessible-article-reader';
+import { createServiceClient } from '@/lib/supabase/server';
+import { getOrCompileArticleTranslation } from '@/lib/services/astTranslationEngine';
 
 // Async data fetching with advanced SEO metadata and dynamic AI content generation
 async function getArticleData(slug: string, locale: string) {
   const decodedSlug = decodeURIComponent(slug).replace(/-/g, ' ');
-  
+
+  // 0. Primary check: Search in 3NF canonical_articles
+  const supabase = createServiceClient();
+  const { data: canonicalArticle } = await supabase
+    .from('canonical_articles')
+    .select('id, title, content_html, image_url, pillar, published_at')
+    .eq('slug', slug)
+    .maybeSingle();
+
+  if (canonicalArticle) {
+    const { title: translatedTitle, contentHtml: translatedContentHtml } = await getOrCompileArticleTranslation(
+      canonicalArticle.id,
+      slug,
+      canonicalArticle.title,
+      canonicalArticle.content_html,
+      locale
+    );
+
+    const category = (canonicalArticle.pillar || 'general') as 'health' | 'finance' | 'tech' | 'general';
+    let expertReviewer = null;
+    if (category === 'health') {
+      expertReviewer = { name: 'Dr. Sarah Jenkins, MD', url: 'https://lifebloom.hub/author/sarah-jenkins' };
+    } else if (category === 'finance') {
+      expertReviewer = { name: 'Michael Chen, CFP', url: 'https://lifebloom.hub/author/michael-chen' };
+    }
+
+    const dateStr = new Date(canonicalArticle.published_at || '2026-05-20T08:00:00Z').toLocaleDateString(
+      locale === 'id' ? 'id-ID' : 'en-US',
+      { month: 'long', day: 'numeric', year: 'numeric' }
+    );
+
+    return {
+      title: translatedTitle,
+      source: "LifeBloom Hub Curation",
+      date: dateStr,
+      datePublished: canonicalArticle.published_at || new Date('2026-05-20T08:00:00Z').toISOString(),
+      dateModified: new Date().toISOString(),
+      author: { name: "LifeBloom Editorial Team", url: "https://lifebloom.hub/about" },
+      category,
+      expertReviewer,
+      imageUrl: canonicalArticle.image_url || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+      content: translatedContentHtml
+    };
+  }
+
   // Simple heuristic for category mapping
   let category: 'health' | 'finance' | 'tech' | 'general' = 'general';
   let expertReviewer = null;
@@ -36,6 +82,7 @@ async function getArticleData(slug: string, locale: string) {
     imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop", // Clean premium digital layout image
     content: ""
   };
+
 
   // 1. Dynamic Server-Side LLM Article Generator (using Gemini API)
   const geminiKey = process.env.GEMINI_API_KEY;

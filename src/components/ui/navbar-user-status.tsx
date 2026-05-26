@@ -1,59 +1,68 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { LayoutDashboard, Sparkles } from "lucide-react";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { useLocale } from "next-intl";
-
-interface UserProfile {
-  nickname: string;
-  mood: string;
-  joinedAt: string;
-}
+import { Sparkles, User, LogOut, ArrowRight } from "lucide-react";
 
 export function NavbarUserStatus() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const { user, profile, loading, signOut } = useAuth();
   const locale = useLocale();
 
-  useEffect(() => {
-    const fetchProfile = () => {
-      const stored = localStorage.getItem("lifebloom_user_profile");
-      if (stored) {
-        try {
-          setProfile(JSON.parse(stored));
-        } catch (e) {
-          console.error("Error parsing user profile", e);
-        }
-      }
-    };
-
-    fetchProfile();
-
-    // Listen for our custom event from the Onboarding Overlay
-    window.addEventListener("lifebloom_profile_updated", fetchProfile);
-    return () => {
-      window.removeEventListener("lifebloom_profile_updated", fetchProfile);
-    };
-  }, []);
-
-  if (profile) {
+  if (loading) {
     return (
-      <Link 
-        href={`/${locale}/join-us`}
-        className="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-full text-sm font-bold text-emerald-700 transition-colors shadow-sm"
-      >
-        <Sparkles className="w-4 h-4 text-emerald-500" />
-        Hi, {profile.nickname}
-      </Link>
+      <div className="h-touch-target flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-brand-green border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (user) {
+    const displayName = profile?.display_name || user.email?.split("@")[0] || "User";
+    const role = profile?.role || "user";
+    
+    // Role-based redirect path
+    let workspacePath = `/${locale}/saved`;
+    if (role === "admin" || role === "expert") {
+      workspacePath = `/${locale}/dashboard`;
+    }
+
+    return (
+      <div className="flex items-center gap-3 animate-fade-in">
+        <Link 
+          href={workspacePath}
+          className="flex items-center gap-2 h-touch-target px-5 bg-brand-green-light hover:bg-[#d8f3e5] border border-brand-green-light rounded-full text-base font-bold text-brand-green-dark transition-all duration-200 shadow-sm hover:scale-[1.02]"
+        >
+          <Sparkles className="w-4 h-4 text-brand-green" />
+          Hi, {displayName}
+        </Link>
+        <button
+          onClick={() => signOut()}
+          className="w-10 h-10 flex items-center justify-center bg-rose-50 hover:bg-rose-100 border border-rose-100 rounded-full text-rose-600 transition-colors"
+          title="Sign Out"
+          aria-label="Sign Out"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
+      </div>
     );
   }
 
   return (
-    <Link 
-      href={`/${locale}/dashboard`} 
-      className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full text-sm font-semibold text-brand-blue transition-colors"
-    >
-      <LayoutDashboard className="w-4 h-4" /> Dashboard
-    </Link>
+    <div className="flex items-center gap-3 animate-fade-in">
+      <Link 
+        href={`/${locale}/login`}
+        className="flex items-center justify-center h-touch-target px-6 bg-brand-green-light hover:bg-[#d8f3e5] text-brand-green-dark font-bold text-base rounded-full transition-colors border border-transparent"
+      >
+        Sign In
+      </Link>
+      <Link 
+        href={`/${locale}/join-us`}
+        className="flex items-center justify-center h-touch-target px-6 bg-[#131b2e] hover:bg-[#0a0e1a] text-white font-bold text-base rounded-full transition-colors flex gap-1.5 shadow-md"
+      >
+        Join Us <ArrowRight className="w-4 h-4" />
+      </Link>
+    </div>
   );
 }

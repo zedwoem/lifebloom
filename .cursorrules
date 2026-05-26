@@ -4,6 +4,11 @@
 **Stack Context:** Next.js 15 (App Router, PPR), React 19, Supabase (RLS, Edge Functions), TailwindCSS, Vibe Coding paradigm 2026
 **Target User:** Seniors (65+). UI must be accessible (WCAG 2.1 AA), large text (16px+ default), high contrast (AAA), minimal cognitive load, no fast animations/autoplay.
 
+> [!IMPORTANT]
+> **AI CODER ABSOLUTE DIRECTIVE:**  
+> Before writing, modifying, or creating any files or database migrations, you MUST load, read, and strictly follow the arsitektur, A11Y, security, and validation protocols declared in [AI_COPILOT_PLAYBOOK.md](file:///Users/mac/Downloads/PROYEK/LIFEBLOOMHUB/docs/AI_COPILOT_PLAYBOOK.md). Running the **Global System Audit Prompt** in Section 3 of the playbook is a mandatory prerequisite for all sessions.
+
+
 ## AI Rules and Absolute Constraints
 
 1. **Client-Side First:** Maximize client-side computation. Minimize API calls; batch requests where necessary. Use React Query/SWR for data fetching only on critical endpoints.

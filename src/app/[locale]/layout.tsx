@@ -22,6 +22,7 @@ import OnboardingOverlay from '@/components/ui/onboarding-overlay';
 import { NavbarUserStatus } from '@/components/ui/navbar-user-status';
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'sonner';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
 
 export default async function LocaleLayout({
   children,
@@ -124,13 +125,7 @@ export default async function LocaleLayout({
       <body className="min-h-screen flex flex-col font-sans bg-background text-slate-900">
         <NextTopLoader color="#10B981" showSpinner={false} />
         <Toaster position="bottom-right" richColors />
-        <div className="gtranslate_wrapper"></div>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.gtranslateSettings = {"default_language":"en","native_language_names":true,"languages":["en","fr","it","es","id","hi","zh-CN","ja","kn","de","ar"],"wrapper_selector":".gtranslate_wrapper","float_switcher_open_direction":"bottom","alt_flags":{"en":"usa"}}`
-          }}
-        />
-        <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
+
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -170,10 +165,13 @@ export default async function LocaleLayout({
                     Helpdesk
                   </Link>
                   <div className="h-6 w-px bg-slate-200 mx-2"></div>
+                  <LanguageSwitcher currentLocale={locale} />
+                  <div className="h-6 w-px bg-slate-200 mx-2"></div>
                   <NavbarUserStatus />
                 </nav>
 
                 <div className="md:hidden flex items-center gap-3">
+                  <LanguageSwitcher currentLocale={locale} />
                   <GlobalSearch />
                 </div>
               </div>

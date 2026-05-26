@@ -33,51 +33,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
-    const getActiveSession = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (!error && user) {
-        setUser(user);
-        await fetchProfile(user.id);
-      }
+    // 6-second SRE Timeout Guard to unconditionally dismantle the loading spinner
+    const timeoutId = setTimeout(() => {
       setLoading(false);
+      console.warn("[useAuth] Session recovery timed out. Dismantling loading state gracefully.");
+    }, 6000);
+
+    const getActiveSession = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (!error && user) {
+          setUser(user);
+          await fetchProfile(user.id);
+        }
+      } catch (e) {
+        console.error("[useAuth getActiveSession error]:", e);
+      } finally {
+        setLoading(false);
+        clearTimeout(timeoutId);
+      }
     };
 
     getActiveSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
-      } else {
-        setUser(null);
-        setProfile(null);
+      try {
+        if (session) {
+          setUser(session.user);
+          await fetchProfile(session.user.id);
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (e) {
+        console.error("[useAuth onAuthStateChange error]:", e);
+      } finally {
+        setLoading(false);
+        clearTimeout(timeoutId);
       }
-      setLoading(false);
     });
 
     return () => {
       subscription.unsubscribe();
+      clearTimeout(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("users")
-      .select("id, email, display_name, subscription_tier, role, default_locale, created_at, bloom_points")
-      .eq("id", userId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, email, display_name, subscription_tier, role, default_locale, created_at, bloom_points")
+        .eq("id", userId)
+        .maybeSingle();
 
-    if (!error && data) {
-      let userProfile = data as UserProfile;
-      
-      // Admin elevation bypass for specific email
-      if (userProfile.email === "liorazedwoem@gmail.com" && userProfile.role !== "admin") {
-        userProfile.role = "admin";
-        await supabase.rpc("elevate_to_admin", { email_param: userProfile.email });
+      if (!error && data) {
+        let userProfile = data as UserProfile;
+        
+        // Admin elevation bypass for specific email (Decoupled & Non-blocking)
+        if (userProfile.email === "liorazedwoem@gmail.com" && userProfile.role !== "admin") {
+          userProfile.role = "admin";
+          (async () => {
+            const { error: rpcErr } = await supabase.rpc("elevate_to_admin", { email_param: userProfile.email });
+            if (rpcErr) {
+              console.error("[useAuth elevate_to_admin rpc error]:", rpcErr);
+            }
+          })();
+        }
+        
+        setProfile(userProfile);
       }
-      
-      setProfile(userProfile);
+    } catch (e) {
+      console.error("[useAuth fetchProfile error]:", e);
     }
   };
 
