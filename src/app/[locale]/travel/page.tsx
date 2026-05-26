@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { AccessibleTripPlanner } from "@/components/calculators/trip-planner";
-import { AccessibleNewsFeed } from '@/components/content/accessible-news-feed';
+import { TravelpayoutsWidget } from "@/components/calculators/travel-widget";
+import { DynamicNewsFeed } from '@/components/content/dynamic-news-feed';
+import { PillarVideoSection } from '@/components/content/pillar-video-section';
 
 export default async function PillarPage({
   params,
@@ -51,19 +53,22 @@ export default async function PillarPage({
         </header>
 
         {/* Above-the-fold Interactive Widgets */}
-        <section className="w-full max-w-4xl mx-auto space-y-8 mb-12">
+        <section className="w-full max-w-4xl mx-auto space-y-8 mb-12 animate-fade-in">
           <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
             <AccessibleTripPlanner />
           </div>
+          
+          {/* Travelpayouts Flight & Hotel Search Widget */}
+          <TravelpayoutsWidget />
         </section>
+
+        {/* Dynamic Video Section */}
+        <PillarVideoSection pillarSlug={slug} locale={locale} />
 
         {/* Contextual Articles & News Feed */}
         <section className="w-full max-w-4xl mx-auto space-y-8">
           <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
-            <h2 className="text-2xl font-bold text-foreground mb-6 font-display border-b border-border pb-4">
-              Latest Insights & Expert Articles
-            </h2>
-            <AccessibleNewsFeed pillarSlug={slug} />
+            <DynamicNewsFeed pillarSlug={slug} locale={locale} />
           </div>
         </section>
 

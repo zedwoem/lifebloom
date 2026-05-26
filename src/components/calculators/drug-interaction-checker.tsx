@@ -202,6 +202,22 @@ export function DrugInteractionChecker() {
           </div>
         )}
 
+        {/* Accessible Elder Advisory Guide Block */}
+        <div className="mt-8 p-6 bg-[#f5fff7] border border-[#006948]/20 rounded-2xl">
+          <h3 className="text-xl font-bold text-[#006948] mb-3 flex items-center gap-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+            🛡️ Safe Medication Advisory & Fall Prevention Guide
+          </h3>
+          <p className="text-sm text-slate-600 leading-relaxed mb-4">
+            Did you know that taking multiple medications (known as <strong>polypharmacy</strong>) is one of the leading causes of balance issues and falls in older adults? 
+            ACE inhibitors (for blood pressure) combined with standard NSAIDs (like Ibuprofen or Naproxen) can affect kidney function and lead to sudden lightheadedness.
+          </p>
+          <ul className="text-xs text-slate-500 list-disc list-inside space-y-2">
+            <li><strong>Keep an Active Log:</strong> Always write down every prescription, OTC drug, and herbal supplement you take.</li>
+            <li><strong>Timing Matters:</strong> Spacing out blood pressure medication can help prevent sudden drops in pressure upon standing (orthostatic hypotension).</li>
+            <li><strong>Consult Regularly:</strong> Bring your printed high-contrast Medication Summary Report to every doctor visit.</li>
+          </ul>
+        </div>
+
         <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
         </div>
       </div>

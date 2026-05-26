@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const results = await ingestRSSFeeds('id');
+    const results = await ingestRSSFeeds('en');
     return NextResponse.json({ success: true, processed: results });
   } catch (error: any) {
     console.error('RSS Ingest Cron Failed:', error);
