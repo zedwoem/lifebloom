@@ -223,6 +223,23 @@ export default async function LocaleLayout({
             `
           }}
         />
+        
+        {/* Prevent OneSignal Bell widget overlap on Mobile Navigation Bar */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            #onesignal-bell-container.onesignal-reset {
+              bottom: 85px !important;
+              right: 20px !important;
+              z-index: 40 !important;
+            }
+            @media (max-width: 768px) {
+              #onesignal-bell-container.onesignal-reset {
+                bottom: 95px !important;
+                right: 15px !important;
+              }
+            }
+          `
+        }} />
       </head>
       <body className="min-h-screen flex flex-col font-sans bg-background text-slate-900">
         <NextTopLoader color="#10B981" showSpinner={false} />
