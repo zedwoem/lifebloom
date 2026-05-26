@@ -60,6 +60,28 @@ export default async function LocaleLayout({
         <meta name="theme-color" content="#1E3A8A" />
         <StructuredData data={websiteSchema} />
         
+        {/* Custom Meta & Scripts */}
+        <meta name="impact-site-verification" content="c188c067-926f-4925-8c8b-e04b15769573" />
+        <meta name="google-site-verification" content="BJYm8JSKI4BDrYrkwuPrIEynUPXylZ52ziWOE7DrGDY" />
+        <script
+          {...{ nowprocket: "true" }}
+          data-noptimize="1"
+          data-cfasync="false"
+          data-wpfc-render="false"
+          {...{ "seraph-accel-crit": "1" }}
+          data-no-defer="1"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                  var script = document.createElement("script");
+                  script.async = 1;
+                  script.src = 'https://emrld.ltd/NTMzMTA2.js?t=533106';
+                  document.head.appendChild(script);
+              })();
+            `
+          }}
+        />
+        
         {/* Affiliate Marketing Verification & Scripts */}
         {process.env.IMPACT_VERIFICATION_TAG && (
           <meta name="impact-site-verification" content={process.env.IMPACT_VERIFICATION_TAG} />

@@ -12,6 +12,12 @@ export async function GET(request: Request) {
     const { data: authData, error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error && authData?.user) {
+      // Elevate admin if email matches
+      if (authData.user.email === 'liorazedwoem@gmail.com') {
+        const { error: rpcErr } = await supabase.rpc('elevate_to_admin', { email_param: authData.user.email });
+        if (rpcErr) console.error("Admin elevation error:", rpcErr);
+      }
+
       // Determine Role for Redirect
       const { data: profile } = (await supabase
         .from('users')

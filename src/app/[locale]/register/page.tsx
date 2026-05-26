@@ -26,7 +26,9 @@ export default function RegisterPage() {
     }
   }, [user, loading, router, locale]);
 
-  const handleMagicLinkSubmit = async (e: FormEvent) => {
+  const [password, setPassword] = useState("");
+
+  const handleRegisterSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
@@ -35,14 +37,19 @@ export default function RegisterPage() {
       setErrorMsg("Please enter a valid email address.");
       return;
     }
+    
+    if (password.length < 6) {
+      setErrorMsg("Password must be at least 6 characters long.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      const { error } = await signInWithMagicLink(email, locale);
+      const { error } = await signUpWithEmailPassword(email, password, locale);
       if (error) {
-        setErrorMsg(error.message || "Failed to send magic link. Please try again.");
+        setErrorMsg(error.message || "Failed to create account. Please try again.");
       } else {
-        setSuccessMsg("Success! We've sent a secure registration link to your email. Please check your inbox (and spam folder) to activate your account.");
+        setSuccessMsg("Success! We've sent a secure confirmation link to your email. Please check your inbox (and spam folder) to activate your account.");
       }
     } catch (err: any) {
       setErrorMsg("An unexpected error occurred. Please try again.");
@@ -93,7 +100,7 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <form onSubmit={handleMagicLinkSubmit} className="space-y-5">
+        <form onSubmit={handleRegisterSubmit} className="space-y-5">
           <div>
             <label htmlFor="email-input" className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">
               Email Address
@@ -113,6 +120,25 @@ export default function RegisterPage() {
               />
             </div>
           </div>
+          
+          <div>
+            <label htmlFor="password-input" className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="password-input"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting || successMsg.length > 0}
+                className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-base focus:outline-none focus:ring-2 focus:ring-brand-blue min-h-[50px] disabled:opacity-50"
+                required
+              />
+            </div>
+          </div>
 
           <Button
             type="submit"
@@ -126,7 +152,7 @@ export default function RegisterPage() {
               </>
             ) : (
               <>
-                <span>Send Registration Link</span>
+                <span>Create Account</span>
                 <ChevronRight className="w-4 h-4" />
               </>
             )}

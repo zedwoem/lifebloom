@@ -15,6 +15,9 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
@@ -22,6 +25,28 @@ export default function LoginPage() {
       router.push(`/${locale}/dashboard`);
     }
   }, [user, loading, router, locale]);
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setErrorMsg("Harap masukkan email dan kata sandi.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setErrorMsg("");
+    try {
+      const { error } = await signInWithEmailPassword(email, password);
+      if (error) {
+        setErrorMsg(error.message || "Gagal masuk. Periksa kembali email dan kata sandi Anda.");
+        setIsSubmitting(false);
+      }
+      // If success, Supabase will refresh the session and trigger the redirect in useEffect or callback
+    } catch (err: any) {
+      setErrorMsg("Terjadi kesalahan sistem. Silakan coba lagi.");
+      setIsSubmitting(false);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     setIsSubmitting(true);
@@ -75,8 +100,50 @@ export default function LoginPage() {
           </div>
         )}
 
+        <form onSubmit={handleEmailLogin} className="space-y-4 mb-6">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Email</label>
+            <input 
+              type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#006948]/30 outline-none transition-all"
+              placeholder="nama@email.com"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Kata Sandi</label>
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#006948]/30 outline-none transition-all"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-[#006948] hover:bg-[#005439] text-white font-bold text-[18px] rounded-xl h-[60px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+          >
+            {isSubmitting ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              "Masuk dengan Email"
+            )}
+          </Button>
+        </form>
+
+        <div className="relative flex items-center justify-center mb-6">
+          <div className="absolute border-t border-slate-200 w-full"></div>
+          <span className="bg-white px-4 text-slate-400 font-bold text-sm z-10">ATAU</span>
+        </div>
+
         {/* Massive Accessible Google Button */}
         <Button
+          type="button"
           onClick={handleGoogleLogin}
           disabled={isSubmitting}
           className="w-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-bold text-[18px] rounded-xl h-[60px] flex items-center justify-center gap-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
@@ -100,6 +167,10 @@ export default function LoginPage() {
             </>
           )}
         </Button>
+
+        <div className="mt-6 text-center">
+          <p className="text-slate-500 font-medium">Belum punya akun? <a href={`/${locale}/register`} className="text-[#006948] font-bold hover:underline">Daftar sekarang</a></p>
+        </div>
 
         <div className="mt-8 text-center border-t border-slate-100 pt-6">
           <p className="text-slate-500 text-sm leading-relaxed">

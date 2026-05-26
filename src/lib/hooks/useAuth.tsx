@@ -21,6 +21,8 @@ interface AuthContextType {
   loading: boolean;
   signInWithMagicLink: (email: string, locale: string) => Promise<{ error: any }>;
   signInWithGoogle: (locale?: string) => Promise<{ error: any }>;
+  signInWithEmailPassword: (email: string, password: string) => Promise<{ data?: any, error: any }>;
+  signUpWithEmailPassword: (email: string, password: string, locale?: string) => Promise<{ data?: any, error: any }>;
   signOut: () => Promise<{ error: any }>;
 }
 
@@ -91,17 +93,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!error && data) {
         let userProfile = data as UserProfile;
         
-        // Admin elevation bypass for specific email (Decoupled & Non-blocking)
-        if (userProfile.email === "liorazedwoem@gmail.com" && userProfile.role !== "admin") {
-          userProfile.role = "admin";
-          (async () => {
-            const { error: rpcErr } = await supabase.rpc("elevate_to_admin", { email_param: userProfile.email });
-            if (rpcErr) {
-              console.error("[useAuth elevate_to_admin rpc error]:", rpcErr);
-            }
-          })();
-        }
-        
         setProfile(userProfile);
       }
     } catch (e) {
@@ -129,12 +120,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const signInWithEmailPassword = async (email: string, password: string) => {
+    return await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+  };
+
+  const signUpWithEmailPassword = async (email: string, password: string, locale: string = "en") => {
+    const redirectUrl = `${window.location.origin}/${locale}/callback`;
+    return await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+  };
+
   const signOut = async () => {
     return await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signInWithMagicLink, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signInWithMagicLink, signInWithGoogle, signInWithEmailPassword, signUpWithEmailPassword, signOut }}>
       {children}
     </AuthContext.Provider>
   );
