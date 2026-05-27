@@ -71,12 +71,14 @@ export const CONTENT_ENGINE_SOURCES: Record<string, { rss: string[]; youtubeChan
   },
   "senior": {
     rss: [
-      "https://medlineplus.gov/rss.html"
+      "https://www.sciencedaily.com/rss/health_medicine/healthy_aging.xml",
+      "https://rss.medicalnewstoday.com/aging.xml"
     ]
   },
   "travel": {
     rss: [
-      "https://www.disabled-world.com/info/newsfeeds.php"
+      "https://wheelchairtravel.org/feed/",
+      "https://thepointsguy.com/feed/"
     ]
   }
 };
