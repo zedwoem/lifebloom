@@ -43,3 +43,5 @@ keys/
 # Excluded internal documentation
 docs/
 
+# Local-Only Admin Dashboard
+src/app/[locale]/(admin)/
