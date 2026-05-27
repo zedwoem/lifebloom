@@ -6,6 +6,7 @@ import Fuse from 'fuse.js';
 import { Search, Command, ArrowRight, TrendingUp, Sparkles, Hash, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export const searchIndex = [
   { id: 1, title: 'Retirement Calculator', category: 'money', tags: ['finance', 'planning', 'savings', '401k', 'High-Yield Savings'], url: '/money-future/retirement-planner' },
@@ -32,6 +33,9 @@ const CATEGORIES = [
 
 export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'hero' }) {
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [dbResults, setDbResults] = useState<{ item: any }[]>([]);
+  const [isSearchingDB, setIsSearchingDB] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   
@@ -83,13 +87,62 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
     });
   }, [locale]);
 
+  // 1. Static Fuse.js search setup
   const fuse = useMemo(() => new Fuse(searchIndex, {
     keys: ['title', 'category', 'tags'],
     threshold: 0.4,
     includeScore: true
   }), []);
 
-  const results = query ? fuse.search(query).slice(0, 5) : [];
+  // 2. Debounce user input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 400);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  // 3. Dynamic DB Search Hook
+  useEffect(() => {
+    if (debouncedQuery.trim().length < 3) {
+      setDbResults([]);
+      setIsSearchingDB(false);
+      return;
+    }
+
+    const searchSupabase = async () => {
+      setIsSearchingDB(true);
+      const supabase = createClient();
+      try {
+        const { data, error } = await supabase
+          .from('canonical_articles')
+          .select('id, title, pillar, slug')
+          .ilike('title', `%${debouncedQuery}%`)
+          .limit(4);
+
+        if (!error && data) {
+          const mapped = data.map((art) => ({
+            item: {
+              id: `db-${art.id}`,
+              title: art.title,
+              category: art.pillar || 'article',
+              tags: ['article'],
+              url: `/article/${art.slug}`
+            }
+          }));
+          setDbResults(mapped);
+        }
+      } catch (err) {
+        console.error('[SearchDB Error]', err);
+      } finally {
+        setIsSearchingDB(false);
+      }
+    };
+
+    searchSupabase();
+  }, [debouncedQuery]);
+
+  // 4. Combine results
+  const staticResults = query ? fuse.search(query).slice(0, 3) : [];
+  const results = [...staticResults, ...dbResults];
 
   // Focus input when modal opens
   useEffect(() => {
@@ -206,6 +259,11 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
               {query.trim() !== '' ? (
                 /* SEARCH RESULTS */
                 <div>
+                  {isSearchingDB && (
+                    <div className="flex items-center gap-2 p-3 text-sm text-emerald-600 font-bold animate-pulse">
+                      <Sparkles className="w-4 h-4" /> Mencari artikel terbaru...
+                    </div>
+                  )}
                   {results.length > 0 ? (
                     <ul className="space-y-1">
                       {results.map(({ item }, index) => {
