@@ -271,6 +271,13 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
                 .replace(/(^-|-$)+/g, '')
                 .slice(0, 80);
 
+              const videoPillarMap: Record<string, string> = {
+                'home-living': 'home',
+                'money-future': 'money',
+                'pet-family': 'pet'
+              };
+              const dbPillar = videoPillarMap[pillarSlug] || pillarSlug;
+
               const { data: insertedVideo, error: videoError } = await supabase
                 .from('videos')
                 .upsert({
@@ -279,7 +286,7 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
                   title: ytItem.title,
                   description: ytItem.contentSnippet?.slice(0, 500) || ytItem.content?.slice(0, 500) || '',
                   provider: 'youtube',
-                  pillar: pillarSlug,
+                  pillar: dbPillar,
                   locale: 'en',
                   slug: `${titleSlug}-${videoId}`,
                 }, { onConflict: 'embed_id', ignoreDuplicates: true })
