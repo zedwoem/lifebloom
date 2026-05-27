@@ -20,7 +20,7 @@ export function AdminAnalyticsDashboard() {
     try {
       // Fetch high-level stats
       const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
-      const { count: contentCount } = await supabase.from('aggregated_content').select('*', { count: 'exact', head: true });
+      const { count: contentCount } = await supabase.from('canonical_articles').select('*', { count: 'exact', head: true });
       const { count: calcCount } = await supabase.from('calculations_history').select('*', { count: 'exact', head: true });
 
       setStats({

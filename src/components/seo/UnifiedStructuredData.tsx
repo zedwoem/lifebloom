@@ -12,7 +12,7 @@ interface StructuredDataProps {
   publishDate?: string;
   modifiedDate?: string;
   image?: string;
-  entityType?: "Article" | "WebPage" | "Tool" | "SoftwareApplication";
+  entityType?: "Article" | "WebPage" | "Tool" | "SoftwareApplication" | "VideoObject";
   entitySpecificData?: any; // e.g. for Tool or Product
 }
 

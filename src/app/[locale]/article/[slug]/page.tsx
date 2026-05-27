@@ -5,6 +5,8 @@ import { Article, MedicalWebPage, WithContext } from 'schema-dts';
 import { AccessibleArticleReader } from '@/components/content/accessible-article-reader';
 import { createServiceClient } from '@/lib/supabase/server';
 import { getOrCompileArticleTranslation } from '@/lib/services/astTranslationEngine';
+import crypto from 'crypto';
+import { AccessibleComments } from '@/components/community/accessible-comments';
 
 // Async data fetching with advanced SEO metadata and dynamic AI content generation
 async function getArticleData(slug: string, locale: string) {
@@ -19,15 +21,124 @@ async function getArticleData(slug: string, locale: string) {
     .maybeSingle();
 
   if (canonicalArticle) {
+    let contentHtml = canonicalArticle.content_html || '';
+    let finalImageUrl = canonicalArticle.image_url;
+    const category = (canonicalArticle.pillar || 'general') as 'health' | 'finance' | 'tech' | 'general';
+
+    // A. Dynamic On-Demand LLM Generation Fallback (if content is pending, thin, or default placeholder)
+    if ((!contentHtml || contentHtml.length < 500 || contentHtml.includes("Processing premium content...")) && process.env.GEMINI_API_KEY) {
+      try {
+        console.log(`[On-Demand Generator] Article "${canonicalArticle.title}" content is thin (${contentHtml.length} chars). Generating rich content via Gemini...`);
+        const cleanDesc = contentHtml.replace(/<[^>]*>/g, '').trim().slice(0, 500);
+        
+        let expertReviewerName = "LifeBloom Editorial Board";
+        let expertReviewerTitle = "Senior Accessibility Curators";
+        if (category === 'health') {
+          expertReviewerName = "Dr. Sarah Jenkins, MD";
+          expertReviewerTitle = "Geriatric Medicine Specialist";
+        } else if (category === 'finance') {
+          expertReviewerName = "Michael Chen, CFP";
+          expertReviewerTitle = "Certified Financial Planner";
+        }
+
+        const generationPrompt = `You are a professional, expert editor at LifeBloom Hub. Write a highly informative, detailed, 600-word professional article in English for senior citizens about the topic: "${canonicalArticle.title}". 
+Original summary/context: "${cleanDesc}". 
+
+Instructions:
+1. Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, and bullet lists.
+2. Incorporate a beautiful verification note reflecting that this article content is reviewed by the designated expert.
+   Reviewer details: Name: "${expertReviewerName}", Title: "${expertReviewerTitle}".
+   Wrap this block inside a custom styling structure:
+   <div class="expert-verification-box p-5 my-6 bg-emerald-50/50 border border-emerald-200/50 rounded-2xl">
+     <strong class="font-bold text-xs uppercase tracking-wider text-emerald-800 block mb-1">Verified Expert Review:</strong>
+     <p class="text-sm text-slate-600 mb-0">"Designated advice is reviewed by <strong>${expertReviewerName}</strong> (${expertReviewerTitle}) to ensure clinical/financial compliance. Always consult a certified professional for personalized guidance."</p>
+   </div>
+3. End the article with a 'Sources & References' section (using an <h2>) listing 2-3 real, authoritative sources (e.g., AARP, NIH, SSA.gov) with HTML links. The links MUST have rel="nofollow noopener noreferrer" target="_blank" as a security boundary.
+4. Internal Linking Strategy: You MUST inject at least 1-2 semantic internal HTML anchor links to our tools when relevant keywords appear.
+   Strict mapping (always prepend '/${locale}' to the link):
+   - /${locale}/money-future/retirement-planner (Triggers: retirement, pensiun, dana pensiun)
+   - /${locale}/money-future/yield-radar (Triggers: yield, deposito, obligasi, imbal hasil)
+   - /${locale}/pet-family/canine-symptom-checker (Triggers: dog symptom, anjing sakit, vet checklist)
+   - /${locale}/senior/drug-checker (Triggers: drug checker, interaksi obat, obat resep, side effects)
+   - /${locale}/senior/mobility-planner (Triggers: mobility, fall prevention, mencegah jatuh)
+   - /${locale}/travel/trip-planner (Triggers: trip planner, travel budget, accessible travel)
+   - /${locale}/home-living/budget-renovator (Triggers: renovation, renovasi, budget rumah)
+   - /${locale}/home-living/smart-matcher (Triggers: smart home, matter protocol, perangkat pintar)
+5. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
+
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: generationPrompt }] }]
+            }),
+            signal: AbortSignal.timeout(12000)
+          }
+        );
+
+        if (geminiRes.ok) {
+          const resData = await geminiRes.json();
+          const generatedText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (generatedText && generatedText.trim().length > 100) {
+            console.log(`[On-Demand Generator] Rich content successfully generated on-the-fly.`);
+            contentHtml = generatedText;
+
+            // Apply Unsplash image fallback if null
+            if (!finalImageUrl) {
+              const pillarKeywords: Record<string, string> = {
+                'home-living': 'home-interior-decor',
+                'money-future': 'retirement-finance-wealth',
+                'pet-family': 'happy-pets-dogs',
+                'senior': 'healthy-aging-seniors',
+                'travel': 'wheelchair-accessible-travel',
+                'general': 'wellness'
+              };
+              const keyword = pillarKeywords[canonicalArticle.pillar || 'general'] || pillarKeywords['general'];
+              const randomSeed = Math.abs(crypto.createHash('md5').update(canonicalArticle.title).digest().readInt32BE(0)) % 1000;
+              finalImageUrl = `https://images.unsplash.com/featured/1200x630/?${keyword}&sig=${randomSeed}`;
+            }
+
+            // Save back to DB to cache permanently
+            await supabase
+              .from('canonical_articles')
+              .update({
+                content_html: contentHtml,
+                image_url: finalImageUrl,
+                processing_status: 'completed'
+              })
+              .eq('id', canonicalArticle.id);
+          }
+        }
+      } catch (err) {
+        console.error(`[On-Demand Generator] Failed to enrich thin content:`, err);
+      }
+    }
+
+    // Apply Unsplash fallback image if still null
+    if (!finalImageUrl) {
+      const pillarKeywords: Record<string, string> = {
+        'home-living': 'home-interior-decor',
+        'money-future': 'retirement-finance-wealth',
+        'pet-family': 'happy-pets-dogs',
+        'senior': 'healthy-aging-seniors',
+        'travel': 'wheelchair-accessible-travel',
+        'general': 'wellness'
+      };
+      const keyword = pillarKeywords[canonicalArticle.pillar || 'general'] || pillarKeywords['general'];
+      const randomSeed = Math.abs(crypto.createHash('md5').update(canonicalArticle.title).digest().readInt32BE(0)) % 1000;
+      finalImageUrl = `https://images.unsplash.com/featured/1200x630/?${keyword}&sig=${randomSeed}`;
+    }
+
     const { title: translatedTitle, contentHtml: translatedContentHtml } = await getOrCompileArticleTranslation(
       canonicalArticle.id,
       slug,
       canonicalArticle.title,
-      canonicalArticle.content_html,
+      contentHtml,
       locale
     );
 
-    const category = (canonicalArticle.pillar || 'general') as 'health' | 'finance' | 'tech' | 'general';
     let expertReviewer = null;
     if (category === 'health') {
       expertReviewer = { name: 'Dr. Sarah Jenkins, MD', url: 'https://lifebloomhub.vercel.app/author/sarah-jenkins' };
@@ -41,6 +152,7 @@ async function getArticleData(slug: string, locale: string) {
     );
 
     return {
+      id: canonicalArticle.id,
       title: translatedTitle,
       source: "LifeBloom Hub Curation",
       date: dateStr,
@@ -49,8 +161,9 @@ async function getArticleData(slug: string, locale: string) {
       author: { name: "LifeBloom Editorial Team", url: "https://lifebloomhub.vercel.app/about" },
       category,
       expertReviewer,
-      imageUrl: canonicalArticle.image_url || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
-      content: translatedContentHtml
+      imageUrl: finalImageUrl,
+      content: translatedContentHtml,
+      pillar: canonicalArticle.pillar
     };
   }
 
@@ -72,6 +185,7 @@ async function getArticleData(slug: string, locale: string) {
   const dateStr = new Date('2026-05-20T08:00:00Z').toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
   const articleDetails = {
+    id: null as string | null,
     title: decodedSlug.charAt(0).toUpperCase() + decodedSlug.slice(1),
     source: "LifeBloom Hub Curation",
     date: dateStr,
@@ -81,7 +195,8 @@ async function getArticleData(slug: string, locale: string) {
     category,
     expertReviewer,
     imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop", // Clean premium digital layout image
-    content: ""
+    content: "",
+    pillar: "general" as string
   };
 
 
@@ -333,6 +448,20 @@ export default async function ArticleReaderPage({
 
   if (!article) notFound();
 
+  // SSR fetch approved comments for the current article
+  let initialComments: any[] = [];
+  if (article.id) {
+    const supabase = createServiceClient();
+    const { data: comments } = await supabase
+      .from('comments')
+      .select('id, parent_id, author_name, content, created_at, user_id')
+      .eq('article_id', article.id)
+      .eq('is_approved', true)
+      .order('created_at', { ascending: true });
+    
+    initialComments = comments || [];
+  }
+
   // Base Schema Properties
   const baseSchema = {
     '@context': 'https://schema.org',
@@ -385,10 +514,28 @@ export default async function ArticleReaderPage({
     } as WithContext<Article>;
   }
 
+  // Inject comment structured data for SEO E-E-A-T
+  if (initialComments.length > 0) {
+    articleSchema.comment = initialComments.map((c: any) => ({
+      '@type': 'Comment',
+      'text': c.content,
+      'author': {
+        '@type': 'Person',
+        'name': c.author_name
+      },
+      'dateCreated': c.created_at
+    }));
+  }
+
   return (
     <>
       <StructuredData data={articleSchema} />
       <AccessibleArticleReader article={article} locale={locale} slug={slug} />
+      {article.id && (
+        <div className="max-w-4xl mx-auto px-4 pb-16">
+          <AccessibleComments articleId={article.id} initialComments={initialComments} />
+        </div>
+      )}
     </>
   );
 }

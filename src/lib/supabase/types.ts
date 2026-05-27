@@ -76,81 +76,6 @@ export type Database = {
         }
         Relationships: []
       }
-      aggregated_content: {
-        Row: {
-          content_hash: string | null
-          created_at: string | null
-          id: string
-          image_url: string | null
-          is_approved: boolean | null
-          is_blacklisted: boolean
-          metadata: Json | null
-          original_url: string | null
-          pillar: string
-          published_at: string
-          source_name: string
-          source_type: string
-          summary_de: string | null
-          summary_en: string | null
-          summary_es: string | null
-          summary_fr: string | null
-          summary_id: string | null
-          title_de: string | null
-          title_en: string | null
-          title_es: string | null
-          title_fr: string | null
-          title_id: string | null
-        }
-        Insert: {
-          content_hash?: string | null
-          created_at?: string | null
-          id?: string
-          image_url?: string | null
-          is_approved?: boolean | null
-          is_blacklisted?: boolean
-          metadata?: Json | null
-          original_url?: string | null
-          pillar: string
-          published_at: string
-          source_name: string
-          source_type: string
-          summary_de?: string | null
-          summary_en?: string | null
-          summary_es?: string | null
-          summary_fr?: string | null
-          summary_id?: string | null
-          title_de?: string | null
-          title_en?: string | null
-          title_es?: string | null
-          title_fr?: string | null
-          title_id?: string | null
-        }
-        Update: {
-          content_hash?: string | null
-          created_at?: string | null
-          id?: string
-          image_url?: string | null
-          is_approved?: boolean | null
-          is_blacklisted?: boolean
-          metadata?: Json | null
-          original_url?: string | null
-          pillar?: string
-          published_at?: string
-          source_name?: string
-          source_type?: string
-          summary_de?: string | null
-          summary_en?: string | null
-          summary_es?: string | null
-          summary_fr?: string | null
-          summary_id?: string | null
-          title_de?: string | null
-          title_en?: string | null
-          title_es?: string | null
-          title_fr?: string | null
-          title_id?: string | null
-        }
-        Relationships: []
-      }
       api_health_logs: {
         Row: {
           api_name: string
@@ -1161,6 +1086,47 @@ export type Database = {
         }
         Relationships: []
       }
+      video_transcripts: {
+        Row: {
+          ai_chapters: Json | null
+          ai_summary: string | null
+          fetched_at: string | null
+          full_text: string | null
+          id: string
+          language: string | null
+          segments: Json | null
+          video_id: string
+        }
+        Insert: {
+          ai_chapters?: Json | null
+          ai_summary?: string | null
+          fetched_at?: string | null
+          full_text?: string | null
+          id?: string
+          language?: string | null
+          segments?: Json | null
+          video_id: string
+        }
+        Update: {
+          ai_chapters?: Json | null
+          ai_summary?: string | null
+          fetched_at?: string | null
+          full_text?: string | null
+          id?: string
+          language?: string | null
+          segments?: Json | null
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_transcripts_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: true
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       videos: {
         Row: {
           created_at: string
@@ -1173,11 +1139,16 @@ export type Database = {
           pillar: string
           platform: string
           provider: string | null
+          reaction_helpful: number | null
+          reaction_insightful: number | null
+          reaction_love: number | null
           slug: string
           thumbnail_url: string | null
           title: string
           transcript: string | null
+          transcript_status: string | null
           video_id: string
+          view_count: number | null
         }
         Insert: {
           created_at?: string
@@ -1190,11 +1161,16 @@ export type Database = {
           pillar: string
           platform?: string
           provider?: string | null
+          reaction_helpful?: number | null
+          reaction_insightful?: number | null
+          reaction_love?: number | null
           slug: string
           thumbnail_url?: string | null
           title: string
           transcript?: string | null
+          transcript_status?: string | null
           video_id: string
+          view_count?: number | null
         }
         Update: {
           created_at?: string
@@ -1207,11 +1183,16 @@ export type Database = {
           pillar?: string
           platform?: string
           provider?: string | null
+          reaction_helpful?: number | null
+          reaction_insightful?: number | null
+          reaction_love?: number | null
           slug?: string
           thumbnail_url?: string | null
           title?: string
           transcript?: string | null
+          transcript_status?: string | null
           video_id?: string
+          view_count?: number | null
         }
         Relationships: []
       }
@@ -1286,15 +1267,32 @@ export type Database = {
         }
       }
       get_latest_videos: {
-        Args: { p_limit?: number; p_locale?: string; p_pillar?: string }
+        Args: {
+          p_limit?: number
+          p_locale?: string
+          p_offset?: number
+          p_pillar?: string
+        }
         Returns: {
           created_at: string
+          description: string
+          duration: number
           embed_id: string
           id: string
+          is_active: boolean
           locale: string
           pillar: string
+          platform: string
           provider: string
+          reaction_helpful: number
+          reaction_insightful: number
+          reaction_love: number
+          slug: string
+          thumbnail_url: string
           title: string
+          transcript_status: string
+          video_id: string
+          view_count: number
         }[]
       }
       get_new_posts: {
@@ -1411,6 +1409,10 @@ export type Database = {
       }
       increment_user_bloom_points: {
         Args: { amount: number; user_id_param: string }
+        Returns: undefined
+      }
+      increment_video_views: {
+        Args: { p_video_id: string }
         Returns: undefined
       }
       is_admin: { Args: never; Returns: boolean }
@@ -1577,4 +1579,3 @@ export const Constants = {
     },
   },
 } as const
-

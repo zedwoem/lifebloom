@@ -77,7 +77,7 @@ export default function AdminAutopostPage() {
         .limit(50);
 
       if (error) throw error;
-      setLogs(data || []);
+      setLogs((data || []) as any[]);
     } catch (err: any) {
       console.error('Failed to load autopost logs:', err.message);
       toast.error('Gagal memuat log autopost.');

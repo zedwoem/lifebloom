@@ -1,6 +1,6 @@
 export const secureLogger = {
   error: (message: string, error?: any, context?: Record<string, any>) => {
-    const sanitize = (obj: any) => {
+    const sanitize = (obj: any): any => {
       if (typeof obj === 'string') {
         // Mask typical API key patterns (keep first 4 and last 4, mask middle)
         return obj.replace(/([a-zA-Z0-9]{4})[a-zA-Z0-9_-]{10,}([a-zA-Z0-9]{4})/g, '$1***MASKED***$2');

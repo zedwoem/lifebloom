@@ -151,9 +151,10 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
           if (!item.title || !item.link) continue;
 
           try {
-            const hashId = generateHash(item.title, item.link);
-            const slug = slugify(item.title, hashId);
-            const imageUrl = extractImageUrl(item);
+            const anyItem = item as any;
+            const hashId = generateHash(anyItem.title || "", anyItem.link || "");
+            const slug = slugify(anyItem.title || "", hashId);
+            const imageUrl = extractImageUrl(anyItem);
 
             // Insert basic details and set processing_status = 'pending'
             const { data: insertedData, error: canonicalError } = await supabase
@@ -161,12 +162,12 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
               .upsert({
                 source_hash: hashId,
                 slug,
-                title: item.title,
-                content_html: item['content:encoded'] || item.content || item.description || '<p>Content unavailable</p>',
-                source_url: item.link,
+                title: anyItem.title || "",
+                content_html: anyItem['content:encoded'] || anyItem.content || anyItem.description || '<p>Content unavailable</p>',
+                source_url: anyItem.link || "",
                 pillar: pillarSlug,
                 image_url: imageUrl || null,
-                published_at: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
+                published_at: anyItem.pubDate ? new Date(anyItem.pubDate).toISOString() : new Date().toISOString(),
                 processing_status: 'pending'
               }, { onConflict: 'source_hash', ignoreDuplicates: true })
               .select('id, title, slug, pillar, image_url')
@@ -260,12 +261,13 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
           const ytItems = feed.items || [];
 
           for (const ytItem of ytItems.slice(0, 5)) {
+            const anyYtItem = ytItem as any;
             // YouTube RSS id is formatted like: yt:video:VIDEO_ID
-            const videoId = ytItem.id ? ytItem.id.replace('yt:video:', '') : '';
-            if (!videoId || !ytItem.title) continue;
+            const videoId = anyYtItem.id ? anyYtItem.id.replace('yt:video:', '') : '';
+            if (!videoId || !anyYtItem.title) continue;
 
             try {
-              const titleSlug = ytItem.title
+              const titleSlug = anyYtItem.title
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '')
@@ -283,12 +285,14 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
                 .upsert({
                   embed_id: videoId,
                   video_id: videoId,
-                  title: ytItem.title,
-                  description: ytItem.contentSnippet?.slice(0, 500) || ytItem.content?.slice(0, 500) || '',
+                  title: anyYtItem.title || "",
+                  description: anyYtItem.contentSnippet?.slice(0, 500) || anyYtItem.content?.slice(0, 500) || '',
                   provider: 'youtube',
                   pillar: dbPillar,
                   locale: 'en',
                   slug: `${titleSlug}-${videoId}`,
+                  thumbnail_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+                  transcript_status: 'pending',
                 }, { onConflict: 'embed_id', ignoreDuplicates: true })
                 .select('id, title, slug, description, pillar')
                 .maybeSingle();
@@ -337,6 +341,7 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
 // ============================================================
 
 export async function scrapeFullArticleContent(url: string): Promise<{ contentText: string; imageUrl?: string }> {
+  let html = '';
   try {
     const res = await fetch(url, {
       headers: {
@@ -351,7 +356,34 @@ export async function scrapeFullArticleContent(url: string): Promise<{ contentTe
       throw new Error(`HTTP ${res.status}`);
     }
 
-    const html = await res.text();
+    html = await res.text();
+  } catch (primaryErr: any) {
+    console.warn(`[Scraper] Primary scrape failed for ${url}: ${primaryErr.message}. Trying Jina Reader fallback...`);
+    try {
+      const jinaUrl = `https://r.jina.ai/${url}`;
+      const jinaRes = await fetch(jinaUrl, {
+        headers: {
+          'Accept': 'text/plain',
+        },
+        signal: AbortSignal.timeout(10000)
+      });
+      if (jinaRes.ok) {
+        const jinaText = await jinaRes.text();
+        if (jinaText && jinaText.trim().length > 300) {
+          console.log(`[Scraper] Jina Reader successfully retrieved ${jinaText.length} characters.`);
+          return {
+            contentText: jinaText.replace(/\s+/g, ' ').substring(0, 10000),
+            imageUrl: undefined
+          };
+        }
+      }
+    } catch (jinaErr: any) {
+      console.error(`[Scraper] Jina fallback failed as well:`, jinaErr.message);
+    }
+    throw primaryErr; // Re-throw primary error if Jina also fails
+  }
+
+  try {
     const $ = cheerio.load(html);
 
     // 1. Extract og:image from metadata
@@ -553,8 +585,8 @@ IMPORTANT: Respond ONLY with the raw JSON object. Do not wrap in markdown code b
 // DECOUPLED BATCH QUEUE PROCESSOR
 // ============================================================
 
-export async function processPendingArticlesBatch(limit: number = 2): Promise<{ processed: number; errors: string[] }> {
-  const supabase = createServiceClient();
+export async function processPendingArticlesBatch(limit: number = 5): Promise<{ processed: number; errors: string[] }> {
+  const supabase = createServiceClient() as any;
   const results = {
     processed: 0,
     errors: [] as string[]
@@ -563,7 +595,7 @@ export async function processPendingArticlesBatch(limit: number = 2): Promise<{ 
   // 1. Fetch 'pending' articles
   const { data: pendingArticles, error: fetchError } = await supabase
     .from('canonical_articles')
-    .select('id, title, source_url, pillar, slug')
+    .select('id, title, source_url, pillar, slug, content_html, image_url')
     .eq('processing_status', 'pending')
     .order('ingested_at', { ascending: true })
     .limit(limit);
@@ -580,7 +612,7 @@ export async function processPendingArticlesBatch(limit: number = 2): Promise<{ 
 
   console.log(`[Queue Processor] Found ${pendingArticles.length} pending articles. Processing...`);
 
-  for (const article of pendingArticles) {
+  for (const article of (pendingArticles as any[])) {
     // Update status to 'processing' to prevent double processing in case of multiple concurrent runs
     await supabase
       .from('canonical_articles')
@@ -590,31 +622,91 @@ export async function processPendingArticlesBatch(limit: number = 2): Promise<{ 
     try {
       console.log(`[Queue Processor] Scraping content for article "${article.title}" (${article.source_url})`);
 
-      // A. Scrape target canonical page
-      const scraped = await scrapeFullArticleContent(article.source_url);
+      let scraped: { contentText: string; imageUrl?: string };
+      try {
+        scraped = await scrapeFullArticleContent(article.source_url || "");
+        if (!scraped.contentText || scraped.contentText.length < 200) {
+          throw new Error('Scraped content is too thin or empty.');
+        }
+      } catch (scrapeErr: any) {
+        console.warn(`[Queue Processor] Scraping failed for "${article.title}": ${scrapeErr.message}. Attempting Gemini Direct AI Generation fallback...`);
+        
+        const cleanDesc = article.content_html 
+          ? article.content_html.replace(/<[^>]*>/g, '').trim().slice(0, 500) 
+          : '';
+        
+        const geminiKey = process.env.GEMINI_API_KEY;
+        if (!geminiKey) throw new Error('Missing GEMINI_API_KEY for direct AI fallback.');
+        
+        console.log(`[Queue Processor] Generating direct AI content for "${article.title}"...`);
+        const generationPrompt = `Write a highly informative, detailed, 600-word professional article in English for senior citizens about the topic: "${article.title}". 
+Original summary/context: "${cleanDesc}".
 
-      if (!scraped.contentText || scraped.contentText.length < 200) {
-        throw new Error('Scraped content is too thin or empty.');
+Instructions:
+1. Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, and bullet lists.
+2. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
+        
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: generationPrompt }] }]
+            }),
+            signal: AbortSignal.timeout(12000)
+          }
+        );
+
+        if (!geminiRes.ok) {
+          throw new Error(`Gemini AI generation fallback failed with HTTP ${geminiRes.status}`);
+        }
+
+        const resData = await geminiRes.json();
+        const generatedText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!generatedText || generatedText.trim().length < 100) {
+          throw new Error('Gemini direct generation returned empty content.');
+        }
+
+        scraped = {
+          contentText: generatedText,
+          imageUrl: undefined
+        };
       }
 
-      console.log(`[Queue Processor] Scraped ${scraped.contentText.length} chars. Enriching with Gemini AI...`);
+      console.log(`[Queue Processor] Scraped/Generated ${scraped.contentText.length} chars. Enriching with Gemini AI...`);
 
       // B. Enrich content with Gemini
       const enriched = await enrichScrapedContentWithAI(
         scraped.contentText,
-        article.source_url,
+        article.source_url || "",
         article.pillar || 'general',
         'en' // default locale for ingestion
       );
 
       console.log(`[Queue Processor] Content enriched. Updating database...`);
 
+      let finalImageUrl = scraped.imageUrl || article.image_url || null;
+      if (!finalImageUrl) {
+        const pillarKeywords: Record<string, string> = {
+          'home-living': 'home-interior-decor',
+          'money-future': 'retirement-finance-wealth',
+          'pet-family': 'happy-pets-dogs',
+          'senior': 'healthy-aging-seniors',
+          'travel': 'wheelchair-accessible-travel',
+          'general': 'wellness'
+        };
+        const keyword = pillarKeywords[article.pillar] || pillarKeywords['general'];
+        const randomSeed = Math.abs(crypto.createHash('md5').update(article.title).digest().readInt32BE(0)) % 1000;
+        finalImageUrl = `https://images.unsplash.com/featured/1200x630/?${keyword}&sig=${randomSeed}`;
+      }
+
       // C. Save rich data back to database and mark as 'completed'
       const { error: updateError } = await supabase
         .from('canonical_articles')
         .update({
           content_html: enriched.contentHtml,
-          image_url: scraped.imageUrl || article.image_url || null, // Scraped image is preferred, fallback to feed
+          image_url: finalImageUrl,
           raw_scraped_content: scraped.contentText,
           processing_status: 'completed',
           processing_error: null
@@ -628,20 +720,18 @@ export async function processPendingArticlesBatch(limit: number = 2): Promise<{ 
       results.processed++;
 
       // D. Trigger Background Translation
-      // We translate the completed rich content to other locales (id, es) in the background asynchronously!
       getOrCompileArticleTranslation(article.id, article.slug, article.title, enriched.contentHtml, 'id')
         .catch(err => console.error(`[Pre-translate ID Queue Error]`, err.message));
       getOrCompileArticleTranslation(article.id, article.slug, article.title, enriched.contentHtml, 'es')
         .catch(err => console.error(`[Pre-translate ES Queue Error]`, err.message));
 
       // E. Trigger Social Autoposting
-      // Now that we have a rich, interlinked, and robust article, it's ready to post!
       const postItem: IngestedItem = {
         id: article.id,
         title: article.title,
         slug: article.slug,
         description: enriched.description,
-        imageUrl: scraped.imageUrl || undefined,
+        imageUrl: finalImageUrl || undefined,
         pillar: article.pillar || 'general',
         type: 'article'
       };

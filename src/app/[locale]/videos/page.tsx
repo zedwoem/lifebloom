@@ -1,150 +1,82 @@
-"use client";
+import { Metadata } from 'next';
+import { getAllVideos } from '@/lib/services/videoService';
+import VideoHubClient from './VideoHubClient';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { PlayCircle, Tv, Heart } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { getAllVideos, VideoItem } from '@/lib/services/videoService';
-import { useSearchParams } from 'next/navigation';
+export const revalidate = 300; // Cache for 5 minutes
 
-const VideoPlayer = dynamic(() => import('@/components/features/video-player'), {
-  loading: () => (
-    <div className="w-full aspect-video bg-slate-900 rounded-xl flex items-center justify-center animate-pulse">
-      <PlayCircle className="w-12 h-12 text-slate-700" />
-    </div>
-  ),
-  ssr: false
-});
-
-function VideoHubContent() {
-  const searchParams = useSearchParams();
-  const videoSlug = searchParams.get('v');
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ locale: string }> 
+}): Promise<Metadata> {
+  const { locale } = await params;
   
-  const [videos, setVideos] = useState<VideoItem[]>([]);
-  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
+  const dict = {
+    en: {
+      title: "Educational Video Hub | LifeBloom Hub",
+      description: "Explore verified, premium masterclasses in health wellness, home layout, pet family, and retirement planning. Step-by-step guidance for active longevity.",
+      keywords: ["educational video hub", "active longevity guide", "retirement masterclass", "home renovator wellness", "expert senior health check", "LifeBloom Academy"]
+    },
+    id: {
+      title: "Pusat Video Edukasi | LifeBloom Hub",
+      description: "Jelajahi kelas master premium dan terverifikasi untuk kesehatan lansia, dana pensiun, hewan peliharaan, dan arsitektur rumah pintar.",
+      keywords: ["pusat edukasi video", "panduan hidup sehat lansia", "kelas master pensiun", "renovasi rumah praktis", "LifeBloom Academy"]
+    }
+  };
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      const data = await getAllVideos(12);
-      setVideos(data);
-      if (data.length > 0) {
-        if (videoSlug) {
-          const matched = data.find(v => v.slug === videoSlug || v.id === videoSlug);
-          if (matched) {
-            setActiveVideo(matched);
-            return;
-          }
-        }
-        setActiveVideo(data[0]);
+  const t = dict[locale as keyof typeof dict] || dict.en;
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app';
+
+  return {
+    title: t.title,
+    description: t.description,
+    keywords: t.keywords,
+    alternates: {
+      canonical: `/videos`,
+      languages: {
+        'x-default': `/en/videos`,
+        'en': `/en/videos`,
+        'id': `/id/videos`,
+        'es': `/es/videos`,
       }
-    };
-    fetchVideos();
-  }, [videoSlug]);
-
-  if (!activeVideo) {
-    return (
-      <div className="min-h-screen bg-background py-12 flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <Tv className="w-12 h-12 text-brand-green/50 mb-4" />
-          <p className="text-brand-blue font-bold">Loading Masterclasses...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="flex items-center gap-4 mb-10">
-          <div className="p-4 bg-emerald-100 rounded-2xl text-emerald-600">
-            <Tv className="w-8 h-8" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-black text-brand-blue font-display tracking-tight">Educational Video Hub</h1>
-            <p className="text-slate-600 font-medium mt-2 text-lg">
-              Curated masterclasses with interactive, adjustable transcripts for your comfort.
-            </p>
-          </div>
-        </div>
-
-        {/* Featured Video Player */}
-        <div className="mb-12">
-          <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100">
-            <div className="mb-6">
-              <span className="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-widest rounded-lg mb-3 inline-block">
-                Now Playing • {activeVideo.category}
-              </span>
-              <h2 className="text-3xl font-bold text-brand-blue mb-2">{activeVideo.title}</h2>
-              <p className="text-slate-600 leading-relaxed">{activeVideo.description}</p>
-            </div>
-            
-            <VideoPlayer 
-              key={activeVideo.id} // Force remount on video change
-              videoId={activeVideo.embed_id || activeVideo.id}
-              platform="youtube"
-              transcripts={activeVideo.transcripts}
-            />
-          </div>
-        </div>
-
-        {/* Up Next / Playlist */}
-        <div>
-          <h3 className="text-2xl font-bold text-brand-blue mb-6 flex items-center gap-2">
-            <PlayCircle className="w-6 h-6 text-brand-green" />
-            More Masterclasses
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.filter(v => v.id !== activeVideo.id).map(video => (
-              <div 
-                key={video.id}
-                onClick={() => setActiveVideo(video)}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer group hover:shadow-lg transition-all hover:border-brand-green/30"
-              >
-                {/* Thumbnail Placeholder */}
-                <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 relative flex items-center justify-center overflow-hidden">
-                  {video.embed_id ? (
-                    <img 
-                      src={`https://img.youtube.com/vi/${video.embed_id}/hqdefault.jpg`} 
-                      alt={video.title} 
-                      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                    />
-                  ) : null}
-                  <PlayCircle className="w-12 h-12 text-white/90 group-hover:text-brand-green group-hover:scale-110 transition-all relative z-10 drop-shadow-md" />
-                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded z-20">
-                    Play
-                  </div>
-                </div>
-                <div className="p-5">
-                  <span className="text-xs font-black text-brand-green uppercase tracking-wider block mb-2">
-                    {video.category}
-                  </span>
-                  <h4 className="font-bold text-brand-blue text-lg mb-2 line-clamp-2 group-hover:text-brand-green-dark transition-colors">
-                    {video.title}
-                  </h4>
-                  <p className="text-sm text-slate-500 line-clamp-2">
-                    {video.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
+    },
+    openGraph: {
+      title: t.title,
+      description: t.description,
+      url: `${baseUrl}/${locale}/videos`,
+      type: 'website',
+      images: [
+        {
+          url: `${baseUrl}/images/og-video-hub.jpg`,
+          width: 1200,
+          height: 630,
+          alt: t.title
+        }
+      ]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: t.title,
+      description: t.description
+    }
+  };
 }
 
-export default function VideoHubPage() {
+export default async function VideoHubPage({ 
+  params 
+}: { 
+  params: Promise<{ locale: string }> 
+}) {
+  const { locale } = await params;
+
+  // Fetch up to 100 videos to support full client-side filtering/sorting/pagination
+  const videos = await getAllVideos(100, locale);
+
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-background py-12 flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <Tv className="w-12 h-12 text-brand-green/50 mb-4" />
-          <p className="text-brand-blue font-bold">Loading Video Hub...</p>
-        </div>
-      </div>
-    }>
-      <VideoHubContent />
-    </Suspense>
+    <VideoHubClient 
+      initialVideos={videos} 
+      locale={locale} 
+    />
   );
 }
