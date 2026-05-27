@@ -6,10 +6,7 @@ import { Globe, ChevronDown, Check } from 'lucide-react';
 
 const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English',
-  id: 'Bahasa Indonesia',
-  es: 'Español',
-  fr: 'Français',
-  de: 'Deutsch'
+  id: 'Bahasa Indonesia'
 };
 
 interface LanguageSwitcherProps {

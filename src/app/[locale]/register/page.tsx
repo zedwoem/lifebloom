@@ -8,7 +8,7 @@ import { Mail, ShieldAlert, CheckCircle2, UserPlus, ChevronRight } from "lucide-
 import Link from "next/link";
 
 export default function RegisterPage() {
-  const { user, signInWithMagicLink, loading } = useAuth();
+  const { user, signInWithMagicLink, loading, signUpWithEmailPassword } = useAuth();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;

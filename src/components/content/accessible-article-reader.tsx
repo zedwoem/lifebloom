@@ -266,7 +266,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
   };
 
   // URL for QR code
-  const articleUrl = typeof window !== 'undefined' ? window.location.href : `https://lifebloom.hub/${locale}/article/${slug}`;
+  const articleUrl = typeof window !== 'undefined' ? window.location.href : `https://lifebloomhub.vercel.app/${locale}/article/${slug}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(articleUrl)}`;
 
   return (

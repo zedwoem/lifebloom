@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { smartTranslate } from '@/lib/utils/translator';
+import { translateHtml } from '@/lib/services/astTranslationEngine';
 
-// Set runtime to edge for lowest possible latency globally
-export const runtime = 'edge';
+// NOTE: No edge runtime — astTranslationEngine uses Node.js crypto and Supabase client
 
 export async function POST(request: Request) {
   // === SECURITY CHECK: Prevent external scraping ===
@@ -24,7 +23,8 @@ export async function POST(request: Request) {
     }
 
     // Panggil utilitas terjemahan pintar (Cache -> LibreTranslate -> DeepL -> Teks Asli)
-    const translatedText = await smartTranslate(text, targetLang, sourceLang);
+    // translateHtml aman untuk teks biasa maupun HTML — fallback ke tier Groq > CF Workers > Gemini
+    const translatedText = await translateHtml(text, targetLang, sourceLang);
 
     return NextResponse.json({ translatedText });
   } catch (error) {

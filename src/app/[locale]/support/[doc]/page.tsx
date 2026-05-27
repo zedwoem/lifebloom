@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { remark } from 'remark';
 import html from 'remark-html';
-import { AccessibleReaderBar } from '@/components/content/accessible-reader-bar';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -73,7 +72,6 @@ export default async function DocumentPage({ params }: { params: Promise<{ doc: 
           </article>
         </main>
       </div>
-      <AccessibleReaderBar />
     </div>
   );
 }

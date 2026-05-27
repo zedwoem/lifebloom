@@ -1,3 +1,7 @@
+// src/lib/services/translationAdapter.ts
+// [DEPRECATED FOR EXTERNAL CALLS] This file is now reserved exclusively as an SRE fallback layer
+// for astTranslationEngine.ts. All main applications must route through astTranslationEngine.ts.
+
 import crypto from 'crypto';
 import { Redis } from '@upstash/redis';
 

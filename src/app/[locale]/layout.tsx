@@ -42,10 +42,10 @@ export default async function LocaleLayout({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'LifeBloom Hub',
-    url: 'https://lifebloom.hub',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://lifebloom.hub/search?q={search_term_string}',
+      target: `${process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app'}/search?q={search_term_string}`,
       'query-input': 'required name=search_term_string'
     } as any
   };
@@ -62,7 +62,7 @@ export default async function LocaleLayout({
         
         {/* Custom Meta & Scripts */}
         <meta name="impact-site-verification" content="c188c067-926f-4925-8c8b-e04b15769573" />
-        <meta name="impact-site-verification" value="ca6b1edc-0537-4c76-89fe-cbb058b59229" />
+        <meta name="impact-site-verification" content="ca6b1edc-0537-4c76-89fe-cbb058b59229" />
         <meta name="google-site-verification" content="BsuKe58zHtvtyw7zN_tK9zTo_ZDK7qW533ds7-uoPEg" />
         <script
           {...{ nowprocket: "true" }}
@@ -324,9 +324,9 @@ export default async function LocaleLayout({
                 <Home className="w-6 h-6" />
                 <span className="text-[10px] font-bold">Home</span>
               </Link>
-              <Link href={`/${locale}/search`} className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#006948] transition-colors w-[64px] h-[52px] shrink-0">
-                <Search className="w-6 h-6" />
-                <span className="text-[10px] font-bold">Search</span>
+              <Link href={`/${locale}/support/contact`} className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#006948] transition-colors w-[64px] h-[52px] shrink-0">
+                <LayoutDashboard className="w-6 h-6" />
+                <span className="text-[10px] font-bold">Contact</span>
               </Link>
               <Link href={`/${locale}/dashboard`} className="flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#006948] transition-colors w-[64px] h-[52px] shrink-0">
                 <LayoutDashboard className="w-6 h-6" />

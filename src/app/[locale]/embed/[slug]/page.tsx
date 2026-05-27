@@ -26,7 +26,7 @@ export default async function EmbedPage({
     <div className="w-full h-full bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100">
       <CalculatorComponent />
       <div className="bg-brand-slate-light p-3 text-center text-xs text-brand-slate border-t border-slate-200">
-        Powered by <a href="https://lifebloom.hub" target="_blank" rel="noopener noreferrer" className="text-brand-green font-bold">LifeBloom Hub</a>
+        Powered by <a href="https://lifebloomhub.vercel.app" target="_blank" rel="noopener noreferrer" className="text-brand-green font-bold">LifeBloom Hub</a>
       </div>
     </div>
   );

@@ -22,12 +22,13 @@ export async function POST(req: NextRequest) {
 
     const { job } = await req.json();
 
-    if (job !== "rss-ingest" && job !== "price-sync") {
+    if (!['rss-ingest', 'price-sync', 'youtube-ingest', 'translate-queue'].includes(job)) {
       return NextResponse.json({ error: "Invalid job name" }, { status: 400 });
     }
 
-    // Call the corresponding Supabase edge function with cron token authorization
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pusqytkxmoytvmajjodb.supabase.co";
+    // Panggil cron route internal Next.js (single unified pipeline, bukan Supabase Edge Function terpisah)
+    // Ini memastikan job yang di-trigger manual identik dengan yang di-trigger Vercel Cron
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://lifebloomhub.vercel.app";
     const cronSecret = process.env.CRON_SECRET;
 
     if (!cronSecret) {
@@ -35,31 +36,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Server configuration error" }, { status: 503 });
     }
 
-    const functionUrl = `${supabaseUrl}/functions/v1/${job}`;
-    const response = await fetch(functionUrl, {
-      method: "POST",
+    // Map job name ke internal API route
+    const jobRouteMap: Record<string, string> = {
+      'rss-ingest': '/api/cron/rss-ingest',
+      'youtube-ingest': '/api/cron/youtube-ingest',
+      'price-sync': '/api/cron/price-sync',
+      'translate-queue': '/api/cron/translate-queue',
+    };
+
+    const internalRoute = jobRouteMap[job];
+    if (!internalRoute) {
+      return NextResponse.json({ error: `No route mapped for job: ${job}` }, { status: 400 });
+    }
+
+    const response = await fetch(`${appUrl}${internalRoute}`, {
+      method: "GET",
       headers: {
         "Authorization": `Bearer ${cronSecret}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ trigger: "manual" })
+        "Content-Type": "application/json",
+        "x-manual-trigger": "admin"
+      }
     });
 
     const responseData = await response.json().catch(() => ({}));
 
-    // Record the execution log inside system_cron_logs
+    // Catat log dengan data riil dari response — tidak ada Math.random()
     const { createAdminClient } = await import("@/lib/supabase/admin");
     const adminSupabase = createAdminClient();
 
-    // Parse processed count and deduplicated duplicates blocked count
-    const processed = responseData.count || 0;
-    // Deduplication engine logs: if RSS Ingest, fetch blocked items from parsing
-    const duplicates = job === "rss-ingest" ? (responseData.count === 0 ? Math.floor(Math.random() * 8) + 1 : Math.floor(Math.random() * 3)) : 0;
+    const processed = responseData.processed ?? responseData.count ?? 0;
+    const duplicatesBlocked = responseData.duplicates_blocked ?? responseData.skipped ?? 0;
 
     await adminSupabase.from("system_cron_logs").insert({
       job_name: job,
       status: response.ok ? "success" : "failed",
-      duplicates_blocked: duplicates,
+      duplicates_blocked: duplicatesBlocked,
       items_processed: processed,
       details: responseData
     });

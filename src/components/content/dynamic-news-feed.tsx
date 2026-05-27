@@ -38,7 +38,9 @@ export async function DynamicNewsFeed({ pillarSlug, locale }: DynamicNewsFeedPro
     .in('article_id', articleIds);
 
   const translationMap = new Map<string, string>(
-    (translations || []).map(t => [t.article_id, t.title_translated])
+    (translations || [])
+      .filter((t): t is typeof t & { article_id: string } => t.article_id !== null)
+      .map(t => [t.article_id, t.title_translated])
   );
 
   // 3. Map articles to localized title and descriptions
@@ -46,7 +48,7 @@ export async function DynamicNewsFeed({ pillarSlug, locale }: DynamicNewsFeedPro
     const translatedTitle = translationMap.get(article.id) || article.title;
     
     // Create a readable formatted date
-    const dateObj = new Date(article.published_at);
+    const dateObj = new Date(article.published_at ?? new Date().toISOString());
     const dateStr = dateObj.toLocaleDateString(
       locale === 'id' ? 'id-ID' : 'en-US',
       { month: 'long', day: 'numeric', year: 'numeric' }

@@ -1,9 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from '@/lib/supabase/server';
 
-// Use standard Node.js fetch inside Server Actions/Utilities
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Singleton service-role client — aman untuk server-side queries
+const supabase = createServiceClient();
 
 export interface Article {
   id: string;

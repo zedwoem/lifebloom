@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       activity_logs: {
@@ -810,6 +785,50 @@ export type Database = {
         }
         Relationships: []
       }
+      questions: {
+        Row: {
+          answer_content: string | null
+          answered_at: string | null
+          author_name: string
+          content: string
+          created_at: string | null
+          expert_id: string | null
+          id: string
+          pillar: string | null
+          status: string | null
+        }
+        Insert: {
+          answer_content?: string | null
+          answered_at?: string | null
+          author_name: string
+          content: string
+          created_at?: string | null
+          expert_id?: string | null
+          id?: string
+          pillar?: string | null
+          status?: string | null
+        }
+        Update: {
+          answer_content?: string | null
+          answered_at?: string | null
+          author_name?: string
+          content?: string
+          created_at?: string | null
+          expert_id?: string | null
+          id?: string
+          pillar?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_expert_id_fkey"
+            columns: ["expert_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_items: {
         Row: {
           created_at: string
@@ -1063,6 +1082,7 @@ export type Database = {
           display_name: string | null
           email: string
           id: string
+          is_active: boolean | null
           preferences: Json | null
           role: string | null
           subscription_tier: string
@@ -1075,6 +1095,7 @@ export type Database = {
           display_name?: string | null
           email: string
           id: string
+          is_active?: boolean | null
           preferences?: Json | null
           role?: string | null
           subscription_tier?: string
@@ -1087,6 +1108,7 @@ export type Database = {
           display_name?: string | null
           email?: string
           id?: string
+          is_active?: boolean | null
           preferences?: Json | null
           role?: string | null
           subscription_tier?: string
@@ -1491,9 +1513,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       article_publishing_status: [
@@ -1513,3 +1532,4 @@ export const Constants = {
     },
   },
 } as const
+

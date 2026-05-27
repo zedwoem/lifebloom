@@ -27,10 +27,10 @@ export async function PillarVideoSection({ pillarSlug, locale }: PillarVideoSect
   const processedVideos = videos.map(v => ({
     id: v.id,
     title: v.title,
-    embedId: v.embed_id,
+    embedId: v.embed_id ?? '',
     pillar: v.pillar,
     description: v.description || (locale === 'id' ? "Panduan edukasi komprehensif LifeBloom Hub." : "Comprehensive educational masterclass by LifeBloom Hub.")
-  }));
+  })).filter(v => v.embedId !== ''); // Filter video tanpa embed_id valid
 
   return (
     <PillarVideoSectionClient 

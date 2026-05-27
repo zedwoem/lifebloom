@@ -29,9 +29,9 @@ async function getArticleData(slug: string, locale: string) {
     const category = (canonicalArticle.pillar || 'general') as 'health' | 'finance' | 'tech' | 'general';
     let expertReviewer = null;
     if (category === 'health') {
-      expertReviewer = { name: 'Dr. Sarah Jenkins, MD', url: 'https://lifebloom.hub/author/sarah-jenkins' };
+      expertReviewer = { name: 'Dr. Sarah Jenkins, MD', url: 'https://lifebloomhub.vercel.app/author/sarah-jenkins' };
     } else if (category === 'finance') {
-      expertReviewer = { name: 'Michael Chen, CFP', url: 'https://lifebloom.hub/author/michael-chen' };
+      expertReviewer = { name: 'Michael Chen, CFP', url: 'https://lifebloomhub.vercel.app/author/michael-chen' };
     }
 
     const dateStr = new Date(canonicalArticle.published_at || '2026-05-20T08:00:00Z').toLocaleDateString(
@@ -45,7 +45,7 @@ async function getArticleData(slug: string, locale: string) {
       date: dateStr,
       datePublished: canonicalArticle.published_at || new Date('2026-05-20T08:00:00Z').toISOString(),
       dateModified: new Date().toISOString(),
-      author: { name: "LifeBloom Editorial Team", url: "https://lifebloom.hub/about" },
+      author: { name: "LifeBloom Editorial Team", url: "https://lifebloomhub.vercel.app/about" },
       category,
       expertReviewer,
       imageUrl: canonicalArticle.image_url || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
@@ -59,13 +59,13 @@ async function getArticleData(slug: string, locale: string) {
 
   if (slug.includes('health') || slug.includes('medicare') || slug.includes('arthritis')) {
     category = 'health';
-    expertReviewer = { name: 'Dr. Sarah Jenkins, MD', url: 'https://lifebloom.hub/author/sarah-jenkins' };
+    expertReviewer = { name: 'Dr. Sarah Jenkins, MD', url: 'https://lifebloomhub.vercel.app/author/sarah-jenkins' };
   } else if (slug.includes('money') || slug.includes('social-security') || slug.includes('savings')) {
     category = 'finance';
-    expertReviewer = { name: 'Michael Chen, CFP', url: 'https://lifebloom.hub/author/michael-chen' };
+    expertReviewer = { name: 'Michael Chen, CFP', url: 'https://lifebloomhub.vercel.app/author/michael-chen' };
   } else if (slug.includes('smart-home') || slug.includes('gadgets')) {
     category = 'tech';
-    expertReviewer = { name: 'Alex Rivera, Tech Analyst', url: 'https://lifebloom.hub/author/alex-rivera' };
+    expertReviewer = { name: 'Alex Rivera, Tech Analyst', url: 'https://lifebloomhub.vercel.app/author/alex-rivera' };
   }
 
   const dateStr = new Date('2026-05-20T08:00:00Z').toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -76,7 +76,7 @@ async function getArticleData(slug: string, locale: string) {
     date: dateStr,
     datePublished: new Date('2026-05-20T08:00:00Z').toISOString(),
     dateModified: new Date().toISOString(),
-    author: { name: "LifeBloom Editorial Team", url: "https://lifebloom.hub/about" },
+    author: { name: "LifeBloom Editorial Team", url: "https://lifebloomhub.vercel.app/about" },
     category,
     expertReviewer,
     imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop", // Clean premium digital layout image
@@ -247,7 +247,7 @@ export default async function ArticleReaderPage({
       name: 'LifeBloom Hub',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://lifebloom.hub/logo.png'
+        url: 'https://lifebloomhub.vercel.app/logo.png'
       }
     },
     image: [article.imageUrl] // Discover requirement: array of high-res images

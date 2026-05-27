@@ -16,7 +16,8 @@ import {
   Settings,
   Terminal,
   Database,
-  Sliders
+  Sliders,
+  Send
 } from "lucide-react";
 import { toast } from "sonner";
 import { HydrationGuard } from "@/components/ui/hydration-guard";
@@ -25,7 +26,7 @@ export default function AdminPage() {
   const { profile, signOut } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params?.locale || "id";
+  const locale = params?.locale || "en";
   const supabase = createClient();
 
   const [pendingComments, setPendingComments] = useState(0);
@@ -42,8 +43,8 @@ export default function AdminPage() {
       
       if (!isUserAdmin) {
         setIsAdmin(false);
-        toast.error("Akses Ditolak. Anda bukan Administrator.");
-        router.push("/id/dashboard"); // Redirect to regular dashboard
+        toast.error("Access denied. Administrator role required.");
+        router.push(`/${locale}/dashboard`);
         return;
       }
       
@@ -296,6 +297,25 @@ export default function AdminPage() {
               <Link href={`/${locale}/dashboard`}>
                 <button className="self-start px-6 py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 outline-none shadow-sm">
                   Aktifkan / Matikan Fitur
+                </button>
+              </Link>
+            </div>
+
+            {/* Box 9: AI Autopost Center */}
+            <div className="group bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between min-h-[260px]">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Send className="w-32 h-32 text-[#006948]" />
+              </div>
+              <div>
+                <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 border border-emerald-100">
+                  <Send className="w-6 h-6 text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>AI AUTOPOST CENTER</h3>
+                <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Pantau log autoposting media sosial (Telegram, Pinterest, Threads, Bluesky, Mastodon) secara real-time.</p>
+              </div>
+              <Link href={`/${locale}/admin/autopost`}>
+                <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
+                  Buka Autopost Center
                 </button>
               </Link>
             </div>

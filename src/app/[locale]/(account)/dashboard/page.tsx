@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { 
   Settings, 
   Calculator, 
@@ -53,6 +53,7 @@ const DynamicTravelMap = dynamic(
 
 export default function UnifiedMultiRoleDashboard() {
   const { profile, signOut } = useAuth();
+  const router = useRouter();
   const params = useParams();
   const locale = params.locale || "en";
   const supabase = createClient();
@@ -87,6 +88,11 @@ export default function UnifiedMultiRoleDashboard() {
 
   // Load Database Values on Mount
   useEffect(() => {
+    if (activeRole === "admin") {
+      router.push(`/${locale}/admin`);
+      return;
+    }
+
     async function loadDashboardData() {
       // 1. Fetch pending comments if Admin
       if (activeRole === "admin") {
@@ -130,12 +136,24 @@ export default function UnifiedMultiRoleDashboard() {
         const { data: viewsData } = await supabase
           .from("content_metrics")
           .select("total_views");
+
+        // Count 'senior' articles as dynamic medical index indicator
+        const { count: seniorCount } = await supabase
+          .from("canonical_articles")
+          .select("*", { count: "exact", head: true })
+          .eq("pillar", "senior");
         
         if (viewsData) {
           const sum = viewsData.reduce((acc, curr) => acc + (Number(curr.total_views) || 0), 0);
           setExpertStats(prev => ({
             ...prev,
-            totalViews: sum || 12420 // fallback if empty
+            totalViews: sum || 12420, // fallback if empty
+            fdaTerms: seniorCount || 88
+          }));
+        } else {
+          setExpertStats(prev => ({
+            ...prev,
+            fdaTerms: seniorCount || 88
           }));
         }
       }
@@ -158,7 +176,7 @@ export default function UnifiedMultiRoleDashboard() {
     if (profile) {
       loadDashboardData();
     }
-  }, [profile, activeRole, supabase]);
+  }, [profile, activeRole, supabase, locale, router]);
 
   // Toggle Feature Flag Handler (Saves to DB!)
   const handleToggleFlag = async (flagKey: keyof typeof featureFlags, name: string) => {
@@ -179,11 +197,7 @@ export default function UnifiedMultiRoleDashboard() {
     const dbKey = dbKeys[flagKey];
     if (dbKey) {
       toast.loading(`Menyinkronkan ${name}...`);
-      const res = await updateWebsiteSetting({
-        key: dbKey,
-        value: String(nextVal),
-        description: `Feature flag for ${name}`
-      });
+      const res = await updateWebsiteSetting(dbKey, String(nextVal));
       toast.dismiss();
       if (res.success) {
         toast.success(`${name} pipeline successfully ${nextVal ? "ENABLED" : "DISABLED"}.`);

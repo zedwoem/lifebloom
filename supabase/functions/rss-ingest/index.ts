@@ -40,6 +40,18 @@ serve(async (req) => {
       const response = await fetch(url);
       const xmlText = await response.text();
       
+      // Map pillar based on feed URL hints
+      let pillar = 'senior';
+      if (url.includes('handyman') || url.includes('younghouselove')) {
+        pillar = 'home-living';
+      } else if (url.includes('moneyguy')) {
+        pillar = 'money-future';
+      } else if (url.includes('avma') || url.includes('bark')) {
+        pillar = 'pet-family';
+      } else if (url.includes('disabled-world')) {
+        pillar = 'travel';
+      }
+
       // Simple RegExp-based RSS XML parsing for Deno Edge environment compatibility
       const items = xmlText.match(/<item>([\s\S]*?)<\/item>/g) || [];
       
@@ -47,48 +59,49 @@ serve(async (req) => {
         const titleMatch = item.match(/<title>([\s\S]*?)<\/title>/);
         const linkMatch = item.match(/<link>([\s\S]*?)<\/link>/);
         const descMatch = item.match(/<description>([\s\S]*?)<\/description>/);
-        const authorMatch = item.match(/<dc:creator>([\s\S]*?)<\/dc:creator>/) || item.match(/<author>([\s\S]*?)<\/author>/);
+        const contentMatch = item.match(/<content:encoded>([\s\S]*?)<\/content:encoded>/) || item.match(/<content>([\s\S]*?)<\/content>/);
+        const pubDateMatch = item.match(/<pubDate>([\s\S]*?)<\/pubDate>/);
+        const enclosureMatch = item.match(/<enclosure[^>]*url="([^"]*)"/);
 
         if (!titleMatch || !linkMatch) continue;
 
         const title = titleMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim();
         const sourceUrl = linkMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim();
         const description = descMatch ? descMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim() : "";
-        const author = authorMatch ? authorMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim() : "LifeBloom Editorial";
+        const rawContent = contentMatch ? contentMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').trim() : description;
+        const pubDate = pubDateMatch ? pubDateMatch[1].trim() : new Date().toISOString();
+        const imageUrl = enclosureMatch ? enclosureMatch[1].trim() : "";
 
-        // Create standard slug from title
-        const slug = title.toLowerCase()
+        // Standard SHA-256 source hash generation in Deno
+        const encoder = new TextEncoder();
+        const data = encoder.encode(`${title.toLowerCase()}|${sourceUrl.trim().toLowerCase()}`);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashId = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+        // Create standard slug from title and hash
+        const slugBase = title.toLowerCase()
           .replace(/[^a-z0-9\s-]/g, '')
           .replace(/\s+/g, '-')
           .slice(0, 80);
+        const slug = `${slugBase}-${hashId.slice(0, 8)}`;
 
-        // Check if article with this slug already exists in database
-        const { data: existing } = await supabase
-          .from('articles')
-          .select('id')
-          .eq('slug', slug)
-          .maybeSingle();
+        const cleanBody = rawContent.replace(/<[^>]*>?/gm, ' ').trim();
+        const contentHtml = `<p>${cleanBody.replace(/\n\n/g, '</p><p>')}</p>`;
 
-        if (existing) continue; // Skip already ingested articles
-
-        // In production, integrate Anthropic API here to perform semantic language translation:
-        // const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
-        // If available, translate `title`, `description`, `content` to multiple languages.
-        // For baseline, we use the primary ingest as English default.
-
-        // Insert new article into public database
+        // Insert new canonical article
         const { error: insertError } = await supabase
-          .from('articles')
-          .insert({
+          .from('canonical_articles')
+          .upsert({
+            source_hash: hashId,
             slug,
-            pillar: 'senior', // Default to senior wellness, can categorise dynamically
             title,
-            description: description.slice(0, 300),
-            content: `<h3>${title}</h3><p>${description}</p><p>Read more original content at: <a href="${sourceUrl}" target="_blank">${sourceUrl}</a></p>`,
-            author,
+            content_html: contentHtml,
             source_url: sourceUrl,
-            is_active: true
-          });
+            pillar,
+            image_url: imageUrl || null,
+            published_at: new Date(pubDate).toISOString()
+          }, { onConflict: 'source_hash', ignoreDuplicates: true });
 
         if (!insertError) {
           processedArticles.push({ title, slug });
@@ -98,7 +111,7 @@ serve(async (req) => {
 
     // 5. Trigger on-demand NextJS ISR Cache invalidation
     const revalidateToken = Deno.env.get('REVALIDATE_TOKEN');
-    const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') ?? "http://localhost:3000";
+    const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') ?? "https://lifebloomhub.vercel.app";
     
     await fetch(`${appUrl}/api/revalidate?secret=${revalidateToken}`, {
       method: 'POST',
@@ -122,3 +135,4 @@ serve(async (req) => {
     });
   }
 })
+

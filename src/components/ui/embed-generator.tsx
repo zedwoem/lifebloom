@@ -13,7 +13,7 @@ export function EmbedGenerator({ slug, title, type = 'tool' }: { slug: string, t
     setCurrentUrl(window.location.href);
   }, []);
 
-  const embedCode = `<iframe src="https://lifebloom.hub/en/embed/${slug}" width="100%" height="800" frameborder="0" title="${title}"></iframe>`;
+  const embedCode = `<iframe src="https://lifebloomhub.vercel.app/en/embed/${slug}" width="100%" height="800" frameborder="0" title="${title}"></iframe>`;
   const shareTextTitle = `Check out ${title} on LifeBloom Hub!`;
   const shareTextFull = `✨ ${title}\n\nRead more here: ${currentUrl}`;
 

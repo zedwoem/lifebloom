@@ -80,7 +80,9 @@ export default function AdminSourcesPage() {
       const statsMap: Record<string, number> = {};
       if (countsData) {
         countsData.forEach((c) => {
-          statsMap[c.pillar] = (statsMap[c.pillar] || 0) + 1;
+          if (c.pillar) {
+            statsMap[c.pillar] = (statsMap[c.pillar] || 0) + 1;
+          }
         });
       }
       setStats(statsMap);

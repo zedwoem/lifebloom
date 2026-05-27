@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ShieldAlert, Lock, ChevronRight } from "lucide-react";
 
 export default function LoginPage() {
-  const { user, signInWithGoogle, loading } = useAuth();
+  const { user, signInWithGoogle, loading, signInWithEmailPassword } = useAuth();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string || 'en';
@@ -146,7 +146,8 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={isSubmitting}
-          className="w-full bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-bold text-[18px] rounded-xl h-[60px] flex items-center justify-center gap-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+          variant="outline"
+          className="w-full bg-white hover:bg-slate-50 text-[#131b2e] border border-slate-200 font-bold text-[18px] h-[60px] flex items-center justify-center gap-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
         >
           {isSubmitting ? (
             <>

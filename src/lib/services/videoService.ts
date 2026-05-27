@@ -1,9 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
+"use server";
 
-// Use standard Node.js fetch inside Server Actions/Utilities
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { createServiceClient } from '@/lib/supabase/server';
+
+// createServiceClient() mengembalikan singleton service-role client — tidak membuat koneksi baru per import
+const supabase = createServiceClient();
 
 export interface TranscriptLine {
   time: number;
@@ -28,7 +28,7 @@ export const getAllVideos = async (limit: number = 3, locale: string = 'en', pil
     const { data, error } = await supabase.rpc("get_latest_videos", {
       p_limit: limit,
       p_locale: locale,
-      p_pillar: pillar || null
+      p_pillar: pillar || undefined
     });
     
     if (error) {

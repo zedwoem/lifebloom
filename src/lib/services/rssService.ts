@@ -1,10 +1,15 @@
 import crypto from 'crypto';
 import { PILLARS } from '@/lib/constants/pillars';
-import { translationAdapter } from '@/lib/services/translationAdapter';
 import nlp from 'compromise';
 import { createServiceClient } from '@/lib/supabase/server';
 import Parser from 'rss-parser';
+import { AutopostService, IngestedItem } from '@/lib/services/autopostService';
+import { getOrCompileArticleTranslation } from '@/lib/services/astTranslationEngine';
 
+// ============================================================
+// CONTENT ENGINE SOURCES — Single source of truth
+// Memetakan pilar ke sumber RSS dan YouTube Channel ID-nya
+// ============================================================
 export interface RSSItem {
   title: string;
   link: string;
@@ -18,12 +23,28 @@ export interface RSSItem {
 export interface IngestedArticle extends RSSItem {
   hashId: string;
   pillar: string;
-  translatedTitle?: string;
-  translatedDescription?: string;
+}
+
+export interface IngestResult {
+  processed: number;
+  skipped: number;
+  duplicates_blocked: number;
+  errors: string[];
+  youtube_videos_added: number;
+  newItems: IngestedItem[];
 }
 
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
-const parser = new Parser();
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const parser = new Parser({
+  customFields: {
+    item: [
+      ['media:thumbnail', 'mediaThumbnail'],
+      ['media:content', 'mediaContent'],
+      ['enclosure', 'enclosure'],
+    ]
+  }
+});
 
 export const CONTENT_ENGINE_SOURCES: Record<string, { rss: string[]; youtubeChannels?: string[] }> = {
   "home-living": {
@@ -37,8 +58,8 @@ export const CONTENT_ENGINE_SOURCES: Record<string, { rss: string[]; youtubeChan
       "https://moneyguy.com/feed/"
     ],
     youtubeChannels: [
-      "UC9vUu4vlIlMC0dHQCTvQPbg",
-      "UCVBkyXzDW4mixAFs2iWswXg"
+      "UC9vUu4vlIlMC0dHQCTvQPbg", // The Money Guy Show
+      "UCVBkyXzDW4mixAFs2iWswXg"  // James Shack
     ]
   },
   "pet-family": {
@@ -59,6 +80,10 @@ export const CONTENT_ENGINE_SOURCES: Record<string, { rss: string[]; youtubeChan
   }
 };
 
+// ============================================================
+// HELPERS
+// ============================================================
+
 function generateHash(title: string, link: string): string {
   const normalizedStr = `${title.toLowerCase()}|${link.trim().toLowerCase()}`;
   return crypto.createHash('sha256').update(normalizedStr).digest('hex');
@@ -68,12 +93,7 @@ function cleanContent(rawText: string): string {
   if (!rawText) return '';
   const noHtml = rawText.replace(/<[^>]*>?/gm, '');
   const doc = nlp(noHtml);
-  doc.normalize({
-    whitespace: true,
-    punctuation: true,
-    case: false,
-    unicode: true,
-  });
+  doc.normalize({ whitespace: true, punctuation: true, case: false, unicode: true });
   return doc.text();
 }
 
@@ -85,21 +105,49 @@ function slugify(title: string, hashId: string): string {
   return `${base}-${hashId.slice(0, 8)}`;
 }
 
-export async function ingestRSSFeeds(targetLang: string = 'en'): Promise<IngestedArticle[]> {
-  const supabase = createServiceClient();
-  const newArticles: IngestedArticle[] = [];
-  const bulkUpsertData: any[] = [];
-  const tempArticlesMap = new Map<string, IngestedArticle>();
+/**
+ * Ekstrak URL gambar dari RSS item — prioritas: enclosure, media:thumbnail, media:content
+ * Fallback ke placeholder netral yang tidak bias ke satu topik
+ */
+function extractImageUrl(item: any): string {
+  const enclosureUrl = item.enclosure?.url;
+  if (enclosureUrl && /\.(jpg|jpeg|png|webp)/i.test(enclosureUrl)) {
+    return enclosureUrl;
+  }
+  const mediaThumbnail = item.mediaThumbnail?.['$']?.url || item.mediaThumbnail?.url;
+  if (mediaThumbnail) return mediaThumbnail;
 
-  // Fetch feeds for all pillars sequentially to manage API rates and handles errors gracefully
+  const mediaContent = item.mediaContent?.['$']?.url;
+  if (mediaContent && /\.(jpg|jpeg|png|webp)/i.test(mediaContent)) {
+    return mediaContent;
+  }
+  return ''; // Kosong = frontend akan gunakan fallback gambar per-pilar
+}
+
+// ============================================================
+// RSS INGESTION
+// ============================================================
+
+export async function ingestRSSFeeds(): Promise<IngestResult> {
+  const supabase = createServiceClient();
+  const result: IngestResult = {
+    processed: 0,
+    skipped: 0,
+    duplicates_blocked: 0,
+    errors: [],
+    youtube_videos_added: 0,
+    newItems: []
+  };
+
   for (const [pillarSlug, config] of Object.entries(CONTENT_ENGINE_SOURCES)) {
     for (const feedUrl of config.rss) {
       try {
-        console.log(`[RSS Ingest] Fetching RSS feed: ${feedUrl} for pillar: ${pillarSlug}`);
+        console.log(`[RSS Ingest] Fetching: ${feedUrl} [${pillarSlug}]`);
         const feed = await parser.parseURL(feedUrl);
         const items = feed.items || [];
 
-        for (const item of items.slice(0, 5)) { // Process top 5 entries to prevent timeouts
+        // Proses max 15 item per feed (cukup untuk daily cron, aman dari timeout Vercel 10s)
+        for (const item of items.slice(0, 15)) {
           if (!item.title || !item.link) continue;
 
           try {
@@ -107,12 +155,11 @@ export async function ingestRSSFeeds(targetLang: string = 'en'): Promise<Ingeste
             const rawSnippet = item.contentSnippet || item.summary || item.content || '';
             const cleanDesc = cleanContent(rawSnippet);
             const cleanBody = cleanContent(item.content || rawSnippet);
-
             const slug = slugify(item.title, hashId);
             const contentHtml = `<p>${cleanBody.replace(/\n\n/g, '</p><p>')}</p>`;
+            const imageUrl = extractImageUrl(item);
 
-            // Write to canonical_articles
-            const { data: canonicalData, error: canonicalError } = await supabase
+            const { data: insertedData, error: canonicalError } = await supabase
               .from('canonical_articles')
               .upsert({
                 source_hash: hashId,
@@ -121,69 +168,43 @@ export async function ingestRSSFeeds(targetLang: string = 'en'): Promise<Ingeste
                 content_html: contentHtml,
                 source_url: item.link,
                 pillar: pillarSlug,
-                image_url: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
+                image_url: imageUrl || null,
                 published_at: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString()
-              }, { onConflict: 'source_hash' })
-              .select('id')
-              .single();
+              }, { onConflict: 'source_hash', ignoreDuplicates: true })
+              .select('id, title, slug, pillar, image_url')
+              .maybeSingle();
 
             if (canonicalError) {
-              console.error(`[RSS Ingest] Canonical Insertion Error for "${item.title}":`, canonicalError.message);
-            }
-
-            // Note: Translations are now completely decoupled from this cron ingestion path to prevent timeouts.
-            // Decoupled async translations will run via database triggers / lazy rendering or background queue.
-
-            let translatedTitle = item.title;
-            let translatedDescription = cleanDesc;
-
-            if (targetLang !== 'en') {
-              try {
-                translatedTitle = await translationAdapter.translate(item.title, targetLang);
-                translatedDescription = await translationAdapter.translate(cleanDesc, targetLang);
-              } catch (transErr: any) {
-                console.warn(`[RSS Ingest] Failed to translate item "${item.title}" for legacy flow:`, transErr.message);
+              // Kode 23505 = unique constraint violation = artikel sudah ada (deduplication normal)
+              if (canonicalError.code === '23505') {
+                result.duplicates_blocked++;
+              } else {
+                console.error(`[RSS Ingest] DB Error for "${item.title}":`, canonicalError.message);
+                result.errors.push(canonicalError.message);
+              }
+            } else {
+              result.processed++;
+              if (insertedData) {
+                result.newItems.push({
+                  id: insertedData.id,
+                  title: insertedData.title,
+                  slug: insertedData.slug,
+                  description: cleanDesc.slice(0, 200),
+                  imageUrl: insertedData.image_url || undefined,
+                  pillar: insertedData.pillar || pillarSlug,
+                  type: 'article'
+                });
               }
             }
-
-            bulkUpsertData.push({
-              pillar: pillarSlug,
-              source_type: 'rss',
-              source_name: feed.title || "News Feed",
-              original_url: item.link,
-              title_en: item.title,
-              title_id: targetLang === 'id' ? translatedTitle : null,
-              title_es: targetLang === 'es' ? translatedTitle : null,
-              summary_en: cleanDesc,
-              summary_id: targetLang === 'id' ? translatedDescription : null,
-              summary_es: targetLang === 'es' ? translatedDescription : null,
-              image_url: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
-              content_hash: hashId,
-              published_at: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
-              metadata: { content: cleanBody }
-            });
-
-            tempArticlesMap.set(hashId, {
-              title: item.title,
-              link: item.link,
-              description: cleanDesc,
-              content: cleanBody,
-              imageUrl: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
-              pubDate: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
-              source: feed.title || "News Feed",
-              hashId,
-              pillar: pillarSlug,
-              translatedTitle,
-              translatedDescription
-            });
           } catch (itemErr: any) {
-            console.error(`[RSS Ingest] Error processing feed item "${item.title}":`, itemErr.message);
+            console.error(`[RSS Ingest] Item error:`, itemErr.message);
+            result.errors.push(itemErr.message);
           }
         }
-      } catch (error: any) {
-        console.warn(`[RSS Ingest] Direct RSS parsing failed for ${feedUrl}. Attempting GNews fallback...`, error.message);
+      } catch (feedErr: any) {
+        console.warn(`[RSS Ingest] Feed failed: ${feedUrl}. Trying GNews fallback...`, feedErr.message);
 
-        // GNews Fallback logic if direct RSS parsing fails
+        // GNews Fallback jika RSS langsung gagal (misal feed down / CORS di edge)
         if (GNEWS_API_KEY) {
           try {
             const queryMap: Record<string, string> = {
@@ -193,79 +214,156 @@ export async function ingestRSSFeeds(targetLang: string = 'en'): Promise<Ingeste
               "senior": "medicare wellness OR healthy aging",
               "travel": "accessible travel OR senior tours"
             };
-
             const query = queryMap[pillarSlug] || "senior wellness";
-            const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&max=3&apikey=${GNEWS_API_KEY}`;
-            const response = await fetch(url);
+            const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&max=5&apikey=${GNEWS_API_KEY}`;
+            const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
 
             if (response.ok) {
               const data = await response.json();
-              const articles = data.articles || [];
-
-              for (const item of articles) {
+              for (const gnewsItem of (data.articles || [])) {
                 try {
-                  const hashId = generateHash(item.title, item.url);
-                  const cleanDesc = cleanContent(item.description);
-                  const cleanBody = cleanContent(item.content || item.description);
-                  const slug = slugify(item.title, hashId);
+                  const hashId = generateHash(gnewsItem.title, gnewsItem.url);
+                  const cleanDesc = cleanContent(gnewsItem.description);
+                  const cleanBody = cleanContent(gnewsItem.content || gnewsItem.description);
+                  const slug = slugify(gnewsItem.title, hashId);
                   const contentHtml = `<p>${cleanBody.replace(/\n\n/g, '</p><p>')}</p>`;
 
-                  const { error: canonicalError } = await supabase
+                  const { data: insertedData, error } = await supabase
                     .from('canonical_articles')
                     .upsert({
                       source_hash: hashId,
                       slug,
-                      title: item.title,
+                      title: gnewsItem.title,
                       content_html: contentHtml,
-                      source_url: item.url,
+                      source_url: gnewsItem.url,
                       pillar: pillarSlug,
-                      image_url: item.image || "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
-                      published_at: item.publishedAt ? new Date(item.publishedAt).toISOString() : new Date().toISOString()
-                    }, { onConflict: 'source_hash' });
+                      image_url: gnewsItem.image || null,
+                      published_at: gnewsItem.publishedAt ? new Date(gnewsItem.publishedAt).toISOString() : new Date().toISOString()
+                    }, { onConflict: 'source_hash', ignoreDuplicates: true })
+                    .select('id, title, slug, pillar, image_url')
+                    .maybeSingle();
 
-                  if (!canonicalError) {
-                    tempArticlesMap.set(hashId, {
-                      title: item.title,
-                      link: item.url,
-                      description: cleanDesc,
-                      content: cleanBody,
-                      imageUrl: item.image || "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
-                      pubDate: item.publishedAt || new Date().toISOString(),
-                      source: item.source?.name || "News Feed",
-                      hashId,
-                      pillar: pillarSlug
-                    });
+                  if (!error) {
+                    result.processed++;
+                    if (insertedData) {
+                      result.newItems.push({
+                        id: insertedData.id,
+                        title: insertedData.title,
+                        slug: insertedData.slug,
+                        description: cleanDesc.slice(0, 200),
+                        imageUrl: insertedData.image_url || undefined,
+                        pillar: insertedData.pillar || pillarSlug,
+                        type: 'article'
+                      });
+                    }
                   }
+                  else if (error.code === '23505') result.duplicates_blocked++;
                 } catch (gnewsItemErr: any) {
-                  console.error(`[RSS Ingest GNews Fallback] Item failed:`, gnewsItemErr.message);
+                  result.errors.push(gnewsItemErr.message);
                 }
               }
             }
           } catch (gnewsErr: any) {
-            console.error(`[RSS Ingest Fallback Engine] GNews fetch failed:`, gnewsErr.message);
+            console.error(`[RSS Ingest GNews Fallback] Failed:`, gnewsErr.message);
+            result.errors.push(`GNews fallback: ${gnewsErr.message}`);
           }
         }
       }
     }
-  }
 
-  // Perform bulk upsert for the legacy aggregated_content table
-  if (bulkUpsertData.length > 0) {
-    const { data: insertedData, error } = await supabase.from('aggregated_content')
-      .upsert(bulkUpsertData, { onConflict: 'content_hash', ignoreDuplicates: true })
-      .select('content_hash');
+    // ============================================================
+    // YOUTUBE CHANNEL INGESTION — per pilar
+    // Menggunakan YouTube Data API v3 untuk fetch video terbaru dari setiap channel
+    // ============================================================
+    if (config.youtubeChannels && config.youtubeChannels.length > 0 && YOUTUBE_API_KEY) {
+      for (const channelId of config.youtubeChannels) {
+        try {
+          console.log(`[YouTube Ingest] Fetching channel: ${channelId} [${pillarSlug}]`);
+          const ytUrl = `https://www.googleapis.com/youtube/v3/search?channelId=${channelId}&order=date&type=video&part=snippet&maxResults=5&key=${YOUTUBE_API_KEY}`;
+          const ytRes = await fetch(ytUrl, { signal: AbortSignal.timeout(8000) });
 
-    if (error) {
-      console.error(`[RSS Ingest] Supabase Bulk Upsert Error:`, error.message);
-    } else if (insertedData) {
-      for (const row of insertedData) {
-        const article = tempArticlesMap.get(row.content_hash || '');
-        if (article) {
-          newArticles.push(article);
+          if (!ytRes.ok) {
+            console.error(`[YouTube Ingest] API error for channel ${channelId}: HTTP ${ytRes.status}`);
+            result.errors.push(`YouTube channel ${channelId}: HTTP ${ytRes.status}`);
+            continue;
+          }
+
+          const ytData = await ytRes.json();
+          const ytItems = ytData.items || [];
+
+          for (const ytItem of ytItems) {
+            const videoId = ytItem.id?.videoId;
+            const snippet = ytItem.snippet;
+            if (!videoId || !snippet?.title) continue;
+
+            try {
+              const titleSlug = snippet.title
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)+/g, '')
+                .slice(0, 80);
+
+              const { data: insertedVideo, error: videoError } = await supabase
+                .from('videos')
+                .upsert({
+                  embed_id: videoId,
+                  video_id: videoId,
+                  title: snippet.title,
+                  description: snippet.description?.slice(0, 500) || '',
+                  provider: 'youtube',
+                  pillar: pillarSlug,
+                  locale: 'en',
+                  slug: `${titleSlug}-${videoId}`,
+                }, { onConflict: 'embed_id', ignoreDuplicates: true })
+                .select('id, title, slug, description, pillar')
+                .maybeSingle();
+
+              if (!videoError) {
+                result.youtube_videos_added++;
+                if (insertedVideo) {
+                  result.newItems.push({
+                    id: insertedVideo.id,
+                    title: insertedVideo.title,
+                    slug: insertedVideo.slug,
+                    description: insertedVideo.description || '',
+                    pillar: insertedVideo.pillar || pillarSlug,
+                    type: 'video'
+                  });
+                }
+              } else if (videoError.code !== '23505') {
+                console.error(`[YouTube Ingest] DB Error for video ${videoId}:`, videoError.message);
+                result.errors.push(videoError.message);
+              }
+            } catch (videoItemErr: any) {
+              result.errors.push(`YouTube video ${videoId}: ${videoItemErr.message}`);
+            }
+          }
+        } catch (channelErr: any) {
+          console.error(`[YouTube Ingest] Channel ${channelId} failed:`, channelErr.message);
+          result.errors.push(`YouTube channel ${channelId}: ${channelErr.message}`);
         }
       }
     }
   }
 
-  return newArticles;
+  // Trigger Pre-translation & Social Autoposting in background
+  if (result.newItems.length > 0) {
+    console.log(`[RSS Ingest] Found ${result.newItems.length} new items. Triggering background tasks...`);
+    
+    // Background Translation (Phase 2)
+    for (const item of result.newItems) {
+      if (item.type === 'article') {
+        getOrCompileArticleTranslation(item.id, 'id').catch(err => console.error(`[Pre-translate ID Error]`, err));
+        getOrCompileArticleTranslation(item.id, 'es').catch(err => console.error(`[Pre-translate ES Error]`, err));
+      }
+    }
+
+    // Background Autoposting (Phase 8)
+    AutopostService.triggerAutopostsForNewIngest(result.newItems).catch(err => {
+      console.error(`[Autopost Service Ingest Trigger Fail]`, err);
+    });
+  }
+
+  console.log(`[Ingest Complete] RSS: ${result.processed} new, ${result.duplicates_blocked} dupes blocked, YouTube: ${result.youtube_videos_added} videos added, Errors: ${result.errors.length}`);
+  return result;
 }
