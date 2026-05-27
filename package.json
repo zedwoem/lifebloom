@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "content:sync": "source .env.local && curl -s -X GET http://localhost:3000/api/cron/rss-ingest -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\n\" && curl -s -X GET http://localhost:3000/api/cron/process-queue -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\nSync Complete\""
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

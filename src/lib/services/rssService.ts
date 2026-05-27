@@ -113,16 +113,14 @@ function slugify(title: string, hashId: string): string {
  */
 function extractImageUrl(item: any): string {
   const enclosureUrl = item.enclosure?.url;
-  if (enclosureUrl && /\.(jpg|jpeg|png|webp)/i.test(enclosureUrl)) {
-    return enclosureUrl;
-  }
+  if (enclosureUrl) return enclosureUrl;
+
   const mediaThumbnail = item.mediaThumbnail?.['$']?.url || item.mediaThumbnail?.url;
   if (mediaThumbnail) return mediaThumbnail;
 
   const mediaContent = item.mediaContent?.['$']?.url;
-  if (mediaContent && /\.(jpg|jpeg|png|webp)/i.test(mediaContent)) {
-    return mediaContent;
-  }
+  if (mediaContent) return mediaContent;
+
   return '';
 }
 
@@ -164,7 +162,7 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
                 source_hash: hashId,
                 slug,
                 title: item.title,
-                content_html: '<p>Processing premium content...</p>',
+                content_html: item['content:encoded'] || item.content || item.description || '<p>Content unavailable</p>',
                 source_url: item.link,
                 pillar: pillarSlug,
                 image_url: imageUrl || null,
@@ -222,7 +220,7 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
                       source_hash: hashId,
                       slug,
                       title: gnewsItem.title,
-                      content_html: '<p>Processing premium content...</p>',
+                      content_html: gnewsItem.content || gnewsItem.description || '<p>Content unavailable</p>',
                       source_url: gnewsItem.url,
                       pillar: pillarSlug,
                       image_url: gnewsItem.image || null,
@@ -253,29 +251,21 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
     // ============================================================
     // YOUTUBE CHANNEL INGESTION
     // ============================================================
-    if (config.youtubeChannels && config.youtubeChannels.length > 0 && YOUTUBE_API_KEY) {
+    if (config.youtubeChannels && config.youtubeChannels.length > 0) {
       for (const channelId of config.youtubeChannels) {
         try {
-          console.log(`[YouTube Ingest] Fetching channel: ${channelId} [${pillarSlug}]`);
-          const ytUrl = `https://www.googleapis.com/youtube/v3/search?channelId=${channelId}&order=date&type=video&part=snippet&maxResults=5&key=${YOUTUBE_API_KEY}`;
-          const ytRes = await fetch(ytUrl, { signal: AbortSignal.timeout(8000) });
+          console.log(`[YouTube Ingest] Fetching channel via RSS: ${channelId} [${pillarSlug}]`);
+          const ytRssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+          const feed = await parser.parseURL(ytRssUrl);
+          const ytItems = feed.items || [];
 
-          if (!ytRes.ok) {
-            console.error(`[YouTube Ingest] API error for channel ${channelId}: HTTP ${ytRes.status}`);
-            result.errors.push(`YouTube channel ${channelId}: HTTP ${ytRes.status}`);
-            continue;
-          }
-
-          const ytData = await ytRes.json();
-          const ytItems = ytData.items || [];
-
-          for (const ytItem of ytItems) {
-            const videoId = ytItem.id?.videoId;
-            const snippet = ytItem.snippet;
-            if (!videoId || !snippet?.title) continue;
+          for (const ytItem of ytItems.slice(0, 5)) {
+            // YouTube RSS id is formatted like: yt:video:VIDEO_ID
+            const videoId = ytItem.id ? ytItem.id.replace('yt:video:', '') : '';
+            if (!videoId || !ytItem.title) continue;
 
             try {
-              const titleSlug = snippet.title
+              const titleSlug = ytItem.title
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/(^-|-$)+/g, '')
@@ -286,8 +276,8 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
                 .upsert({
                   embed_id: videoId,
                   video_id: videoId,
-                  title: snippet.title,
-                  description: snippet.description?.slice(0, 500) || '',
+                  title: ytItem.title,
+                  description: ytItem.contentSnippet?.slice(0, 500) || ytItem.content?.slice(0, 500) || '',
                   provider: 'youtube',
                   pillar: pillarSlug,
                   locale: 'en',

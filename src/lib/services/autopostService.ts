@@ -25,7 +25,7 @@ export class AutopostService {
 
     for (const item of items) {
       // Tentukan target platform aktif
-      const platforms = ['telegram', 'pinterest', 'threads', 'bluesky', 'mastodon'];
+      const platforms = ['telegram', 'pinterest', 'threads', 'bluesky', 'mastodon', 'reddit', 'discord', 'wordpress'];
 
       for (const platform of platforms) {
         try {
@@ -50,6 +50,18 @@ export class AutopostService {
           }
           if (platform === 'threads' && process.env.NEXT_PUBLIC_FEATURE_THREADS_AUTO_POST !== 'true') {
             await this.logStatus(item, platform, 'skipped', '', '', 'Threads Auto-Post feature flag is disabled');
+            continue;
+          }
+          if (platform === 'reddit' && process.env.NEXT_PUBLIC_FEATURE_REDDIT_AUTO_POST !== 'true') {
+            await this.logStatus(item, platform, 'skipped', '', '', 'Reddit Auto-Post feature flag is disabled');
+            continue;
+          }
+          if (platform === 'discord' && process.env.NEXT_PUBLIC_FEATURE_DISCORD_AUTO_POST !== 'true') {
+            await this.logStatus(item, platform, 'skipped', '', '', 'Discord Auto-Post feature flag is disabled');
+            continue;
+          }
+          if (platform === 'wordpress' && process.env.NEXT_PUBLIC_FEATURE_WORDPRESS_AUTO_POST !== 'true') {
+            await this.logStatus(item, platform, 'skipped', '', '', 'WordPress Auto-Post feature flag is disabled');
             continue;
           }
 
@@ -85,6 +97,18 @@ export class AutopostService {
               break;
             case 'mastodon':
               postUrl = await this.postToMastodon(hookText, contentUrl);
+              success = !!postUrl;
+              break;
+            case 'reddit':
+              postUrl = await this.postToReddit(hookText, contentUrl, item.title);
+              success = !!postUrl;
+              break;
+            case 'discord':
+              postUrl = await this.postToDiscord(hookText, contentUrl, item.title);
+              success = !!postUrl;
+              break;
+            case 'wordpress':
+              postUrl = await this.postToWordPress(hookText, contentUrl, item.title, item.imageUrl);
               success = !!postUrl;
               break;
           }
@@ -139,6 +163,15 @@ export class AutopostService {
         break;
       case 'telegram':
         platformInstruction = 'Telegram Channel format. Use rich HTML formatting. Bold the title at the top, add 3 elegant bullet points showing what readers will learn, add suitable emojis, and end with a call to action.';
+        break;
+      case 'reddit':
+        platformInstruction = 'Reddit format. Write a highly organic, discussion-provoking hook under 800 characters. Avoid sounding like an ad. Ask a genuine question to the community based on the article\'s core premise. Keep it conversational.';
+        break;
+      case 'discord':
+        platformInstruction = 'Discord format. Write an engaging community announcement. Use bold text and bullet points. End with a question to prompt chat replies.';
+        break;
+      case 'wordpress':
+        platformInstruction = 'WordPress / Web 2.0 Syndication format. Write a compelling 2-paragraph executive summary or abstract that serves as a syndicated teaser. Encourage readers to click the canonical link for the full story.';
         break;
     }
 
@@ -421,6 +454,145 @@ Rules:
   }
 
   /**
+   * INTEGRASI REDDIT API
+   */
+  private static async postToReddit(text: string, url: string, title: string): Promise<string> {
+    const clientId = process.env.REDDIT_CLIENT_ID;
+    const clientSecret = process.env.REDDIT_CLIENT_SECRET;
+    const username = process.env.REDDIT_USERNAME;
+    const password = process.env.REDDIT_PASSWORD;
+    const subreddit = process.env.REDDIT_SUBREDDIT;
+
+    if (!clientId || !clientSecret || !username || !password || !subreddit || clientId.includes('your-')) {
+      console.warn('[Autopost Reddit] Missing Reddit credentials. Local dry-run.');
+      return `https://reddit.com/r/${subreddit || 'mock'}/comments/mock`;
+    }
+
+    try {
+      // Step 1: Get Access Token
+      const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+      const tokenRes = await fetch('https://www.reddit.com/api/v1/access_token', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'LifeBloomHubAutopostBot/1.0'
+        },
+        body: new URLSearchParams({
+          grant_type: 'password',
+          username,
+          password
+        })
+      });
+
+      if (!tokenRes.ok) return '';
+      const tokenData = await tokenRes.json();
+      const accessToken = tokenData.access_token;
+
+      // Step 2: Submit Post
+      const postRes = await fetch('https://oauth.reddit.com/api/submit', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'LifeBloomHubAutopostBot/1.0'
+        },
+        body: new URLSearchParams({
+          sr: subreddit,
+          kind: 'link', // 'link' or 'self' (text)
+          title: title.slice(0, 300),
+          url: url,
+          text: text
+        })
+      });
+
+      if (postRes.ok) {
+        const postData = await postRes.json();
+        const postUrl = postData.json?.data?.url;
+        return postUrl || `https://reddit.com/r/${subreddit}/comments/mock`;
+      }
+    } catch (err: any) {
+      console.error('[Autopost Reddit Exception]:', err.message);
+    }
+    return '';
+  }
+
+  /**
+   * INTEGRASI DISCORD WEBHOOK
+   */
+  private static async postToDiscord(text: string, url: string, title: string): Promise<string> {
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+
+    if (!webhookUrl || webhookUrl.includes('your-')) {
+      console.warn('[Autopost Discord] Missing Discord webhook url. Local dry-run.');
+      return `https://discord.com/channels/mock`;
+    }
+
+    try {
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: `${text}\n\n👉 **Read more**: ${url}`,
+          username: 'LifeBloom Engine',
+          avatar_url: 'https://lifebloomhub.vercel.app/images/branding/brand-logo.png'
+        })
+      });
+
+      if (res.ok) {
+        return `https://discord.com/channels/success-webhook`;
+      }
+    } catch (err: any) {
+      console.error('[Autopost Discord Exception]:', err.message);
+    }
+    return '';
+  }
+
+  /**
+   * INTEGRASI WORDPRESS REST API
+   */
+  private static async postToWordPress(text: string, url: string, title: string, imageUrl?: string): Promise<string> {
+    const wpUrl = process.env.WORDPRESS_API_URL;
+    const username = process.env.WORDPRESS_USERNAME;
+    const appPassword = process.env.WORDPRESS_APP_PASSWORD;
+
+    if (!wpUrl || !username || !appPassword || wpUrl.includes('your-')) {
+      console.warn('[Autopost WordPress] Missing WP credentials. Local dry-run.');
+      return `https://wordpress.mock/post-mock`;
+    }
+
+    try {
+      const auth = Buffer.from(`${username}:${appPassword}`).toString('base64');
+      const contentHtml = `
+        <p>${text.replace(/\n/g, '<br/>')}</p>
+        <p><strong><a href="${url}" target="_blank">Read the full article on LifeBloom Hub</a></strong></p>
+      `;
+
+      const res = await fetch(`${wpUrl.replace(/\/$/, '')}/wp-json/wp/v2/posts`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: title,
+          content: contentHtml,
+          status: 'publish',
+          format: 'standard'
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        return data.link || `https://wordpress.mock/post-mock`;
+      }
+    } catch (err: any) {
+      console.error('[Autopost WordPress Exception]:', err.message);
+    }
+    return '';
+  }
+
+  /**
    * Catat Log eksekusi status ke database Supabase
    */
   private static async logStatus(
@@ -455,6 +627,9 @@ Rules:
     const teaser = description.slice(0, 150) + '...';
     if (platform === 'telegram') {
       return `<b>🌟 NEW PUBLICATION: ${title}</b>\n\n${teaser}`;
+    }
+    if (platform === 'reddit' || platform === 'discord') {
+      return `Have you seen this? ${title}\n\n${teaser}`;
     }
     return `New ${platform === 'pinterest' ? 'Pin' : 'Post'}: ${title}\n\n${teaser}`;
   }

@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import * as cheerio from 'cheerio';
 import { Redis } from '@upstash/redis';
 import { createServiceClient } from '@/lib/supabase/server';
-import { translateText as fallbackTranslateText } from '@/lib/services/translationAdapter';
+
 
 // Constants
 const CACHE_TTL_SECONDS = 2592000; // 30 days
@@ -195,7 +195,22 @@ ${JSON.stringify(blocks, null, 2)}`;
 }
 
 
+
 // 5. Sequential Fallback for Individual Block via Tier 3 (Lingva Proxy Pool)
+async function fallbackTranslateText(text: string, targetLang: string, sourceLang: string): Promise<string> {
+  if (!text || !text.trim()) return text;
+  try {
+    const url = `https://lingva.ml/api/v1/${sourceLang}/${targetLang}/${encodeURIComponent(text)}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return text;
+    const data = await res.json();
+    return data.translation || text;
+  } catch (error) {
+    return text;
+  }
+}
+
+
 async function translateBlockLingva(
   block: string,
   targetLang: string,
