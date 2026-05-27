@@ -3,8 +3,23 @@
 import React, { useState } from "react";
 import { useSavedItems } from "@/lib/hooks/useSavedItems";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { Heart, Search, Trash2, ExternalLink, Activity, BookOpen, Download } from "lucide-react";
+import { Heart, Search, Trash2, ExternalLink, Activity, BookOpen, Download, Calculator, MapPin, ArrowRight } from "lucide-react";
 import { HydrationGuard } from "@/components/ui/hydration-guard";
+import dynamic from "next/dynamic";
+import { Card } from "@/components/ui/card";
+
+// Prevent Leaflet SSR crash by loading dynamically with ssr: false
+const DynamicTravelMap = dynamic(
+  () => import("@/components/travel/TravelMap"),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[300px] rounded-3xl bg-[#faf8ff] border border-slate-100 animate-pulse flex items-center justify-center text-slate-400 font-sans">
+        Loading Adware-Free Leaflet Map...
+      </div>
+    )
+  }
+);
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -80,8 +95,68 @@ export default function UserWorkspacePage() {
         </header>
 
         <main className="max-w-[1120px] mx-auto px-6 py-8 space-y-10">
+
+          {/* Section 1: User Feature Pebble Cards */}
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+            {/* Pebble Card 1: Safe Calculators */}
+            <Card className="rounded-3xl bg-white border border-slate-100 shadow-soft-ambient p-8 flex flex-col justify-between min-h-[280px]">
+              <div>
+                <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 border border-emerald-100">
+                  <Calculator className="w-6 h-6 text-[#006948]" />
+                </div>
+                <h3 className="text-2xl font-bold tracking-tight mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Kalkulator & Yield Perjalanan</h3>
+                <p className="text-slate-500 text-lg leading-relaxed mb-6">
+                  Pantau pertumbuhan yield tabungan jangka panjang Anda secara live.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href={`/${locale}/money-future/yield-radar`} className="flex-1">
+                  <button className="w-full px-5 py-3.5 bg-[#006948] hover:bg-[#005439] text-white rounded-xl font-bold text-base min-h-[52px] transition-all flex items-center justify-center gap-2">
+                    Buka Alat <ArrowRight className="w-5 h-5" />
+                  </button>
+                </Link>
+              </div>
+            </Card>
+
+            {/* Pebble Card 2: Pet Safety Milestones */}
+            <Card className="rounded-3xl bg-white border border-slate-100 shadow-soft-ambient p-8 flex flex-col justify-between min-h-[280px]">
+              <div>
+                <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center mb-6 border border-rose-100">
+                  <Heart className="w-6 h-6 text-rose-600" />
+                </div>
+                <h3 className="text-2xl font-bold tracking-tight mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Keamanan Dapur Peliharaan</h3>
+                <p className="text-slate-500 text-lg leading-relaxed mb-6">
+                  Pengecekan bahan masakan beracun terintegrasi dengan database Wiki & USDA.
+                </p>
+              </div>
+              <div className="px-4 py-3 bg-emerald-50/50 rounded-2xl border border-emerald-100 text-emerald-800 font-bold flex items-center gap-2 text-sm min-h-[52px]">
+                🐾 14 family recipes scanned this week. 100% pet-safe!
+              </div>
+            </Card>
+
+            {/* Pebble Card 3: Adware-Free Multi-Gen Travel Planner */}
+            <Card className="rounded-3xl bg-white border border-slate-100 shadow-soft-ambient p-8 space-y-6 md:col-span-2">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#faf8ff] rounded-2xl flex items-center justify-center border border-slate-100">
+                    <MapPin className="w-6 h-6 text-[#006948]" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Rute & Peta Ramah Aksesibilitas</h3>
+                    <p className="text-slate-500 text-base">Perencanaan slow travel multigenerasi, 100% bebas iklan dan tracker pihak ketiga.</p>
+                  </div>
+                </div>
+                <Link href={`/${locale}/travel/trip-planner`}>
+                  <button className="px-5 py-3.5 bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-base min-h-[52px] transition-all">
+                    Buka Peta Rute
+                  </button>
+                </Link>
+              </div>
+              <DynamicTravelMap />
+            </Card>
+          </section>
           
-          {/* Section 1: Calculators & Tools */}
+          {/* Section 2: Saved Calculations */}
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
               PANDUAN & KALKULASI YANG SAYA SIMPAN:

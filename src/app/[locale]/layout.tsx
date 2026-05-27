@@ -11,6 +11,8 @@ export function generateStaticParams() {
   return routing.locales.map((locale: string) => ({ locale }));
 }
 
+export const revalidate = 60; // Revalidate all pages every 60 seconds (ISR)
+
 import { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
