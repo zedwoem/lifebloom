@@ -15,6 +15,8 @@ import { createClient } from "@/lib/supabase/client";
 import { submitQuestionAnswer } from "@/lib/actions/userActions";
 import { toast } from "sonner";
 
+const locale = "en";
+
 interface ExpertViewProps {
   profile: any;
   signOut: () => void;

@@ -10,6 +10,9 @@ import { SponsorShowcase } from '@/components/content/sponsor-showcase';
 import { generateProfile } from '@/lib/utils/profileGenerator';
 import { RelatedPostsWidget } from '@/components/content/related-posts-widget';
 import { AccessibleReaderBar } from '@/components/content/accessible-reader-bar';
+import { ContextualTravelDeals } from '@/components/travel/ContextualTravelDeals';
+
+const locale = "en";
 
 export function AccessibleArticleReader({ article, locale, slug }: { article: any, locale: string, slug: string }) {
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
@@ -50,7 +53,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         });
         if (res.ok) {
           setIsBookmarked(false);
-          toast.success(locale === 'id' ? "Artikel dihapus dari simpanan." : "Article removed from saved items.");
+          toast.success("Article removed from saved items.");
         }
       } else {
         const res = await fetch("/api/user/saved-items", {
@@ -69,9 +72,9 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         });
         if (res.ok) {
           setIsBookmarked(true);
-          toast.success(locale === 'id' ? "Artikel berhasil disimpan!" : "Article saved to your dashboard!");
+          toast.success("Article saved to your dashboard!");
         } else {
-          toast.error(locale === 'id' ? "Silakan masuk untuk menyimpan artikel." : "Please sign in to save articles.");
+          toast.error("Please sign in to save articles.");
         }
       }
     } catch (err) {
@@ -181,7 +184,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         const utterance = new SpeechSynthesisUtterance(textToRead);
         
         // Dynamic Lang matching
-        utterance.lang = locale === 'id' ? 'id-ID' : 'en-US';
+        utterance.lang = 'en-US';
         
         utterance.onend = () => {
           setIsSpeaking(false);
@@ -198,11 +201,11 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
         };
 
         window.speechSynthesis.speak(utterance);
-        toast.info(locale === 'id' ? "Memutar audio menggunakan suara sistem..." : "Playing audio using system voice...");
+        toast.info("Playing audio using system voice...");
         
       } else {
         setIsSpeaking(false);
-        toast.error(locale === 'id' ? "Layanan suara tidak didukung di browser ini." : "Speech service is not supported in this browser.");
+        toast.error("Speech service is not supported in this browser.");
       }
     }
   };
@@ -413,7 +416,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold transition-all hover:scale-110 min-h-[48px] ${isBookmarked ? 'bg-brand-green border-brand-green text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}
           >
             <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} /> 
-            {isBookmarked ? (locale === 'id' ? "Tersimpan" : "Saved") : (locale === 'id' ? "Simpan" : "Save")}
+            {isBookmarked ? ("Saved") : (locale === 'id' ? "Simpan" : "Save")}
           </button>
           
           <button 
@@ -453,6 +456,13 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
         {/* Related Posts Widget */}
         <RelatedPostsWidget currentSlug={slug} />
+
+        {/* Contextual Travel Deals */}
+        {article.pillar === 'travel' && (
+          <div className="mt-12 animate-fade-in print:hidden">
+            <ContextualTravelDeals origin="CGK" destination="DPS" />
+          </div>
+        )}
 
         {/* PRINT ONLY FOOTER & QR CODE */}
         <div className="hidden print:flex flex-col items-center mt-12 pt-8 border-t-2 border-black page-break-inside-avoid">

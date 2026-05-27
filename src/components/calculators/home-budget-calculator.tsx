@@ -5,7 +5,7 @@ import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { pdf, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { useTranslations } from 'next-intl';
+
 import { PartnerRecommendation } from "@/components/calculators/partner-recommendation";
 
 const styles = StyleSheet.create({
@@ -53,7 +53,7 @@ const BudgetPDF = ({ area, costPerSqm, contingency, total, t }: any) => (
 );
 
 export function HomeBudgetCalculator() {
-  const t = useTranslations('HomePage');
+  const t = (k: string) => k;
   const [area, setArea] = useState<number | "">("");
   const [costPerSqm, setCostPerSqm] = useState<number | "">(3500);
   const [isGenerating, setIsGenerating] = useState(false);

@@ -7,6 +7,8 @@ import { AutopostService, IngestedItem } from '@/lib/services/autopostService';
 import { getOrCompileArticleTranslation } from '@/lib/services/astTranslationEngine';
 import * as cheerio from 'cheerio';
 
+const locale = "en";
+
 // ============================================================
 // CONTENT ENGINE SOURCES — Single source of truth
 // Memetakan pilar ke sumber RSS dan YouTube Channel ID-nya

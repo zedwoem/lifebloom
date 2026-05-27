@@ -3,6 +3,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
+const locale = "en";
+
 const supabase = createAdminClient();
 
 export async function getPendingSponsors() {

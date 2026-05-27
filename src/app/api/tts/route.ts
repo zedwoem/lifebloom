@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+const locale = "en";
+
 export const runtime = "edge";
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // 2. Fetch from ElevenLabs (Stream)
     // Multilingual Wavenet model: elevelabs v2 multilingual
-    const voiceId = locale === "id" ? "EXAVITQu4vr4xnSDxMaL" : "21m00Tcm4TlvDq8ikWAM"; // Example voices
+    const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Example voices
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`,

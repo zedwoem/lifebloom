@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
+const locale = "en";
+
 export async function getWebsiteSettings() {
   const supabase = await createClient();
   const { data: isUserAdmin } = await supabase.rpc("is_admin");

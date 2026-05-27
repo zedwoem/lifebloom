@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/server';
 import { DynamicNewsFeedClient } from './dynamic-news-feed-client';
 
+const locale = "en";
+
 interface DynamicNewsFeedProps {
   pillarSlug: string;
   locale: string;
@@ -23,7 +25,7 @@ export async function DynamicNewsFeed({ pillarSlug, locale }: DynamicNewsFeedPro
     return (
       <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-3xl">
         <p className="text-slate-500 font-bold">
-          {locale === 'id' ? 'Belum ada artikel. Jalankan Cron Ingest untuk menarik artikel.' : 'No articles available yet. Run the Cron Ingest to populate articles.'}
+          {'No articles available yet. Run the Cron Ingest to populate articles.'}
         </p>
       </div>
     );
@@ -50,7 +52,7 @@ export async function DynamicNewsFeed({ pillarSlug, locale }: DynamicNewsFeedPro
     // Create a readable formatted date
     const dateObj = new Date(article.published_at ?? new Date().toISOString());
     const dateStr = dateObj.toLocaleDateString(
-      locale === 'id' ? 'id-ID' : 'en-US',
+      'en-US',
       { month: 'long', day: 'numeric', year: 'numeric' }
     );
 
@@ -60,9 +62,7 @@ export async function DynamicNewsFeed({ pillarSlug, locale }: DynamicNewsFeedPro
       source: "LifeBloom Curation",
       date: dateStr,
       slug: article.slug,
-      snippet: locale === 'id' 
-        ? `Panduan mendalam mengenai ${translatedTitle.toLowerCase()} khusus lansia dan keluarga.`
-        : `A detailed senior-focused advisory on ${translatedTitle.toLowerCase()}.`
+      snippet: `A detailed senior-focused advisory on ${translatedTitle.toLowerCase()}.`
     };
   });
 

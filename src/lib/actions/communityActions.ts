@@ -6,6 +6,8 @@ import DOMPurify from 'isomorphic-dompurify';
 import { z } from "zod";
 import { Redis } from '@upstash/redis';
 
+const locale = "en";
+
 // Ensure this file executes on default Node.js runtime for TCP access
 
 // Rate Limit helper using Upstash Redis

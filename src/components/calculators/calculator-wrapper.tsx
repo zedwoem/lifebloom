@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useTranslations } from 'next-intl';
+
 
 interface CalculatorWrapperProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ export default function CalculatorWrapper({
   slug,
   title,
 }: CalculatorWrapperProps) {
-  const t = useTranslations('HomePage');
+  const t = (k: string) => k;
   const { user } = useAuth();
   const [showEmbed, setShowEmbed] = useState(false);
   const [copied, setCopied] = useState(false);

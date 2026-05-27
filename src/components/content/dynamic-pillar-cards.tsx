@@ -3,6 +3,8 @@ import { getPopularPostsByPillar, getRandomPostsByPillar, Article } from "@/lib/
 import Link from "next/link";
 import { Clock, TrendingUp, Sparkles, ChevronRight } from "lucide-react";
 
+const locale = "en";
+
 interface Props {
   pillarSlug: string;
   pillarName: string;

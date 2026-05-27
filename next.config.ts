@@ -1,7 +1,4 @@
-import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from "@sentry/nextjs";
-
-const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -16,6 +13,12 @@ const nextConfig = {
   },
   experimental: {
     // ppr: true, // Enable this only if using the latest Next.js 15 canary version
+  },
+  async redirects() {
+    return [
+      { source: '/:locale(en|id)/:path*', destination: '/:path*', permanent: true },
+      { source: '/:locale(en|id)', destination: '/', permanent: true }
+    ];
   },
   images: {
     remotePatterns: [
@@ -41,7 +44,7 @@ const nextConfig = {
 };
 
 export default withSentryConfig(
-  withNextIntl(nextConfig),
+  nextConfig,
   {
     org: "zedwoem",
     project: "javascript-nextjs",

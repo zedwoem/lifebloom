@@ -4,6 +4,8 @@ import { ShieldCheck, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
+const locale = "en";
+
 interface Props {
   pillarSlug: string;
   articleSlug: string;

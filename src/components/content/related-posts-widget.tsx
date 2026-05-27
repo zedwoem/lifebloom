@@ -3,10 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Flame, Clock } from 'lucide-react';
-import { useLocale } from 'next-intl';
+
 
 export function RelatedPostsWidget({ currentSlug }: { currentSlug: string }) {
-  const locale = useLocale();
+  const locale = "en";
 
   // Mock data for demonstration - in production, this would be fetched based on category/tags
   const previousPost = { title: "Essential Guide to Downsizing", slug: "essential-guide-downsizing" };

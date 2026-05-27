@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Newspaper, Contrast, ExternalLink } from 'lucide-react';
 
+const locale = "en";
+
 interface ProcessedArticle {
   id: string;
   title: string;
@@ -53,7 +55,7 @@ export function DynamicNewsFeedClient({ articles, locale, pillarSlug }: DynamicN
           </div>
           <div>
             <h2 className="text-2xl font-bold font-display">
-              {locale === 'id' ? 'Wawasan & Artikel Terbaru' : 'Latest Insights & Expert Articles'}
+              {'Latest Insights & Expert Articles'}
             </h2>
             <p className={`opacity-80 ${highContrast ? 'text-yellow-300' : 'text-slate-500'}`}>
               {locale === 'id' ? 'Informasi terpercaya yang dikurasi khusus untuk Anda.' : 'Curated updates tailored for you.'}

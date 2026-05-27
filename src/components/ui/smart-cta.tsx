@@ -6,6 +6,8 @@ import { useRouter, useParams } from "next/navigation";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
+const locale = "en";
+
 interface SmartCTAProps extends ButtonProps {
   fallbackAction?: "login" | "modal"; // "login" redirects, "modal" shows an inline modal
   modalTitle?: string;

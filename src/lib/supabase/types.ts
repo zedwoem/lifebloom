@@ -1,3 +1,4 @@
+const locale = "en";
 export type Json =
   | string
   | number

@@ -7,6 +7,8 @@ import { Heart, Lock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
+const locale = "en";
+
 interface GuestbookEntry {
   id: string;
   author_name: string;

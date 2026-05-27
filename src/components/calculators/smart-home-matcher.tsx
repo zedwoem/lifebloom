@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+
 import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 export function SmartHomeMatcher() {
-  const t = useTranslations("SmartHomeMatcher");
+  const t = (k: string) => k;
   const [deviceType, setDeviceType] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);

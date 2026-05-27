@@ -2,6 +2,8 @@
 
 import { createServiceClient } from '@/lib/supabase/server';
 
+const locale = "en";
+
 const supabase = createServiceClient() as any;
 
 export interface VideoTranscriptSegment {

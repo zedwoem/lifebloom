@@ -3,6 +3,8 @@ import * as cheerio from 'cheerio';
 import { Redis } from '@upstash/redis';
 import { createServiceClient } from '@/lib/supabase/server';
 
+const locale = "en";
+
 
 // Constants
 const CACHE_TTL_SECONDS = 2592000; // 30 days

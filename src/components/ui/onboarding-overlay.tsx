@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import { Check, Heart, Smile, Wind, HelpCircle, ArrowRight } from "lucide-react";
-import { useLocale } from "next-intl";
+
 
 export default function OnboardingOverlay() {
-  const locale = useLocale();
+  const locale = "en";
   const [isOpen, setIsOpen] = useState(false);
   const [nickname, setNickname] = useState("");
   const [mood, setMood] = useState<string | null>(null);

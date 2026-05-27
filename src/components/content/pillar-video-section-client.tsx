@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { PlayCircle, Tv, X } from 'lucide-react';
 
+const locale = "en";
+
 interface VideoData {
   id: string;
   title: string;
@@ -29,7 +31,7 @@ export function PillarVideoSectionClient({ videos, locale }: PillarVideoSectionC
           </div>
           <div>
             <h2 className="text-2xl font-bold text-slate-900 font-display">
-              {locale === 'id' ? 'Video Edukasi & Masterclass' : 'Video Guides & Masterclasses'}
+              {'Video Guides & Masterclasses'}
             </h2>
             <p className="text-slate-500 text-sm font-medium">
               {locale === 'id' ? 'Tonton penjelasan interaktif dari para pakar kami.' : 'Watch comprehensive walkthroughs by our trusted experts.'}

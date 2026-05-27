@@ -5,6 +5,8 @@ import { getAllVideos, VideoItem } from "@/lib/services/videoService";
 import { HydrationGuard } from "@/components/ui/hydration-guard";
 import { PlayCircle } from "lucide-react";
 
+const locale = "en";
+
 export function VideoFeed({ locale = "en", pillar }: { locale?: string; pillar?: string }) {
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,7 @@
 import React from "react";
 
+const locale = "en";
+
 interface StructuredDataProps {
   currentUrl: string;
   pageTitle: string;

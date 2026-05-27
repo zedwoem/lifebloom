@@ -2,6 +2,8 @@ import React from 'react';
 import { createServiceClient } from '@/lib/supabase/server';
 import { PillarVideoSectionClient } from './pillar-video-section-client';
 
+const locale = "en";
+
 interface PillarVideoSectionProps {
   pillarSlug: string;
   locale: string;
@@ -29,7 +31,7 @@ export async function PillarVideoSection({ pillarSlug, locale }: PillarVideoSect
     title: v.title,
     embedId: v.embed_id ?? '',
     pillar: v.pillar,
-    description: v.description || (locale === 'id' ? "Panduan edukasi komprehensif LifeBloom Hub." : "Comprehensive educational masterclass by LifeBloom Hub.")
+    description: v.description || ("Comprehensive educational masterclass by LifeBloom Hub.")
   })).filter(v => v.embedId !== ''); // Filter video tanpa embed_id valid
 
   return (

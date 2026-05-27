@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import DOMPurify from 'isomorphic-dompurify';
 import { z } from "zod";
 
+const locale = "en";
+
 // Industrial-grade HTML sanitizer using isomorphic-dompurify
 function sanitizeHtml(html: string): string {
   if (!html) return "";

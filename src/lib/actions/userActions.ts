@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
+const locale = "en";
+
 // 1. List all users (Admin only)
 export async function listAllUsers() {
   const supabase = await createClient();

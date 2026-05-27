@@ -3,12 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { useLocale } from "next-intl";
+
 import { Sparkles, User, LogOut, ArrowRight } from "lucide-react";
 
 export function NavbarUserStatus() {
   const { user, profile, loading, signOut } = useAuth();
-  const locale = useLocale();
+  const locale = "en";
 
   if (loading) {
     return (
