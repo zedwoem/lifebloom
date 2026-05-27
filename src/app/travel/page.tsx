@@ -34,7 +34,7 @@ export default async function PillarPage({
         
         {/* Navigation Breadcrumb */}
         <Link 
-          href={`/${locale}`}
+          href={``}
           className="inline-flex items-center gap-2 text-primary hover:text-primary-container mb-8 transition-all font-bold group min-h-[52px]"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />

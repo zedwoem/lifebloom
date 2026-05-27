@@ -44,7 +44,7 @@ export default function AdminPage() {
       if (!isUserAdmin) {
         setIsAdmin(false);
         toast.error("Access denied. Administrator role required.");
-        router.push(`/${locale}/dashboard`);
+        router.push(`/dashboard`);
         return;
       }
       
@@ -161,7 +161,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>MODERASI KOMENTAR</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Tinjau, setujui, atau hapus komentar dari member komunitas sebelum tayang.</p>
               </div>
-              <Link href={`/${locale}/admin/comments`}>
+              <Link href={`/admin/comments`}>
                 <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
                   Moderator Panel: {pendingComments} Antrean
                 </button>
@@ -180,7 +180,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>REVIEW ARTIKEL</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Edit dan publikasikan draft artikel yang diajukan oleh Pakar dan Partner.</p>
               </div>
-              <Link href={`/${locale}/admin/articles`}>
+              <Link href={`/admin/articles`}>
                 <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
                   Reviewer Panel: {pendingArticles} Antrean
                 </button>
@@ -199,7 +199,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>CMS VIDEO & YOUTUBE</h3>
                 <p className="text-slate-400 text-lg mb-8 max-w-[85%]">Ingesti otomatis metadata dari YouTube V3 API ke dalam Supabase.</p>
               </div>
-              <Link href={`/${locale}/admin/videos`}>
+              <Link href={`/admin/videos`}>
                 <button className="self-start px-6 py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 outline-none shadow-sm">
                   Buka Modul Ingesti
                 </button>
@@ -218,7 +218,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>PENGATURAN GLOBAL</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Atur variabel website, *maintenance mode*, dan perbarui halaman statis Support.</p>
               </div>
-              <Link href={`/${locale}/admin/settings`}>
+              <Link href={`/admin/settings`}>
                 <button className="self-start px-6 py-3 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none shadow-sm">
                   Kelola Konfigurasi Website
                 </button>
@@ -237,7 +237,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>USER & CRM</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Kelola peran akses pengguna umum, pakar medis terverifikasi, partner sponsor, dan admin.</p>
               </div>
-              <Link href={`/${locale}/admin/users`}>
+              <Link href={`/admin/users`}>
                 <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
                   Kelola Pengguna
                 </button>
@@ -256,7 +256,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>CRON MONITOR</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Pantau log pipeline penyerapan data otomatis harian dan trigger manual ingestion.</p>
               </div>
-              <Link href={`/${locale}/admin/cron`}>
+              <Link href={`/admin/cron`}>
                 <button className="self-start px-6 py-3 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none shadow-sm">
                   Lihat Pipeline Log
                 </button>
@@ -275,7 +275,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>RSS & VIDEO SOURCES</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Atur sumber ingestion feed RSS dan channel ID YouTube yang terhubung dengan 5 pilar.</p>
               </div>
-              <Link href={`/${locale}/admin/sources`}>
+              <Link href={`/admin/sources`}>
                 <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
                   Sumber Ingestion
                 </button>
@@ -294,7 +294,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>FEATURE FLAGS</h3>
                 <p className="text-slate-400 text-lg mb-8 max-w-[85%]">Kontrol on/off modul opsional telemetri BigQuery, FRED feed, dan USDA recipe matcher.</p>
               </div>
-              <Link href={`/${locale}/dashboard`}>
+              <Link href={`/dashboard`}>
                 <button className="self-start px-6 py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 outline-none shadow-sm">
                   Aktifkan / Matikan Fitur
                 </button>
@@ -313,7 +313,7 @@ export default function AdminPage() {
                 <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>AI AUTOPOST CENTER</h3>
                 <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Pantau log autoposting media sosial & Web 2.0 (Telegram, Reddit, Threads, Discord, WordPress) secara real-time.</p>
               </div>
-              <Link href={`/${locale}/admin/autopost`}>
+              <Link href={`/admin/autopost`}>
                 <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
                   Buka Autopost Center
                 </button>

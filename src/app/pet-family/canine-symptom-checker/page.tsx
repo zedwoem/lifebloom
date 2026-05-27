@@ -48,7 +48,7 @@ export async function generateMetadata({}): Promise<Metadata> {
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `${baseUrl}/${locale}/pet-family/canine-symptom-checker`,
+      url: `${baseUrl}/pet-family/canine-symptom-checker`,
       type: 'website',
       images: [
         {
@@ -96,7 +96,7 @@ export default async function CanineSymptomCheckerPage({
   return (
     <div className="min-h-screen bg-[#FFFDF5] py-12 px-6">
       <UnifiedStructuredData
-        currentUrl={`${baseUrl}/${locale}/pet-family/canine-symptom-checker`}
+        currentUrl={`${baseUrl}/pet-family/canine-symptom-checker`}
         pageTitle={'Canine Symptom Checker'}
         pageDescription={locale === 'id' ? 'Panduan klasifikasi gejala penyakit anjing untuk mendeteksi tingkat risiko darurat secara mandiri.' : 'Evaluate your dog symptoms instantly using our decision tree.'}
         locale={locale}
@@ -115,7 +115,7 @@ export default async function CanineSymptomCheckerPage({
       
       <div className="max-w-4xl mx-auto">
         <Link 
-          href={`/${locale}`} 
+          href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
           <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}

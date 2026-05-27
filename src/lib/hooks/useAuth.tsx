@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithMagicLink = async (email: string, locale: string) => {
-    const redirectUrl = `${window.location.origin}/${locale}/callback`;
+    const redirectUrl = `${window.location.origin}/callback`;
     return await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async (locale: string = "en") => {
-    const redirectUrl = `${window.location.origin}/${locale}/callback`;
+    const redirectUrl = `${window.location.origin}/callback`;
     return await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUpWithEmailPassword = async (email: string, password: string, locale: string = "en") => {
-    const redirectUrl = `${window.location.origin}/${locale}/callback`;
+    const redirectUrl = `${window.location.origin}/callback`;
     return await supabase.auth.signUp({
       email,
       password,

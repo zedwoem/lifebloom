@@ -48,7 +48,7 @@ export async function generateMetadata({}): Promise<Metadata> {
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `${baseUrl}/${locale}/money-future/yield-radar`,
+      url: `${baseUrl}/money-future/yield-radar`,
       type: 'website',
       images: [
         {
@@ -96,7 +96,7 @@ export default async function YieldRadarPage({
   return (
     <div className="min-h-screen bg-[#FFFDF5] py-12 px-6">
       <UnifiedStructuredData
-        currentUrl={`${baseUrl}/${locale}/money-future/yield-radar`}
+        currentUrl={`${baseUrl}/money-future/yield-radar`}
         pageTitle={'Real-Time Yield Radar'}
         pageDescription={locale === 'id' ? 'Perbandingan tingkat imbal hasil obligasi negara dan deposito teratas secara real-time.' : 'Compare yield rates across secure government bonds.'}
         locale={locale}
@@ -115,7 +115,7 @@ export default async function YieldRadarPage({
 
       <div className="max-w-4xl mx-auto">
         <Link 
-          href={`/${locale}`} 
+          href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
           <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}

@@ -103,7 +103,7 @@ export function DynamicNewsFeedClient({ articles, locale, pillarSlug }: DynamicN
         {articles.map((article, idx) => (
           <Link 
             key={article.id} 
-            href={`/${locale}/article/${article.slug}`}
+            href={`/article/${article.slug}`}
             className={`block focus:outline-none focus:ring-4 focus:ring-brand-blue rounded-2xl ${idx === 0 ? 'md:col-span-2 lg:col-span-2' : ''}`}
           >
             <article 

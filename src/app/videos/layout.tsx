@@ -36,7 +36,7 @@ export async function generateMetadata({
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `https://lifebloomhub.vercel.app/${locale}/videos`,
+      url: `https://lifebloomhub.vercel.app/videos`,
       type: 'website',
       images: [
         {

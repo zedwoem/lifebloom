@@ -53,9 +53,9 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true') {
       setTrending([
-        { title: "Medicare Part D Changes", url: `/${locale}/article/the-new-medicare-part-d-changes-explained` },
-        { title: "Accessible European Cities", url: `/${locale}/article/the-10-most-wheelchair-accessible-cities-in-europe` },
-        { title: "Retirement Planner", url: `/${locale}/money-future/retirement-planner` }
+        { title: "Medicare Part D Changes", url: `/article/the-new-medicare-part-d-changes-explained` },
+        { title: "Accessible European Cities", url: `/article/the-10-most-wheelchair-accessible-cities-in-europe` },
+        { title: "Retirement Planner", url: `/money-future/retirement-planner` }
       ]);
       setIsLoadingDynamic(false);
       return;
@@ -66,21 +66,21 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
         if (data && data.length > 0) {
           setTrending(data.map(item => ({
             title: item.title,
-            url: `/${locale}/${item.slug.startsWith('article') ? '' : ''}${item.slug}`
+            url: `/${item.slug.startsWith('article') ? '' : ''}${item.slug}`
           })));
         } else {
           setTrending([
-            { title: "Medicare Part D Changes", url: `/${locale}/article/the-new-medicare-part-d-changes-explained` },
-            { title: "Accessible European Cities", url: `/${locale}/article/the-10-most-wheelchair-accessible-cities-in-europe` },
-            { title: "Retirement Planner", url: `/${locale}/money-future/retirement-planner` }
+            { title: "Medicare Part D Changes", url: `/article/the-new-medicare-part-d-changes-explained` },
+            { title: "Accessible European Cities", url: `/article/the-10-most-wheelchair-accessible-cities-in-europe` },
+            { title: "Retirement Planner", url: `/money-future/retirement-planner` }
           ]);
         }
         setIsLoadingDynamic(false);
       }).catch(() => {
         setTrending([
-          { title: "Medicare Part D Changes", url: `/${locale}/article/the-new-medicare-part-d-changes-explained` },
-          { title: "Accessible European Cities", url: `/${locale}/article/the-10-most-wheelchair-accessible-cities-in-europe` },
-          { title: "Retirement Planner", url: `/${locale}/money-future/retirement-planner` }
+          { title: "Medicare Part D Changes", url: `/article/the-new-medicare-part-d-changes-explained` },
+          { title: "Accessible European Cities", url: `/article/the-10-most-wheelchair-accessible-cities-in-europe` },
+          { title: "Retirement Planner", url: `/money-future/retirement-planner` }
         ]);
         setIsLoadingDynamic(false);
       });
@@ -185,11 +185,11 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
       if (activeSuggestionIndex >= 0 && results[activeSuggestionIndex]) {
         const selected = results[activeSuggestionIndex].item;
         setIsOpen(false);
-        router.push(`/${locale}${selected.url}`);
+        router.push(`${selected.url}`);
       } else if (query.trim()) {
         // Trigger generic search
         setIsOpen(false);
-        router.push(`/${locale}/search?q=${encodeURIComponent(query)}`);
+        router.push(`/search?q=${encodeURIComponent(query)}`);
       }
     }
   };
@@ -271,7 +271,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
                         return (
                           <li key={item.id}>
                             <Link
-                              href={`/${locale}${item.url}`}
+                              href={`${item.url}`}
                               onClick={() => setIsOpen(false)}
                               className={`flex items-center gap-4 p-3.5 rounded-2xl transition-all group ${
                                 isActive ? 'bg-emerald-50/80 border-emerald-100' : 'hover:bg-slate-50'
@@ -337,7 +337,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
                           {CATEGORIES.map(cat => (
                             <Link
                               key={cat.path}
-                              href={`/${locale}/${cat.path}`}
+                              href={`/${cat.path}`}
                               onClick={() => setIsOpen(false)}
                               className={`px-4 py-3 rounded-2xl font-bold text-sm text-center transition-all hover:scale-[1.02] active:scale-95 border border-slate-100 ${cat.color}`}
                             >

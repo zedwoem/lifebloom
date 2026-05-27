@@ -22,7 +22,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (!loading && user) {
       // Role routing is handled by the callback, but as a fallback:
-      router.push(`/${locale}/dashboard`);
+      router.push(`/dashboard`);
     }
   }, [user, loading, router, locale]);
 
@@ -170,7 +170,7 @@ export default function LoginPage() {
         </Button>
 
         <div className="mt-6 text-center">
-          <p className="text-slate-500 font-medium">Belum punya akun? <a href={`/${locale}/register`} className="text-[#006948] font-bold hover:underline">Daftar sekarang</a></p>
+          <p className="text-slate-500 font-medium">Belum punya akun? <a href={`/register`} className="text-[#006948] font-bold hover:underline">Daftar sekarang</a></p>
         </div>
 
         <div className="mt-8 text-center border-t border-slate-100 pt-6">

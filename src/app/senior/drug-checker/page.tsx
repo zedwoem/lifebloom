@@ -47,7 +47,7 @@ export async function generateMetadata({}): Promise<Metadata> {
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `${baseUrl}/${locale}/senior/drug-checker`,
+      url: `${baseUrl}/senior/drug-checker`,
       type: 'website',
       images: [
         {
@@ -95,7 +95,7 @@ export default async function DrugCheckerPage({
   return (
     <div className="min-h-screen bg-[#FFFDF5] py-12 px-6">
       <UnifiedStructuredData
-        currentUrl={`${baseUrl}/${locale}/senior/drug-checker`}
+        currentUrl={`${baseUrl}/senior/drug-checker`}
         pageTitle={'Prescription Drug Checker'}
         pageDescription={locale === 'id' ? 'Periksa interaksi antara obat resep lansia secara instan dengan data klinis teruji.' : 'Instantly check peer-reviewed interactions between senior prescription medications.'}
         locale={locale}
@@ -114,7 +114,7 @@ export default async function DrugCheckerPage({
 
       <div className="max-w-6xl mx-auto">
         <Link 
-          href={`/${locale}`} 
+          href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
           <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}

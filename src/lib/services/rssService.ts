@@ -519,11 +519,11 @@ Instructions:
 1. **Clean & Structure:** Remove any cookie notifications, newsletter popups, navigational links, or ads. Clean up typos. Output only clean, highly readable, semantic HTML content.
 2. **Formatting:** Use structured subheadings (<h2> and <h3>), well-paced paragraphs, and formatted bullet lists (<ul><li>) where appropriate. Wrap paragraphs in standard <p> tags.
 3. **Internal Linking Strategy:** You MUST inject at least 1-2 semantic internal HTML anchor links to our tools when relevant keywords appear.
-   Here is the strict mapping you must follow (always prepend the locale '/${locale}' to the link):
+   Here is the strict mapping you must follow (always prepend the locale '' to the link):
    ${JSON.stringify(toolLinkMappings.map(t => ({ keywordTriggers: t.triggers, urlPath: t.path, linkAnchorText: t.name })))}
-   - Example: if discussing compound savings, insert: <a href="/${locale}/money-future/retirement-planner">Retirement Planner</a>.
-   - Example: if discussing side effects, insert: <a href="/${locale}/senior/drug-checker">Prescription Drug Checker</a>.
-   - Always link to '/${locale}/videos' when recommending visual tutorials or masterclasses.
+   - Example: if discussing compound savings, insert: <a href="/money-future/retirement-planner">Retirement Planner</a>.
+   - Example: if discussing side effects, insert: <a href="/senior/drug-checker">Prescription Drug Checker</a>.
+   - Always link to '/videos' when recommending visual tutorials or masterclasses.
    ${!isStrictEEAT 
       ? `- **Affiliate Strategy**: Since this article is in the '${category}' pillar, you may inject commercial affiliate links (using href="/api/affiliate?vendor=b2b&product_id=keyword") when recommending physical generic products like smart devices or travel gear.` 
       : `- **STRICT MEDICAL GUARDRAIL**: This article is in the '${category}' pillar. You are STRICTLY PROHIBITED from injecting commercial affiliate links or product endorsements to maintain medical/clinical credibility.`}

@@ -57,7 +57,7 @@ export function SponsorShowcase({ pillarSlug, articleSlug, locale = "en" }: Prop
 
       <div className="flex-shrink-0">
         <Link 
-          href={`/${locale}/support/partners/${sponsor.id}`} 
+          href={`/support/partners/${sponsor.id}`} 
           className="inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-brand-blue transition-colors group-hover:border-brand-green/30"
         >
           {t.viewProfile} <ArrowUpRight className="w-4 h-4 ml-1 opacity-50 group-hover:opacity-100 transition-opacity" />

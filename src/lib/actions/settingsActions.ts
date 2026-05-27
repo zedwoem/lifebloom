@@ -90,6 +90,6 @@ export async function updateSupportDocument(slug: string, title: string, content
     return { success: false, error: error.message };
   }
 
-  revalidatePath(`/[locale]/support/${slug}`, "page");
+  revalidatePath(`/support/${slug}`, "page");
   return { success: true };
 }

@@ -15,8 +15,7 @@ export default function CalculatorWrapper({
   slug,
   title,
 }: CalculatorWrapperProps) {
-  const t = (k: string) => k;
-  const { user } = useAuth();
+    const { user } = useAuth();
   const [showEmbed, setShowEmbed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [brandColor, setBrandColor] = useState("#1e40af");
@@ -36,9 +35,9 @@ export default function CalculatorWrapper({
 
       {/* 2. Viral Backlink Embed Widget Generator Trigger */}
       <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center max-w-2xl mx-auto">
-        <h3 className="text-lg font-bold text-slate-800">{t('embed_calculator_title')}</h3>
+        <h3 className="text-lg font-bold text-slate-800">Embed This Calculator</h3>
         <p className="text-slate-600 text-sm mt-1 mb-4">
-          {t('embed_calculator_desc')}
+          Share this helpful tool with your audience by pasting the iframe widget on your blog.
         </p>
 
         {!showEmbed ? (
@@ -46,12 +45,12 @@ export default function CalculatorWrapper({
             onClick={() => setShowEmbed(true)}
             className="px-5 py-2.5 bg-slate-200 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-300 transition-colors min-h-[48px]"
           >
-            {t('embed_button_get')}
+            Get Embed Code
           </button>
         ) : (
           <div className="space-y-4 text-left animate-fade-in">
             <div className="flex items-center gap-3">
-              <label htmlFor="brand-color" className="text-sm font-bold text-slate-700">{t('embed_color_label')}</label>
+              <label htmlFor="brand-color" className="text-sm font-bold text-slate-700">Iframe Theme Color:</label>
               <input
                 id="brand-color"
                 type="color"
@@ -59,7 +58,7 @@ export default function CalculatorWrapper({
                 onChange={(e) => setBrandColor(e.target.value)}
                 className="w-10 h-10 p-0 border-0 rounded cursor-pointer"
               />
-              <span className="text-xs text-slate-400">{t('embed_color_hint')}</span>
+              <span className="text-xs text-slate-400">Choose a brand color that matches your blog</span>
             </div>
 
             {/* Code Snippet and Copy Button */}
@@ -73,7 +72,7 @@ export default function CalculatorWrapper({
                 onClick={handleCopy}
                 className={`absolute right-2 bottom-3 px-4 py-1.5 rounded text-xs font-bold text-white transition-colors ${copied ? "bg-emerald-600" : "bg-brand-blue hover:bg-blue-800"}`}
               >
-                {copied ? t('embed_copied') : t('embed_copy')}
+                {copied ? "Copied!" : "Copy Code"}
               </button>
             </div>
             
@@ -81,7 +80,7 @@ export default function CalculatorWrapper({
               onClick={() => setShowEmbed(false)}
               className="text-xs text-slate-400 underline hover:text-slate-600"
             >
-              {t('embed_hide')}
+              Hide Panel
             </button>
           </div>
         )}

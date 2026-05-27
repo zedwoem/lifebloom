@@ -14,7 +14,7 @@ export default function SupportLayout({ children }: { children: React.ReactNode 
   // we must ensure the locale is correctly prepended only if we want explicit paths, or just let next-intl's Link handle it.
   // Actually, since we're using localePrefix: 'as-needed', it's better to just use relative or next-intl Link.
   // We'll stick to manual for now, but locale is guaranteed correct now.
-  const localePath = locale === 'en' ? '' : `/${locale}`;
+  const localePath = locale === 'en' ? '' : ``;
 
   const MENU = [
     { name: "Help Desk", href: `${localePath}/support`, icon: <LifeBuoy className="w-5 h-5" /> },

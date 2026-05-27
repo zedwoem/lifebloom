@@ -48,7 +48,7 @@ export async function generateMetadata({}): Promise<Metadata> {
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `${baseUrl}/${locale}/home-living/budget-renovator`,
+      url: `${baseUrl}/home-living/budget-renovator`,
       type: 'website',
       images: [
         {
@@ -96,7 +96,7 @@ export default async function BudgetRenovatorPage({
   return (
     <div className="min-h-screen bg-[#FFFDF5] py-12 px-6">
       <UnifiedStructuredData
-        currentUrl={`${baseUrl}/${locale}/home-living/budget-renovator`}
+        currentUrl={`${baseUrl}/home-living/budget-renovator`}
         pageTitle={'Home Renovation Budget Calculator'}
         pageDescription={locale === 'id' ? 'Hitung biaya renovasi rumah mandiri Anda secara instan dan unduh berkas laporannya.' : 'Calculate custom house renovation costs dynamically.'}
         locale={locale}
@@ -115,7 +115,7 @@ export default async function BudgetRenovatorPage({
 
       <div className="max-w-4xl mx-auto">
         <Link 
-          href={`/${locale}`} 
+          href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
           <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}

@@ -57,15 +57,15 @@ Instructions:
    </div>
 3. End the article with a 'Sources & References' section (using an <h2>) listing 2-3 real, authoritative sources (e.g., AARP, NIH, SSA.gov) with HTML links. The links MUST have rel="nofollow noopener noreferrer" target="_blank" as a security boundary.
 4. Internal Linking Strategy: You MUST inject at least 1-2 semantic internal HTML anchor links to our tools when relevant keywords appear.
-   Strict mapping (always prepend '/${locale}' to the link):
-   - /${locale}/money-future/retirement-planner (Triggers: retirement, pensiun, dana pensiun)
-   - /${locale}/money-future/yield-radar (Triggers: yield, deposito, obligasi, imbal hasil)
-   - /${locale}/pet-family/canine-symptom-checker (Triggers: dog symptom, anjing sakit, vet checklist)
-   - /${locale}/senior/drug-checker (Triggers: drug checker, interaksi obat, obat resep, side effects)
-   - /${locale}/senior/mobility-planner (Triggers: mobility, fall prevention, mencegah jatuh)
-   - /${locale}/travel/trip-planner (Triggers: trip planner, travel budget, accessible travel)
-   - /${locale}/home-living/budget-renovator (Triggers: renovation, renovasi, budget rumah)
-   - /${locale}/home-living/smart-matcher (Triggers: smart home, matter protocol, perangkat pintar)
+   Strict mapping (always prepend '' to the link):
+   - /money-future/retirement-planner (Triggers: retirement, pensiun, dana pensiun)
+   - /money-future/yield-radar (Triggers: yield, deposito, obligasi, imbal hasil)
+   - /pet-family/canine-symptom-checker (Triggers: dog symptom, anjing sakit, vet checklist)
+   - /senior/drug-checker (Triggers: drug checker, interaksi obat, obat resep, side effects)
+   - /senior/mobility-planner (Triggers: mobility, fall prevention, mencegah jatuh)
+   - /travel/trip-planner (Triggers: trip planner, travel budget, accessible travel)
+   - /home-living/budget-renovator (Triggers: renovation, renovasi, budget rumah)
+   - /home-living/smart-matcher (Triggers: smart home, matter protocol, perangkat pintar)
 5. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
 
         const geminiRes = await fetch(
@@ -225,15 +225,15 @@ Instructions:
    </div>
 3. End the article with a 'Sources & References' section (using an <h2>) listing 2-3 real, authoritative sources (e.g., AARP, NIH, SSA.gov) with HTML links. The links MUST have rel="nofollow noopener noreferrer" target="_blank" as a security boundary.
 4. Internal Linking Strategy: You MUST inject at least 1-2 semantic internal HTML anchor links to our tools when relevant keywords appear.
-   Strict mapping (always prepend '/${locale}' to the link):
-   - /${locale}/money-future/retirement-planner (Triggers: retirement, pensiun, dana pensiun)
-   - /${locale}/money-future/yield-radar (Triggers: yield, deposito, obligasi, imbal hasil)
-   - /${locale}/pet-family/canine-symptom-checker (Triggers: dog symptom, anjing sakit, vet checklist)
-   - /${locale}/senior/drug-checker (Triggers: drug checker, interaksi obat, obat resep, side effects)
-   - /${locale}/senior/mobility-planner (Triggers: mobility, fall prevention, mencegah jatuh)
-   - /${locale}/travel/trip-planner (Triggers: trip planner, travel budget, accessible travel)
-   - /${locale}/home-living/budget-renovator (Triggers: renovation, renovasi, budget rumah)
-   - /${locale}/home-living/smart-matcher (Triggers: smart home, matter protocol, perangkat pintar)
+   Strict mapping (always prepend '' to the link):
+   - /money-future/retirement-planner (Triggers: retirement, pensiun, dana pensiun)
+   - /money-future/yield-radar (Triggers: yield, deposito, obligasi, imbal hasil)
+   - /pet-family/canine-symptom-checker (Triggers: dog symptom, anjing sakit, vet checklist)
+   - /senior/drug-checker (Triggers: drug checker, interaksi obat, obat resep, side effects)
+   - /senior/mobility-planner (Triggers: mobility, fall prevention, mencegah jatuh)
+   - /travel/trip-planner (Triggers: trip planner, travel budget, accessible travel)
+   - /home-living/budget-renovator (Triggers: renovation, renovasi, budget rumah)
+   - /home-living/smart-matcher (Triggers: smart home, matter protocol, perangkat pintar)
 5. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
       
       const response = await fetch(
@@ -412,7 +412,7 @@ export async function generateMetadata({
       openGraph: {
         title: `${article.title} | LifeBloom Hub`,
         description: plainDescription,
-        url: `${baseUrl}/${locale}/article/${slug}`,
+        url: `${baseUrl}/article/${slug}`,
         type: 'article',
         publishedTime: article.datePublished,
         modifiedTime: article.dateModified,

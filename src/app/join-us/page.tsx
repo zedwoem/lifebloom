@@ -103,7 +103,7 @@ export default async function B2BPitchDeckPage({}) {
                 <CheckCircle2 className="w-5 h-5 text-[#006948]" /> Access to the Expert Moderation Queue
               </li>
             </ul>
-            <Link href={`/${locale}/register?role=expert`} className="block w-full">
+            <Link href={`/register?role=expert`} className="block w-full">
               <button className="w-full h-[56px] bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all outline-none focus:ring-4 focus:ring-slate-300">
                 Apply as Expert <ArrowRight className="w-5 h-5" />
               </button>
@@ -130,7 +130,7 @@ export default async function B2BPitchDeckPage({}) {
                 <BarChart3 className="w-5 h-5 text-[#904d00]" /> Exclusive Pillar Sponsorships
               </li>
             </ul>
-            <Link href={`/${locale}/support/contact`} className="block w-full">
+            <Link href={`/support/contact`} className="block w-full">
               <button className="w-full h-[56px] bg-white border-2 border-slate-200 hover:border-[#904d00] hover:text-[#904d00] text-slate-900 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all outline-none focus:ring-4 focus:ring-slate-100">
                 Inquire Here
               </button>

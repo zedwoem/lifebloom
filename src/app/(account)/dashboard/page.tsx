@@ -19,9 +19,9 @@ export default function UnifiedMultiRoleDashboard() {
     if (loading || !profile) return;
 
     if (activeRole === "admin") {
-      router.push(`/${locale}/admin`);
+      router.push(`/admin`);
     } else if (activeRole === "user") {
-      router.push(`/${locale}/saved`);
+      router.push(`/saved`);
     }
   }, [profile, activeRole, loading, locale, router]);
 
@@ -48,7 +48,7 @@ export default function UnifiedMultiRoleDashboard() {
           Silakan masuk ke akun terverifikasi Anda untuk mengakses panel kontrol LifeBloom.
         </p>
         <button 
-          onClick={() => router.push(`/${locale}/login`)}
+          onClick={() => router.push(`/login`)}
           className="mt-6 px-6 py-3 bg-emerald-800 hover:bg-emerald-950 text-white font-black rounded-2xl text-sm transition-all shadow-md cursor-pointer"
         >
           Masuk Sekarang

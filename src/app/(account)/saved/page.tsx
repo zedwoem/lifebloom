@@ -110,7 +110,7 @@ export default function UserWorkspacePage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href={`/${locale}/money-future/yield-radar`} className="flex-1">
+                <Link href={`/money-future/yield-radar`} className="flex-1">
                   <button className="w-full px-5 py-3.5 bg-[#006948] hover:bg-[#005439] text-white rounded-xl font-bold text-base min-h-[52px] transition-all flex items-center justify-center gap-2">
                     Buka Alat <ArrowRight className="w-5 h-5" />
                   </button>
@@ -146,7 +146,7 @@ export default function UserWorkspacePage() {
                     <p className="text-slate-500 text-base">Perencanaan slow travel multigenerasi, 100% bebas iklan dan tracker pihak ketiga.</p>
                   </div>
                 </div>
-                <Link href={`/${locale}/travel/trip-planner`}>
+                <Link href={`/travel/trip-planner`}>
                   <button className="px-5 py-3.5 bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-base min-h-[52px] transition-all">
                     Buka Peta Rute
                   </button>
@@ -187,7 +187,7 @@ export default function UserWorkspacePage() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-3">
-                        <Link href={`/${locale}/${item.metadata?.pillar || "home"}`} className="flex-1">
+                        <Link href={`/${item.metadata?.pillar || "home"}`} className="flex-1">
                           <button className="w-full px-5 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all outline-none focus:ring-4 focus:ring-[#68dba9]/30">
                             Buka Hasil
                           </button>
@@ -228,7 +228,7 @@ export default function UserWorkspacePage() {
                       <div className="flex items-start gap-3">
                         <span className="text-[#006948] font-bold shrink-0 mt-1">-</span>
                         <div>
-                          <Link href={`/${locale}/article/${item.referenced_id}`} className="hover:underline hover:text-[#006948] decoration-2 underline-offset-4">
+                          <Link href={`/article/${item.referenced_id}`} className="hover:underline hover:text-[#006948] decoration-2 underline-offset-4">
                             <h3 className="font-bold text-slate-900 text-lg">&quot;{item.metadata?.title || item.referenced_id}&quot;</h3>
                           </Link>
                           <p className="text-slate-500 mt-1">Disimpan pada {new Date(item.created_at).toLocaleDateString("id-ID")}</p>

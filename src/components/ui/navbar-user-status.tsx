@@ -23,9 +23,9 @@ export function NavbarUserStatus() {
     const role = profile?.role || "user";
     
     // Role-based redirect path
-    let workspacePath = `/${locale}/saved`;
+    let workspacePath = `/saved`;
     if (role === "admin" || role === "expert") {
-      workspacePath = `/${locale}/dashboard`;
+      workspacePath = `/dashboard`;
     }
 
     return (
@@ -52,13 +52,13 @@ export function NavbarUserStatus() {
   return (
     <div className="flex items-center gap-3 animate-fade-in">
       <Link 
-        href={`/${locale}/login`}
+        href={`/login`}
         className="flex items-center justify-center h-touch-target px-6 bg-brand-green-light hover:bg-[#d8f3e5] text-brand-green-dark font-bold text-base rounded-full transition-colors border border-transparent"
       >
         Sign In
       </Link>
       <Link 
-        href={`/${locale}/join-us`}
+        href={`/join-us`}
         className="flex items-center justify-center h-touch-target px-6 bg-[#131b2e] hover:bg-[#0a0e1a] text-white font-bold text-base rounded-full transition-colors flex gap-1.5 shadow-md"
       >
         Join Us <ArrowRight className="w-4 h-4" />

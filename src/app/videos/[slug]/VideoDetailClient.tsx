@@ -168,7 +168,7 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
   };
 
   // 3. Sharing helpers
-  const shareLink = typeof window !== "undefined" ? window.location.href : `https://lifebloomhub.vercel.app/${locale}/videos/${video.slug}`;
+  const shareLink = typeof window !== "undefined" ? window.location.href : `https://lifebloomhub.vercel.app/videos/${video.slug}`;
   const embedCode = `<iframe src="https://lifebloomhub.vercel.app/embed/video/${video.embed_id}" width="560" height="315" frameborder="0" allowfullscreen></iframe>`;
 
   const copyToClipboard = (text: string, isEmbed: boolean) => {
@@ -227,7 +227,7 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
       <div className="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200/60 shadow-sm print:hidden">
         <div className="container mx-auto px-6 max-w-7xl h-16 flex items-center justify-between">
           <Link
-            href={`/${locale}/videos`}
+            href={`/videos`}
             className="flex items-center gap-2 text-slate-600 hover:text-[#006948] text-sm font-bold transition-all"
           >
             <ChevronLeft className="w-4 h-4" /> {t.backToHub}
@@ -307,7 +307,7 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
                 {recommendedTools.map((tool, idx) => (
                   <Link
                     key={idx}
-                    href={`/${locale}${tool.path}`}
+                    href={`${tool.path}`}
                     className="group bg-white rounded-2xl p-5 border border-slate-200/60 shadow-2xs hover:shadow-md hover:border-emerald-500/20 transition-all flex flex-col justify-between"
                   >
                     <div>
@@ -461,7 +461,7 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
               {relatedVideos.map(item => (
                 <Link
                   key={item.id}
-                  href={`/${locale}/videos/${item.slug}`}
+                  href={`/videos/${item.slug}`}
                   className="group bg-white rounded-2xl border border-slate-200/60 overflow-hidden flex flex-col shadow-2xs hover:shadow-md hover:border-emerald-500/20 transition-all duration-300"
                 >
                   <div className="aspect-video relative overflow-hidden bg-slate-950 flex items-center justify-center">

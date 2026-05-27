@@ -159,7 +159,7 @@ export default function VideoHubClient({ initialVideos, locale }: VideoHubClient
               {t.featured}
             </h2>
             <Link 
-              href={`/${locale}/videos/${featuredVideo.slug}`}
+              href={`/videos/${featuredVideo.slug}`}
               className="group flex flex-col lg:flex-row bg-white rounded-3xl overflow-hidden border border-slate-200/60 shadow-md hover:shadow-xl hover:border-emerald-500/20 transition-all duration-300"
             >
               {/* Left Side: Thumbnail with elegant play button overlay */}
@@ -284,7 +284,7 @@ export default function VideoHubClient({ initialVideos, locale }: VideoHubClient
               {paginatedGridVideos.map(video => (
                 <Link
                   key={video.id}
-                  href={`/${locale}/videos/${video.slug}`}
+                  href={`/videos/${video.slug}`}
                   className="group bg-white rounded-2xl border border-slate-200/60 overflow-hidden flex flex-col shadow-sm hover:shadow-lg hover:border-emerald-500/20 transition-all duration-300"
                 >
                   {/* Thumbnail Card */}

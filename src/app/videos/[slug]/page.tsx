@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `${video.title} | LifeBloom Academy`,
       description: plainDescription.substring(0, 155),
-      url: `${baseUrl}/${locale}/videos/${slug}`,
+      url: `${baseUrl}/videos/${slug}`,
       type: 'video.other',
       images: [
         {
@@ -109,7 +109,7 @@ export default async function VideoDetailPage({ params }: PageProps) {
     <>
       {/* Search Engine Optimization VideoObject Schema.org injection */}
       <UnifiedStructuredData
-        currentUrl={`${appUrl}/${locale}/videos/${video.slug}`}
+        currentUrl={`${appUrl}/videos/${video.slug}`}
         pageTitle={`${video.title} | LifeBloom Hub`}
         pageDescription={video.description || ""}
         locale={locale}

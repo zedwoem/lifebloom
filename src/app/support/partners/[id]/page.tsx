@@ -24,7 +24,7 @@ export default async function PartnerProfilePage({
     <div className="animate-fade-in space-y-8">
       {/* Back Button */}
       <Link 
-        href={`/${locale}/support`}
+        href={`/support`}
         className="inline-flex items-center text-sm font-bold text-slate-500 hover:text-brand-blue transition-colors group"
       >
         <ArrowLeft className="w-4 h-4 mr-1.5 transition-transform group-hover:-translate-x-1" />
@@ -133,13 +133,13 @@ export default async function PartnerProfilePage({
       {/* Profile Actions */}
       <div className="flex flex-wrap gap-4 border-t pt-6">
         <Link 
-          href={`/${locale}/support/contact?ref=partner_${id}`} 
+          href={`/support/contact?ref=partner_${id}`} 
           className="flex-grow md:flex-grow-0 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
         >
           <span>Business Inquiry / Sponsorship</span>
           <ExternalLink className="w-4 h-4 opacity-70" />
         </Link>
-        <Link href={`/${locale}/support`} className="flex-grow md:flex-grow-0 px-6 py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold rounded-xl text-sm transition-colors flex items-center justify-center">
+        <Link href={`/support`} className="flex-grow md:flex-grow-0 px-6 py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold rounded-xl text-sm transition-colors flex items-center justify-center">
           Open Support Case
         </Link>
       </div>

@@ -103,6 +103,6 @@ export async function ingestVideoAction(payload: {
     return { success: false, error: error.message };
   }
 
-  revalidatePath(`/[locale]/${pillar}`, "page");
+  revalidatePath(`/${pillar}`, "page");
   return { success: true };
 }

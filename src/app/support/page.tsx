@@ -52,7 +52,7 @@ export default async function HelpdeskPage({}) {
             return (
               <Link 
                 key={doc.slug}
-                href={`/${locale}/support/${doc.slug}`}
+                href={`/support/${doc.slug}`}
                 className={`border rounded-2xl p-6 hover:shadow-soft-ambient transition-all duration-200 flex flex-col justify-between group ${colorClass}`}
               >
                 <div>

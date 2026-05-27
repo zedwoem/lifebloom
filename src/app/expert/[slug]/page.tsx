@@ -24,7 +24,7 @@ export default async function ExpertProfilePage({
     <div className="animate-fade-in space-y-8 max-w-5xl mx-auto px-6 py-12">
       {/* Back Button */}
       <Link 
-        href={`/${locale}`}
+        href={``}
         className="inline-flex items-center text-sm font-bold text-slate-500 hover:text-brand-blue transition-colors group"
       >
         <ArrowLeft className="w-4 h-4 mr-1.5 transition-transform group-hover:-translate-x-1" />
@@ -111,13 +111,13 @@ export default async function ExpertProfilePage({
       {/* Profile Actions */}
       <div className="flex flex-wrap gap-4 border-t pt-6">
         <Link 
-          href={`/${locale}/support/contact?ref=expert_${slug}`} 
+          href={`/support/contact?ref=expert_${slug}`} 
           className="flex-grow md:flex-grow-0 px-6 py-3 bg-brand-green hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-sm"
         >
           <span>Business Inquiry / Media Request</span>
           <ExternalLink className="w-4 h-4 opacity-70" />
         </Link>
-        <Link href={`/${locale}/support`} className="flex-grow md:flex-grow-0 px-6 py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold rounded-xl text-sm transition-colors flex items-center justify-center">
+        <Link href={`/support`} className="flex-grow md:flex-grow-0 px-6 py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold rounded-xl text-sm transition-colors flex items-center justify-center">
           Open Support Case
         </Link>
       </div>

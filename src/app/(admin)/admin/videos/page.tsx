@@ -31,7 +31,7 @@ export default function AdminVideosPage() {
       if (!isUserAdmin) {
         setIsAdmin(false);
         toast.error("Akses Ditolak. Anda bukan Administrator.");
-        router.push(`/${locale}/dashboard`);
+        router.push(`/dashboard`);
         return;
       }
 
@@ -97,7 +97,7 @@ export default function AdminVideosPage() {
       
       <header className="max-w-[1120px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-slate-200 mb-8">
         <div className="flex items-center gap-4">
-          <Link href={`/${locale}/admin`}>
+          <Link href={`/admin`}>
             <button className="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors">
               <ArrowLeft className="w-6 h-6 text-slate-500" />
             </button>

@@ -47,7 +47,7 @@ export async function generateMetadata({}): Promise<Metadata> {
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `${baseUrl}/${locale}/senior/mobility-planner`,
+      url: `${baseUrl}/senior/mobility-planner`,
       type: 'website',
       images: [
         {
@@ -95,7 +95,7 @@ export default async function MobilityPlannerPage({
   return (
     <div className="min-h-screen bg-[#FFFDF5] py-12 px-6">
       <UnifiedStructuredData
-        currentUrl={`${baseUrl}/${locale}/senior/mobility-planner`}
+        currentUrl={`${baseUrl}/senior/mobility-planner`}
         pageTitle={'Senior Mobility Safety Planner'}
         pageDescription={locale === 'id' ? 'Audit rumah Anda untuk pencegahan jatuh dan pilih alat bantu jalan yang aman.' : 'Audit your home for fall prevention and select walking aids scientifically.'}
         locale={locale}
@@ -114,7 +114,7 @@ export default async function MobilityPlannerPage({
 
       <div className="max-w-6xl mx-auto">
         <Link 
-          href={`/${locale}`} 
+          href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
           <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}

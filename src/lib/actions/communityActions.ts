@@ -122,7 +122,7 @@ export async function submitCommentAction(payload: any) {
           false
         )
       `;
-      revalidatePath("/[locale]/article/[slug]", "layout");
+      revalidatePath("/article/[slug]", "layout");
       return { success: true };
     } catch (poolError: any) {
       console.warn("[SUPABASE POOLER] submitCommentAction failed, falling back to HTTP REST API:", poolError.message);
@@ -145,7 +145,7 @@ export async function submitCommentAction(payload: any) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/[locale]/article/[slug]", "layout");
+  revalidatePath("/article/[slug]", "layout");
   return { success: true };
 }
 
@@ -195,7 +195,7 @@ export async function submitGuestbookAction(payload: any) {
           ${sanitizedContent.trim()}
         )
       `;
-      revalidatePath("/[locale]/saved", "page");
+      revalidatePath("/saved", "page");
       return { success: true };
     } catch (poolError: any) {
       console.warn("[SUPABASE POOLER] submitGuestbookAction failed, falling back to HTTP REST API:", poolError.message);
@@ -214,7 +214,7 @@ export async function submitGuestbookAction(payload: any) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/[locale]/saved", "page");
+  revalidatePath("/saved", "page");
   return { success: true };
 }
 

@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
 const BudgetPDF = ({ area, costPerSqm, contingency, total, t }: any) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <Text style={styles.header}>{t('budget_calculator_pdf_header')}</Text>
+      <Text style={styles.header}>Home Renovation Budget Plan</Text>
       
       <View style={styles.row}>
         <Text style={styles.label}>Area (m2)</Text>
@@ -45,7 +45,7 @@ const BudgetPDF = ({ area, costPerSqm, contingency, total, t }: any) => (
       </View>
 
       <View style={styles.totalBox}>
-        <Text style={styles.totalLabel}>{t('budget_calculator_total')}</Text>
+        <Text style={styles.totalLabel}>Total Estimated Budget</Text>
         <Text style={styles.totalValue}>${total.toLocaleString()}</Text>
       </View>
     </Page>
@@ -53,8 +53,7 @@ const BudgetPDF = ({ area, costPerSqm, contingency, total, t }: any) => (
 );
 
 export function HomeBudgetCalculator() {
-  const t = (k: string) => k;
-  const [area, setArea] = useState<number | "">("");
+    const [area, setArea] = useState<number | "">("");
   const [costPerSqm, setCostPerSqm] = useState<number | "">(3500);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -84,9 +83,9 @@ export function HomeBudgetCalculator() {
   return (
     <ClientOnly fallbackHeight="h-[600px]">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('budget_calculator_title')}</h2>
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">Renovation Budget Calculator</h2>
         <p className="text-lg text-slate-600 mb-6">
-          {t('budget_calculator_desc')}
+          Calculate your home remodeling costs accurately with a built-in 15% contingency buffer.
         </p>
 
         <Suspense fallback={<div className="h-20 animate-pulse bg-slate-50 border border-slate-200 rounded-2xl mb-6" />}>

@@ -12,9 +12,7 @@ import { Suspense } from 'react';
 
 function ContactFormContent() {
   const searchParams = useSearchParams();
-  const params = useParams();
-  const locale = params.locale as string;
-  const ref = searchParams.get('ref') || '';
+    const ref = searchParams.get('ref') || '';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -79,7 +77,7 @@ function ContactFormContent() {
       
       {/* Return link */}
       <Link 
-        href={`/${locale}/support`}
+        href={`/support`}
         className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
       >
         <ArrowLeft className="w-4 h-4" /> Kembali ke Help Desk

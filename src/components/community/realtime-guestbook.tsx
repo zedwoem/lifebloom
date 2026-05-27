@@ -58,7 +58,7 @@ export function RealtimeGuestbook({
 
   async function handleAction(formData: FormData) {
     if (!isAuthenticated) {
-      router.push(`/${locale}/login`);
+      router.push(`/login`);
       return;
     }
 
@@ -130,7 +130,7 @@ export function RealtimeGuestbook({
             </p>
           </div>
           <button 
-            onClick={() => router.push(`/${locale}/login?redirect=guestbook`)}
+            onClick={() => router.push(`/login?redirect=guestbook`)}
             className="w-full md:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-950 text-white font-black rounded-xl text-xs shadow-sm transition-all cursor-pointer min-h-[44px]"
           >
             Masuk / Register

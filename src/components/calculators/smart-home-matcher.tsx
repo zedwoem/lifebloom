@@ -8,8 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 export function SmartHomeMatcher() {
-  const t = (k: string) => k;
-  const [deviceType, setDeviceType] = useState("");
+    const [deviceType, setDeviceType] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,14 +28,14 @@ export function SmartHomeMatcher() {
   return (
     <ClientOnly fallbackHeight="h-[500px]">
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">{t('title')}</h2>
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">Smart Home Matcher (Matter Standard)</h2>
         <p className="text-lg text-slate-600 mb-6">
-          {t('description')}
+          Find smart devices that are Matter-compatible, energy-efficient, and don't require an extra bridge.
         </p>
 
         <div className="flex gap-4 mb-8">
           <Input 
-            placeholder={t('search_placeholder')} 
+            placeholder="Search devices (e.g., Bulbs, Thermostats...)"
             value={deviceType}
             onChange={(e) => setDeviceType(e.target.value)}
             className="text-lg min-h-[48px]"
@@ -46,13 +45,13 @@ export function SmartHomeMatcher() {
             disabled={isLoading || !deviceType}
             className="min-h-[48px] px-8 bg-brand-blue text-white"
           >
-            {isLoading ? t('searching') : <><Search className="w-5 h-5 mr-2" /> {t('search_button')}</>}
+            {isLoading ? "Searching..." : <><Search className="w-5 h-5 mr-2" /> Search</>}
           </Button>
         </div>
 
         {results.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-slate-800">{t('results_title')}</h3>
+            <h3 className="text-xl font-bold text-slate-800">Recommended Devices (Matter Certified)</h3>
             <div className="grid gap-4">
               {results.map((device) => (
                 <div key={device.id} className="p-4 border border-brand-green/20 bg-brand-green/5 rounded-xl flex justify-between items-center">
@@ -61,7 +60,7 @@ export function SmartHomeMatcher() {
                     <p className="text-slate-600">{device.type} &bull; {device.protocol}</p>
                   </div>
                   <div className="bg-brand-green text-white px-3 py-1 rounded-full font-bold">
-                    {t('rating')} {device.efficiency}
+                    Rating {device.efficiency}
                   </div>
                 </div>
               ))}

@@ -19,12 +19,9 @@ import {
 import { GlobalSearch } from '@/components/ui/global-search';
 
 export default function HomePage() {
-  const params = useParams();
-  const locale = params.locale as string;
-  const { user } = useAuth();
+    const { user } = useAuth();
 
-  const t = (k: string) => k;
-
+  
   const pillarIcons: Record<string, React.ReactNode> = {
     home: <Home className="w-8 h-8 text-[#006948]" />,
     money: <Wallet className="w-8 h-8 text-[#904d00]" />,
@@ -77,15 +74,15 @@ export default function HomePage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#006948] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#006948]"></span>
             </span>
-            {t('hero_badge')}
+            Safe Harbor For Families
           </div>
           
           <h1 className="text-[42px] md:text-[64px] font-extrabold text-slate-900 leading-[1.1] tracking-tight max-w-4xl mx-auto" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-            {t('hero_title')}
+            UNSCROLL YOUR LIFE
           </h1>
           
           <p className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto font-medium">
-            {t('hero_subtitle')}
+            Clarity Over Noise. Solutions Over Scrolls.
           </p>
         </header>
 
@@ -96,18 +93,18 @@ export default function HomePage() {
             <GlobalSearch variant="hero" />
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-            <span className="text-sm font-bold text-slate-500">{t('popular')}</span>
+            <span className="text-sm font-bold text-slate-500">Popular:</span>
             <Link 
-              href={`/${locale}/money-future/retirement-planner`}
+              href={`/money-future/retirement-planner`}
               className="text-sm font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl text-slate-600 hover:text-[#006948] hover:border-[#006948]/30 transition-colors shadow-sm inline-flex items-center gap-1.5 min-h-[40px]"
             >
-              <Wallet className="w-4 h-4 text-[#006948]" /> {t('popular_retire')}
+              <Wallet className="w-4 h-4 text-[#006948]" /> Retirement Yield
             </Link>
             <Link 
-              href={`/${locale}/senior/drug-checker`}
+              href={`/senior/drug-checker`}
               className="text-sm font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl text-slate-600 hover:text-[#006948] hover:border-[#006948]/30 transition-colors shadow-sm inline-flex items-center gap-1.5 min-h-[40px]"
             >
-              <HeartPulse className="w-4 h-4 text-[#006948]" /> {t('popular_drug')}
+              <HeartPulse className="w-4 h-4 text-[#006948]" /> Parent's Drug Safety
             </Link>
           </div>
         </section>
@@ -116,10 +113,10 @@ export default function HomePage() {
         <section className="w-full">
           <div className="mb-10 text-center md:text-left">
             <h2 className="text-3xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-              {t('bento_title')}
+              YOUR LOGICAL PATHWAYS
             </h2>
             <p className="text-slate-500 mt-2 text-lg">
-              {t('bento_subtitle')}
+              Select a pillar to explore step-by-step tools and verified resources.
             </p>
           </div>
 
@@ -128,16 +125,16 @@ export default function HomePage() {
               const aesthetic = pillarAesthetic[pillar.id] || pillarAesthetic.home;
               
               // Custom copy overrides based on translations
-              let desc = t('default_desc');
-              if (pillar.id === "senior") desc = t('senior_desc');
-              if (pillar.id === "pet") desc = t('pet_desc');
-              if (pillar.id === "money") desc = t('money_desc');
-              if (pillar.id === "travel") desc = t('travel_desc');
+              let desc = "Personalized tools and medical-grade guidance.";
+              if (pillar.id === "senior") desc = "Evaluate fall risks & check medication safety instantly.";
+              if (pillar.id === "pet") desc = "Canine symptoms & family matches.";
+              if (pillar.id === "money") desc = "Project compound yield & secure plans.";
+              if (pillar.id === "travel") desc = "Design itineraries without the adware or hidden fees.";
 
               return (
                 <Link 
                   key={pillar.id} 
-                  href={`/${locale}/${pillar.slug}`} 
+                  href={`/${pillar.slug}`} 
                   className={`group relative rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1 ${aesthetic.cardClass}`}
                 >
                   <div className="flex items-start justify-between z-10">
@@ -165,7 +162,7 @@ export default function HomePage() {
 
             {/* STATIC SUPPORT HUB CARD */}
             <Link 
-              href={`/${locale}/support`} 
+              href={`/support`} 
               className="group relative bg-slate-900 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1 border border-slate-800"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-40" />
@@ -178,10 +175,10 @@ export default function HomePage() {
 
               <div className="z-10 mt-auto">
                 <h3 className="text-2xl font-bold text-white group-hover:text-[#85f8c4] transition-colors" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                  {t('support_title')}
+                  Support Center
                 </h3>
                 <p className="text-base text-slate-400 mt-2">
-                  {t('support_desc')}
+                  Knowledge base, privacy details, and contact forms.
                 </p>
               </div>
             </Link>

@@ -21,7 +21,7 @@ async function PopularPosts({ pillarSlug, locale }: { pillarSlug: string, locale
     <ul className="space-y-4">
       {posts.map(post => (
         <li key={post.id} className="group">
-          <Link href={`/${locale}/article/${post.link.split('/').pop()}`} className="flex items-start gap-3">
+          <Link href={`/article/${post.link.split('/').pop()}`} className="flex items-start gap-3">
             <div className="p-2 bg-rose-50 rounded-lg text-rose-500 group-hover:bg-rose-100 transition-colors">
               <TrendingUp className="w-5 h-5" />
             </div>
@@ -50,7 +50,7 @@ async function DiscoveryPosts({ pillarSlug, locale }: { pillarSlug: string, loca
     <ul className="space-y-4">
       {posts.map(post => (
         <li key={post.id} className="group">
-          <Link href={`/${locale}/article/${post.link.split('/').pop()}`} className="flex items-start gap-3">
+          <Link href={`/article/${post.link.split('/').pop()}`} className="flex items-start gap-3">
             <div className="p-2 bg-amber-50 rounded-lg text-amber-500 group-hover:bg-amber-100 transition-colors">
               <Sparkles className="w-5 h-5" />
             </div>
@@ -88,7 +88,7 @@ export function DynamicPillarCards({ pillarSlug, pillarName, locale }: Props) {
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 overflow-hidden relative group">
       <div className="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
         <h3 className="text-2xl font-black text-slate-800">{pillarName}</h3>
-        <Link href={`/${locale}/${pillarSlug}`} className="text-brand-blue font-bold flex items-center hover:underline">
+        <Link href={`/${pillarSlug}`} className="text-brand-blue font-bold flex items-center hover:underline">
           Jelajahi <ChevronRight className="w-5 h-5 ml-1" />
         </Link>
       </div>

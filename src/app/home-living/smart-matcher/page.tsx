@@ -48,7 +48,7 @@ export async function generateMetadata({}): Promise<Metadata> {
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `${baseUrl}/${locale}/home-living/smart-matcher`,
+      url: `${baseUrl}/home-living/smart-matcher`,
       type: 'website',
       images: [
         {
@@ -96,7 +96,7 @@ export default async function SmartMatcherPage({
   return (
     <div className="min-h-screen bg-[#FFFDF5] py-12 px-6">
       <UnifiedStructuredData
-        currentUrl={`${baseUrl}/${locale}/home-living/smart-matcher`}
+        currentUrl={`${baseUrl}/home-living/smart-matcher`}
         pageTitle={'Smart Home Device Matcher'}
         pageDescription={locale === 'id' ? 'Temukan perangkat pintar terbaik yang mendukung protokol Matter dan ramah lingkungan.' : 'Find premium smart home devices matching your ecosystem.'}
         locale={locale}
@@ -115,7 +115,7 @@ export default async function SmartMatcherPage({
 
       <div className="max-w-4xl mx-auto">
         <Link 
-          href={`/${locale}`} 
+          href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
           <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}

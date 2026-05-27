@@ -269,7 +269,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
   };
 
   // URL for QR code
-  const articleUrl = typeof window !== 'undefined' ? window.location.href : `https://lifebloomhub.vercel.app/${locale}/article/${slug}`;
+  const articleUrl = typeof window !== 'undefined' ? window.location.href : `https://lifebloomhub.vercel.app/article/${slug}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(articleUrl)}`;
 
   return (
@@ -282,7 +282,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
       {/* Top Navigation Bar with Accessibility Controls - HIDDEN ON PRINT */}
       <div className={`sticky top-0 w-full z-50 print:hidden ${stickyHeaderClasses}`}>
         <div className="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <Link href={`/${locale}`} className={`inline-flex items-center font-semibold transition-colors ${iconClasses}`}>
+          <Link href={``} className={`inline-flex items-center font-semibold transition-colors ${iconClasses}`}>
             <ChevronLeft className="w-5 h-5 mr-1" />
             Back
           </Link>
@@ -377,7 +377,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
             </div>
           ) : (
             <Link 
-              href={`/${locale}/support`}
+              href={`/support`}
               className={`mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-slate-100/80 transition-colors ${highContrast ? 'bg-yellow-300/10 border border-yellow-300 text-yellow-300' : 'bg-slate-50 border border-slate-200 text-slate-700'}`}
               title="Apply as a Verified Expert Reviewer"
             >

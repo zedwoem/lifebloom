@@ -120,7 +120,7 @@ export default function OnboardingOverlay() {
                 />
               </div>
               <label htmlFor="consent" className="ml-3 text-xs text-emerald-100/60 leading-tight">
-                I agree to the <a href={locale === 'en' ? '/support/terms' : `/${locale}/support/terms`} className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Terms of Service</a> and <a href={locale === 'en' ? '/support/privacy' : `/${locale}/support/privacy`} className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Privacy Policy</a>, and consent to the use of cookies to enhance my experience.
+                I agree to the <a href={locale === 'en' ? '/support/terms' : `/support/terms`} className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Terms of Service</a> and <a href={locale === 'en' ? '/support/privacy' : `/support/privacy`} className="text-emerald-400 hover:underline" target="_blank" rel="noreferrer">Privacy Policy</a>, and consent to the use of cookies to enhance my experience.
               </label>
             </div>
 

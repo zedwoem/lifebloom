@@ -32,7 +32,7 @@ export async function approveSponsor(id: string) {
     return { success: false, error: error.message };
   }
   
-  revalidatePath("/[locale]/admin");
+  revalidatePath("/admin");
   return { success: true };
 }
 
@@ -47,6 +47,6 @@ export async function rejectSponsor(id: string) {
     return { success: false, error: error.message };
   }
   
-  revalidatePath("/[locale]/admin");
+  revalidatePath("/admin");
   return { success: true };
 }

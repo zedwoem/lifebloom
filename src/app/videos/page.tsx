@@ -46,7 +46,7 @@ export async function generateMetadata({
     openGraph: {
       title: t.title,
       description: t.description,
-      url: `${baseUrl}/${locale}/videos`,
+      url: `${baseUrl}/videos`,
       type: 'website',
       images: [
         {

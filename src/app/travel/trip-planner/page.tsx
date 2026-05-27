@@ -47,7 +47,7 @@ export async function generateMetadata({}): Promise<Metadata> {
     openGraph: {
       title: titles[locale] || titles.en,
       description: descriptions[locale] || descriptions.en,
-      url: `${baseUrl}/${locale}/travel/trip-planner`,
+      url: `${baseUrl}/travel/trip-planner`,
       type: 'website',
       images: [
         {
@@ -95,7 +95,7 @@ export default async function TripPlannerPage({
   return (
     <div className="min-h-screen bg-[#FFFDF5] py-12 px-6">
       <UnifiedStructuredData
-        currentUrl={`${baseUrl}/${locale}/travel/trip-planner`}
+        currentUrl={`${baseUrl}/travel/trip-planner`}
         pageTitle={'Accessible Trip Planner'}
         pageDescription={locale === 'id' ? 'Rencanakan perjalanan Anda dengan rincian biaya yang tepat dan ramah aksesibilitas.' : 'Plan your next journey with customized travel budgets.'}
         locale={locale}
@@ -114,7 +114,7 @@ export default async function TripPlannerPage({
 
       <div className="max-w-6xl mx-auto">
         <Link 
-          href={`/${locale}`} 
+          href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
           <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}

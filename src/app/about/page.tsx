@@ -161,13 +161,13 @@ export default async function AboutPage({}) {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href={`/${locale}/join-us`} className="w-full sm:w-auto">
+              <Link href={`/join-us`} className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-8 h-[56px] bg-[#85f8c4] hover:bg-[#68e0ac] text-[#002114] font-bold rounded-xl text-base transition-colors flex items-center justify-center gap-2">
                   {content.ctaButtonPrimary} <ArrowRight className="w-5 h-5" />
                 </button>
               </Link>
               
-              <Link href={`/${locale}/support/contact`} className="w-full sm:w-auto">
+              <Link href={`/support/contact`} className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto px-8 h-[56px] bg-transparent border-2 border-slate-700 hover:border-slate-500 text-white font-bold rounded-xl text-base transition-colors">
                   {content.ctaButtonSecondary}
                 </button>

@@ -49,7 +49,7 @@ export async function updateUserRole({ userId, newRole }: { userId: string; newR
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/[locale]/admin/users", "page");
+  revalidatePath("/admin/users", "page");
   return { success: true };
 }
 
@@ -73,7 +73,7 @@ export async function toggleUserActiveStatus({ userId, isActive }: { userId: str
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/[locale]/admin/users", "page");
+  revalidatePath("/admin/users", "page");
   return { success: true };
 }
 
@@ -113,6 +113,6 @@ export async function submitQuestionAnswer({ questionId, answerContent }: { ques
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/[locale]/dashboard", "page");
+  revalidatePath("/dashboard", "page");
   return { success: true };
 }

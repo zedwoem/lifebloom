@@ -10,9 +10,7 @@ import Link from "next/link";
 export default function RegisterPage() {
   const { user, signInWithMagicLink, loading, signUpWithEmailPassword } = useAuth();
   const router = useRouter();
-  const params = useParams();
-  const locale = params.locale as string;
-
+  
   // Form States
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +20,7 @@ export default function RegisterPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
-      router.push(`/${locale}/dashboard`);
+      router.push(`/dashboard`);
     }
   }, [user, loading, router, locale]);
 
@@ -162,7 +160,7 @@ export default function RegisterPage() {
         <div className="mt-8 text-center border-t border-slate-100 pt-6">
           <p className="text-slate-500 text-sm">
             Already have an account?{" "}
-            <Link href={`/${locale}/login`} className="font-bold text-brand-blue hover:text-brand-green transition-colors">
+            <Link href={`/login`} className="font-bold text-brand-blue hover:text-brand-green transition-colors">
               Sign in
             </Link>
           </p>

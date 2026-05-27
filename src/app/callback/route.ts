@@ -26,12 +26,12 @@ export async function GET(request: Request) {
         .single()) as any;
         
         
-      let redirectPath = `/${locale}/saved`; // Default for standard users
+      let redirectPath = `/saved`; // Default for standard users
       
       if (profile?.role === 'admin') {
-        redirectPath = `/${locale}/admin`;
+        redirectPath = `/admin`;
       } else if (profile?.role === 'expert') {
-        redirectPath = `/${locale}/dashboard`;
+        redirectPath = `/dashboard`;
       }
       
       return NextResponse.redirect(`${requestUrl.origin}${redirectPath}`)
@@ -41,5 +41,5 @@ export async function GET(request: Request) {
   }
 
   // Return the user to an error page with some instructions
-  return NextResponse.redirect(`${requestUrl.origin}/${locale}/login?error=auth-callback-failed`)
+  return NextResponse.redirect(`${requestUrl.origin}/login?error=auth-callback-failed`)
 }

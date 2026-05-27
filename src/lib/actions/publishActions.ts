@@ -115,7 +115,7 @@ export async function submitArticleAction(payload: any) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/[locale]/article/[slug]", "page");
+  revalidatePath("/article/[slug]", "page");
   return { success: true, slug, status: initialStatus };
 }
 
