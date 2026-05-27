@@ -11,6 +11,70 @@ export function generateStaticParams() {
   return routing.locales.map((locale: string) => ({ locale }));
 }
 
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app';
+  
+  return {
+    title: {
+      default: 'LifeBloom Hub — Inclusive High-Yield Lifestyle Utility Platform',
+      template: '%s | LifeBloom Hub'
+    },
+    description: 'LifeBloom Hub is an all-inclusive automated high-yield utility platform with smart tools for smart living, accessible travel, retirement planning, pet safety, and peer-reviewed medical checking.',
+    metadataBase: new URL(baseUrl),
+    keywords: [
+      'inclusive tools', 'senior care', 'retirement planning', 'pet matchmaker', 
+      'drug checker', 'accessible travel', 'smart home living', 'automated utility platform',
+      'accessibility utilities', 'expert peer-reviewed medical'
+    ],
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        'x-default': '/en',
+        'en': '/en',
+        'id': '/id',
+        'es': '/es'
+      }
+    },
+    openGraph: {
+      title: 'LifeBloom Hub — Inclusive High-Yield Lifestyle Utility Platform',
+      description: 'An all-inclusive automated high-yield utility platform with smart tools for smart living, accessible travel, retirement planning, pet safety, and peer-reviewed medical checking.',
+      url: process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app',
+      siteName: 'LifeBloom Hub',
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'LifeBloom Hub'
+        }
+      ],
+      locale: locale,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'LifeBloom Hub — Inclusive High-Yield Lifestyle Utility Platform',
+      description: 'An all-inclusive automated high-yield utility platform with smart tools for smart living, accessible travel, retirement planning, pet safety, and peer-reviewed medical checking.',
+      images: ['/og-image.png'],
+      creator: '@lifebloomhub',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+  };
+}
+
 import Image from 'next/image';
 import { StructuredData } from '@/components/seo/StructuredData';
 import { WebSite, WithContext } from 'schema-dts';

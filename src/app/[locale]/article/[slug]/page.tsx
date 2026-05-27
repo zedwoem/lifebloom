@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import { StructuredData } from '@/components/seo/StructuredData';
 import { Article, MedicalWebPage, WithContext } from 'schema-dts';
 import { AccessibleArticleReader } from '@/components/content/accessible-article-reader';
@@ -219,6 +220,79 @@ async function getArticleData(slug: string, locale: string) {
   }
 
   return articleDetails;
+}
+
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ slug: string; locale: string }> 
+}): Promise<Metadata> {
+  const { slug, locale } = await params;
+  try {
+    const article = await getArticleData(slug, locale);
+    if (!article) return {};
+
+    const plainDescription = article.content
+      ? article.content.replace(/<[^>]*>/g, '').substring(0, 155) + '...'
+      : 'Inclusive Curated Article | LifeBloom Hub';
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app';
+
+    const categoryKeywords: Record<string, string[]> = {
+      health: ['senior healthcare', 'medical safety', 'geriatric health advice', 'expert peer-reviewed medical checker', 'health care guides', 'clinical screening tools'],
+      finance: ['retirement savings', 'personal finance senior', 'high-yield savings options', 'wealth projection', 'interest rate compounding', 'recession simulator'],
+      tech: ['smart home appliances', 'Matter standard compatibility', 'elderly assistive technology', 'green tech tools', 'energy efficiency matchmaker'],
+      general: ['lifestyle utility platform', 'senior-friendly calculators', 'safe ad-free harbor', 'accessible travel guide', 'inclusive home wellness']
+    };
+    
+    const articleKeywords = [
+      ...(categoryKeywords[article.category || 'general'] || categoryKeywords.general),
+      'LifeBloom Hub',
+      article.title.toLowerCase()
+    ];
+
+    return {
+      title: article.title,
+      description: plainDescription,
+      keywords: articleKeywords,
+      alternates: {
+        canonical: `/article/${slug}`,
+        languages: {
+          'x-default': `/en/article/${slug}`,
+          'en': `/en/article/${slug}`,
+          'id': `/id/article/${slug}`,
+          'es': `/es/article/${slug}`,
+        }
+      },
+      openGraph: {
+        title: `${article.title} | LifeBloom Hub`,
+        description: plainDescription,
+        url: `${baseUrl}/${locale}/article/${slug}`,
+        type: 'article',
+        publishedTime: article.datePublished,
+        modifiedTime: article.dateModified,
+        authors: [article.author.url],
+        images: [
+          {
+            url: article.imageUrl,
+            width: 1200,
+            height: 630,
+            alt: article.title
+          }
+        ]
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: article.title,
+        description: plainDescription,
+        images: [article.imageUrl]
+      }
+    };
+  } catch (e) {
+    return {
+      title: 'Article | LifeBloom Hub'
+    };
+  }
 }
 
 export default async function ArticleReaderPage({

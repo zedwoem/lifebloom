@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { PlayCircle, Tv, Heart } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { getAllVideos, VideoItem } from '@/lib/services/videoService';
+import { useSearchParams } from 'next/navigation';
 
 const VideoPlayer = dynamic(() => import('@/components/features/video-player'), {
   loading: () => (
@@ -14,7 +15,10 @@ const VideoPlayer = dynamic(() => import('@/components/features/video-player'), 
   ssr: false
 });
 
-export default function VideoHubPage() {
+function VideoHubContent() {
+  const searchParams = useSearchParams();
+  const videoSlug = searchParams.get('v');
+  
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
 
@@ -23,11 +27,18 @@ export default function VideoHubPage() {
       const data = await getAllVideos();
       setVideos(data);
       if (data.length > 0) {
+        if (videoSlug) {
+          const matched = data.find(v => v.slug === videoSlug || v.id === videoSlug);
+          if (matched) {
+            setActiveVideo(matched);
+            return;
+          }
+        }
         setActiveVideo(data[0]);
       }
     };
     fetchVideos();
-  }, []);
+  }, [videoSlug]);
 
   if (!activeVideo) {
     return (
@@ -88,7 +99,7 @@ export default function VideoHubPage() {
                 onClick={() => setActiveVideo(video)}
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer group hover:shadow-lg transition-all hover:border-brand-green/30"
               >
-                {/* Thumbnail Placeholder - using a gradient since we don't have actual thumbnails */}
+                {/* Thumbnail Placeholder */}
                 <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 relative flex items-center justify-center">
                   <PlayCircle className="w-12 h-12 text-white/50 group-hover:text-brand-green group-hover:scale-110 transition-all" />
                   <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
@@ -113,5 +124,20 @@ export default function VideoHubPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function VideoHubPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background py-12 flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <Tv className="w-12 h-12 text-brand-green/50 mb-4" />
+          <p className="text-brand-blue font-bold">Loading Video Hub...</p>
+        </div>
+      </div>
+    }>
+      <VideoHubContent />
+    </Suspense>
   );
 }

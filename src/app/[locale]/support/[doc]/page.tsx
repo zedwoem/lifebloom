@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { remark } from 'remark';
 import html from 'remark-html';
@@ -16,6 +17,40 @@ export async function generateStaticParams() {
   return data.map((doc) => ({
     doc: doc.slug,
   }));
+}
+
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ doc: string; locale: string }> 
+}): Promise<Metadata> {
+  const { doc } = await params;
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from('support_documents')
+    .select('title, content')
+    .eq('slug', doc)
+    .maybeSingle();
+
+  if (!data) return {};
+
+  const cleanDesc = data.content
+    ? data.content.replace(/[#*`\[\]]/g, '').substring(0, 155) + '...'
+    : 'LifeBloom Support Document';
+
+  return {
+    title: `${data.title} | LifeBloom Support`,
+    description: cleanDesc,
+    alternates: {
+      canonical: `/support/${doc}`,
+      languages: {
+        'x-default': `/en/support/${doc}`,
+        'en': `/en/support/${doc}`,
+        'id': `/id/support/${doc}`,
+        'es': `/es/support/${doc}`,
+      }
+    }
+  };
 }
 
 export default async function DocumentPage({ params }: { params: Promise<{ doc: string; locale: string }> }) {
