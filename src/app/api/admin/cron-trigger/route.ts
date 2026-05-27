@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       'rss-ingest': '/api/cron/rss-ingest',
       'youtube-ingest': '/api/cron/youtube-ingest',
       'price-sync': '/api/cron/price-sync',
-      'translate-queue': '/api/cron/translate-queue',
+      'translate-queue': '/api/cron/process-queue',
     };
 
     const internalRoute = jobRouteMap[job];

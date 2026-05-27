@@ -1,88 +1,51 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { z } from 'zod';
+import { PartnerizeService } from '@/lib/services/partnerizeService';
+import { secureLogger } from '@/lib/utils/secureLogger';
 
 export const runtime = 'edge';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Strict request validation using Zod
+const AffiliateRequestSchema = z.object({
+  vendor: z.string().min(1),
+  product_id: z.string().min(1),
+  pillar: z.string().optional().default('money')
+});
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const vendor = searchParams.get('vendor');
-  const productId = searchParams.get('product_id') || 'unknown';
-  const pillar = searchParams.get('pillar') || 'money'; // Default to money if not specified
+  try {
+    const { searchParams } = new URL(req.url);
+    const parsedParams = AffiliateRequestSchema.parse({
+      vendor: searchParams.get('vendor') || '',
+      product_id: searchParams.get('product_id') || '',
+      pillar: searchParams.get('pillar') || undefined
+    });
 
-  // Edge Proxy logic to bypass ad-blockers and hide actual affiliate tags
-  let redirectUrl = 'https://www.chewy.com/'; // Fallback
-  let linkType: 'affiliate_product' | 'sponsored_placement' | 'editorial_outgoing' = 'affiliate_product';
+    // Generate isolated link through the service layer
+    const result = PartnerizeService.generateLink({
+      vendor: parsedParams.vendor,
+      productId: parsedParams.product_id,
+      pillar: parsedParams.pillar
+    });
 
-  if (vendor === 'chewy' && productId) {
-    const affiliateTag = process.env.CHEWY_AFFILIATE_ID || 'mock-affiliate-id';
-    redirectUrl = `https://www.chewy.com/dp/${productId}?utm_source=partner&utm_campaign=${affiliateTag}`;
-    linkType = 'affiliate_product';
-  } else if (vendor === 'amazon' && productId) {
-    const affiliateTag = process.env.AMAZON_AFFILIATE_ID || 'mock-amazon-id';
-    redirectUrl = `https://www.amazon.com/dp/${productId}?tag=${affiliateTag}`;
-    linkType = 'affiliate_product';
-  } else if (vendor === 'b2b' && productId) {
-    redirectUrl = `${supabaseUrl}/functions/v1/affiliate-url-rewrite?vendor=b2b&product_id=${productId}`;
-    linkType = 'sponsored_placement';
-  } else if (vendor === 'editorial' && productId) {
-    // Prevent open redirect / SSRF by validating the redirect target
-    try {
-      const parsedUrl = new URL(productId);
-      const allowedDomains = [
-        'amazon.com',
-        'www.amazon.com',
-        'chewy.com',
-        'www.chewy.com',
-        'travelpayouts.com',
-        'www.travelpayouts.com'
-      ];
-      
-      if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
-        return NextResponse.json({ error: 'Invalid protocol' }, { status: 400 });
-      }
-      
-      const hostname = parsedUrl.hostname.toLowerCase();
-      const isAllowed = allowedDomains.some(domain => 
-        hostname === domain || hostname.endsWith('.' + domain)
-      );
+    // Fire-and-forget logging strictly isolated in the service layer
+    const logPromise = PartnerizeService.logClickAsync(
+      result.linkType,
+      parsedParams.pillar,
+      parsedParams.product_id,
+      result.targetUrl
+    );
 
-      if (!isAllowed) {
-        return NextResponse.json({ error: 'Domain is not in editorial allowlist' }, { status: 400 });
-      }
-
-      redirectUrl = productId;
-      linkType = 'editorial_outgoing';
-    } catch (e) {
-      return NextResponse.json({ error: 'Invalid destination URL format' }, { status: 400 });
+    if (typeof (req as any).waitUntil === 'function') {
+      (req as any).waitUntil(logPromise);
+    } else {
+      logPromise.catch(e => secureLogger.error("Async log failed", e));
     }
+
+    return NextResponse.redirect(result.targetUrl, 307);
+  } catch (error: any) {
+    secureLogger.error("Affiliate route error", error);
+    // Sanitize API-level errors from leaking to client. Standardize response.
+    return NextResponse.json({ error: "INVALID_AFFILIATE_REQUEST" }, { status: 400 });
   }
-
-  // Record click event in affiliate_clicks table asynchronously (non-blocking)
-  const logClickPromise = (async () => {
-    const { error } = await supabase
-      .from('affiliate_clicks')
-      .insert({
-        link_type: linkType,
-        pillar: pillar,
-        referenced_id: productId,
-        target_url: redirectUrl,
-        user_id: null // Edge runtime anonymous logging, can be linked to session later
-      });
-    if (error) {
-      console.error("[Affiliate Click Log Error]:", error.message);
-    }
-  })();
-
-  // Execute without blocking redirect
-  if (typeof (req as any).waitUntil === 'function') {
-    (req as any).waitUntil(logClickPromise);
-  } else {
-    logClickPromise.catch(console.error);
-  }
-
-  return NextResponse.redirect(redirectUrl, 307);
 }

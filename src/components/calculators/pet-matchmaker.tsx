@@ -62,28 +62,28 @@ export function PetMatchmaker() {
     setIsLoading(true);
     
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 seconds timeout
+      const response = await fetch(`/api/pets/search?type=dog&limit=3`);
+      if (!response.ok) throw new Error("Failed to fetch pets");
       
-      // Simulate network delay
-      await new Promise(r => setTimeout(r, 1000));
-      clearTimeout(timeoutId);
-
-      // Offline JSON fallback filtering - strict matching (AND) with loose fallback (OR)
+      const data = await response.json();
+      
+      if (data.animals && data.animals.length > 0) {
+        setResults(data.animals.map((animal: any) => ({
+          id: animal.id,
+          name: animal.breeds?.[0]?.name || "Rescue Pet",
+          description: animal.breeds?.[0]?.temperament || "Ready for adoption",
+          url: animal.url
+        })));
+      } else {
+        throw new Error("Empty animals list");
+      }
+    } catch (error: any) {
+      console.warn("API failed. Using local fallback.");
       let matched = t.breeds.filter(b => b.space === space && b.time === time);
       if (matched.length === 0) {
         matched = t.breeds.filter(b => b.space === space || b.time === time);
       }
       setResults(matched.length > 0 ? matched : t.breeds);
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.warn("Petfinder API timeout. Using local fallback JSON.");
-        let matched = t.breeds.filter(b => b.space === space && b.time === time);
-        if (matched.length === 0) {
-          matched = t.breeds.filter(b => b.space === space || b.time === time);
-        }
-        setResults(matched.length > 0 ? matched : t.breeds);
-      }
     } finally {
       setIsLoading(false);
     }
@@ -163,15 +163,34 @@ export function PetMatchmaker() {
           {isLoading ? t.btnSubmitLoading : t.btnSubmit}
         </Button>
 
-        {results && (
+        {isLoading ? (
+          <div className="mt-8 space-y-4 animate-pulse">
+            <div className="h-6 bg-slate-200 rounded w-1/3 mb-4"></div>
+            {[1, 2, 3].map(i => (
+              <div key={i} className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex gap-4">
+                <div className="w-16 h-16 bg-slate-200 rounded-lg shrink-0"></div>
+                <div className="flex-1">
+                  <div className="h-5 bg-slate-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-slate-200 rounded w-3/4 mb-3"></div>
+                  <div className="h-3 bg-brand-blue/20 rounded w-1/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : results && (
           <div className="mt-8 space-y-4">
             <h3 className="text-xl font-bold text-slate-800 border-b pb-2">{t.resultsTitle}</h3>
             {results.map((breed) => (
-              <div key={breed.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                <h4 className="font-bold text-lg text-slate-800 mb-1">{breed.name}</h4>
-                <p className="text-slate-600 text-lg">{breed.description}</p>
-                <div className="mt-3 text-brand-blue font-bold cursor-pointer hover:underline text-sm">
-                  {t.seeInsurance}
+              <div key={breed.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-4">
+                {breed.url && (
+                  <img src={breed.url} alt={breed.name} className="w-16 h-16 object-cover rounded-lg shrink-0" />
+                )}
+                <div>
+                  <h4 className="font-bold text-lg text-slate-800 mb-1">{breed.name}</h4>
+                  <p className="text-slate-600 text-sm line-clamp-2">{breed.description}</p>
+                  <div className="mt-2 text-brand-blue font-bold cursor-pointer hover:underline text-xs">
+                    {t.seeInsurance}
+                  </div>
                 </div>
               </div>
             ))}

@@ -89,7 +89,35 @@ async function getArticleData(slug: string, locale: string) {
   const geminiKey = process.env.GEMINI_API_KEY;
   if (geminiKey) {
     try {
-      const prompt = `Write a highly informative, detailed, 600-word professional article in ${locale === 'id' ? 'Indonesian' : 'English'} for senior citizens about the topic: "${decodedSlug}". Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, bullet lists, and a bold 'Key Expert Tip' block. End the article with a 'Sources & References' section (using an <h2>) listing 2-3 real, authoritative sources (e.g., AARP, NIH, SSA.gov) with HTML links. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
+      const reviewerName = articleDetails.expertReviewer?.name || "LifeBloom Editorial Board";
+      const reviewerTitle = articleDetails.category === 'health' ? "Geriatric Medicine Specialist" : 
+                            articleDetails.category === 'finance' ? "Certified Financial Planner" : 
+                            articleDetails.category === 'tech' ? "Certified Smart Home Technology Analyst" : 
+                            "Senior Accessibility Curators";
+      
+      const prompt = `You are a professional, expert editor at LifeBloom Hub. Write a highly informative, detailed, 600-word professional article in ${locale === 'id' ? 'Indonesian' : 'English'} for senior citizens about the topic: "${decodedSlug}". 
+      
+Instructions:
+1. Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, and bullet lists.
+2. Incorporate a beautiful verification note reflecting that this article content is reviewed by the designated expert.
+   Reviewer details: Name: "${reviewerName}", Title: "${reviewerTitle}".
+   Wrap this block inside a custom styling structure:
+   <div class="expert-verification-box p-5 my-6 bg-emerald-50/50 border border-emerald-200/50 rounded-2xl">
+     <strong class="font-bold text-xs uppercase tracking-wider text-emerald-800 block mb-1">Verified Expert Review:</strong>
+     <p class="text-sm text-slate-600 mb-0">"Designated advice is reviewed by <strong>${reviewerName}</strong> (${reviewerTitle}) to ensure clinical/financial compliance. Always consult a certified professional for personalized guidance."</p>
+   </div>
+3. End the article with a 'Sources & References' section (using an <h2>) listing 2-3 real, authoritative sources (e.g., AARP, NIH, SSA.gov) with HTML links. The links MUST have rel="nofollow noopener noreferrer" target="_blank" as a security boundary.
+4. Internal Linking Strategy: You MUST inject at least 1-2 semantic internal HTML anchor links to our tools when relevant keywords appear.
+   Strict mapping (always prepend '/${locale}' to the link):
+   - /${locale}/money-future/retirement-planner (Triggers: retirement, pensiun, dana pensiun)
+   - /${locale}/money-future/yield-radar (Triggers: yield, deposito, obligasi, imbal hasil)
+   - /${locale}/pet-family/canine-symptom-checker (Triggers: dog symptom, anjing sakit, vet checklist)
+   - /${locale}/senior/drug-checker (Triggers: drug checker, interaksi obat, obat resep, side effects)
+   - /${locale}/senior/mobility-planner (Triggers: mobility, fall prevention, mencegah jatuh)
+   - /${locale}/travel/trip-planner (Triggers: trip planner, travel budget, accessible travel)
+   - /${locale}/home-living/budget-renovator (Triggers: renovation, renovasi, budget rumah)
+   - /${locale}/home-living/smart-matcher (Triggers: smart home, matter protocol, perangkat pintar)
+5. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
       
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,

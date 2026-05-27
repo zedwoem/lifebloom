@@ -1,37 +1,31 @@
 import { NextResponse } from 'next/server';
-import { fetchWithTimeout } from '@/lib/utils/apiTimeout';
+import { z } from 'zod';
+import { RescueGroupsService } from '@/lib/services/rescueGroupsService';
+import { secureLogger } from '@/lib/utils/secureLogger';
+
+const PetSearchSchema = z.object({
+  type: z.enum(['dog', 'cat']).default('dog'),
+  limit: z.coerce.number().min(1).max(50).default(10)
+});
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const animalType = searchParams.get('type') || 'dog'; // 'dog' or 'cat'
-  const limit = searchParams.get('limit') || '10';
-
   try {
-    let apiUrl = '';
-    let apiKey = '';
+    const { searchParams } = new URL(req.url);
+    const parsedParams = PetSearchSchema.parse({
+      type: searchParams.get('type') || undefined,
+      limit: searchParams.get('limit') || undefined
+    });
 
-    if (animalType === 'cat') {
-      apiUrl = `https://api.thecatapi.com/v1/images/search?limit=${limit}&has_breeds=1`;
-      apiKey = process.env.THECATAPI_KEY || '';
-    } else {
-      apiUrl = `https://api.thedogapi.com/v1/images/search?limit=${limit}&has_breeds=1`;
-      apiKey = process.env.THEDOGAPI_KEY || '';
-    }
-    
-    const fallbackData = [
-      { id: 'fb1', url: '', breeds: [{ name: 'Local Fallback Dog', breed_group: 'Mixed', temperament: 'Friendly' }] }
-    ];
+    // Isolated service layer call with strictly typed TS interfaces
+    const animals = await RescueGroupsService.searchPets({
+      animalType: parsedParams.type,
+      limit: parsedParams.limit
+    });
 
-    const options = {
-      headers: {
-        'x-api-key': apiKey
-      }
-    };
-
-    const data = await fetchWithTimeout<any>(apiUrl, options, 4000, fallbackData);
-
-    return NextResponse.json({ animals: data });
+    return NextResponse.json({ animals });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    secureLogger.error("Pet search route error", error);
+    // Prevent sensitive backend trace leakage
+    return NextResponse.json({ error: "PET_SEARCH_FAILED", animals: [] }, { status: 400 });
   }
 }
