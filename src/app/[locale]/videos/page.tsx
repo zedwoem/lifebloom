@@ -24,7 +24,7 @@ function VideoHubContent() {
 
   useEffect(() => {
     const fetchVideos = async () => {
-      const data = await getAllVideos();
+      const data = await getAllVideos(12);
       setVideos(data);
       if (data.length > 0) {
         if (videoSlug) {
@@ -79,7 +79,7 @@ function VideoHubContent() {
             
             <VideoPlayer 
               key={activeVideo.id} // Force remount on video change
-              videoId={activeVideo.id}
+              videoId={activeVideo.embed_id || activeVideo.id}
               platform="youtube"
               transcripts={activeVideo.transcripts}
             />
@@ -100,10 +100,17 @@ function VideoHubContent() {
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer group hover:shadow-lg transition-all hover:border-brand-green/30"
               >
                 {/* Thumbnail Placeholder */}
-                <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 relative flex items-center justify-center">
-                  <PlayCircle className="w-12 h-12 text-white/50 group-hover:text-brand-green group-hover:scale-110 transition-all" />
-                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
-                    5:00
+                <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 relative flex items-center justify-center overflow-hidden">
+                  {video.embed_id ? (
+                    <img 
+                      src={`https://img.youtube.com/vi/${video.embed_id}/hqdefault.jpg`} 
+                      alt={video.title} 
+                      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
+                    />
+                  ) : null}
+                  <PlayCircle className="w-12 h-12 text-white/90 group-hover:text-brand-green group-hover:scale-110 transition-all relative z-10 drop-shadow-md" />
+                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded z-20">
+                    Play
                   </div>
                 </div>
                 <div className="p-5">
