@@ -17,7 +17,8 @@ import {
   Terminal,
   Database,
   Sliders,
-  Send
+  Send,
+  TrendingUp
 } from "lucide-react";
 import { toast } from "sonner";
 import { HydrationGuard } from "@/components/ui/hydration-guard";
@@ -318,7 +319,26 @@ export default function AdminPage() {
                   Buka Autopost Center
                 </button>
               </Link>
+              {/* Box 10: Affiliate Analytics */}
+            <div className="group bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between min-h-[260px]">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <TrendingUp className="w-32 h-32 text-[#006948]" />
+              </div>
+              <div>
+                <div className="w-12 h-12 bg-[#f5fff7] rounded-2xl flex items-center justify-center mb-6 border border-[#006948]/10">
+                  <TrendingUp className="w-6 h-6 text-[#006948]" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>AFFILIATE ANALYTICS</h3>
+                <p className="text-slate-500 text-lg mb-8 max-w-[85%]">Monitor clicks, conversions, and revenue across all affiliate networks (Travelpayouts, Awin, Boldin, dll).</p>
+              </div>
+              <Link href={`/admin/affiliate-analytics`}>
+                <button className="self-start px-6 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 focus:ring-4 focus:ring-[#68dba9]/30 outline-none">
+                  Revenue Dashboard
+                </button>
+              </Link>
             </div>
+
+          </div>
 
           </div>
 

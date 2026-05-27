@@ -48,7 +48,7 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
       copyLink: "Copy SmartLink",
       copied: "Copied!",
       copyEmbed: "Copy Embed Code",
-      toolsRecommendation: "Interactive Recommendations",
+      toolsRecommendation: "Targeted Smart Utilities",
       toolsSubtitle: "Put these learnings into practice with our custom-engineered expert calculators:",
       relatedTitle: "More from this Series",
       relatedSubtitle: "Keep expanding your expertise with related masterclasses.",
@@ -162,7 +162,11 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
     if (success) {
       setReactionState(prev => [...prev, type]);
       const toastText = type === "helpful" ? t.helpfulToast : type === "insightful" ? t.insightfulToast : t.loveToast;
-      const toastIcon = type === "helpful" ? "👍" : type === "insightful" ? "💡" : "❤️";
+      const toastIcon = type === "helpful" 
+        ? <ThumbsUp className="w-5 h-5 text-emerald-600" /> 
+        : type === "insightful" 
+          ? <Lightbulb className="w-5 h-5 text-amber-500" /> 
+          : <Heart className="w-5 h-5 text-rose-500 fill-current" />;
       toast.success(toastText, { icon: toastIcon });
     }
   };

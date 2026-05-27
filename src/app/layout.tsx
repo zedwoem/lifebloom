@@ -7,6 +7,7 @@ import '@/styles/globals.css';
 export const revalidate = 60; // Revalidate all pages every 60 seconds (ISR)
 
 import { Metadata } from 'next';
+import Script from 'next/script';
 
 export async function generateMetadata({}): Promise<Metadata> {
   
@@ -71,8 +72,7 @@ export async function generateMetadata({}): Promise<Metadata> {
 }
 
 import Image from 'next/image';
-import { StructuredData } from '@/components/seo/StructuredData';
-import { WebSite, WithContext } from 'schema-dts';
+import { UnifiedStructuredData } from '@/components/seo/UnifiedStructuredData';
 
 import { GlobalSearch } from '@/components/ui/global-search';
 import { LayoutDashboard, Home, Search, LifeBuoy } from 'lucide-react';
@@ -80,6 +80,8 @@ import OnboardingOverlay from '@/components/ui/onboarding-overlay';
 import { NavbarUserStatus } from '@/components/ui/navbar-user-status';
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'sonner';
+import fs from 'fs';
+import path from 'path';
 
 export default async function RootLayout({
   children
@@ -87,39 +89,56 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
 
-  const websiteSchema: WithContext<WebSite> = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'LifeBloom Hub',
-    url: process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app'}/search?q={search_term_string}`,
-      'query-input': 'required name=search_term_string'
-    } as any
-  };
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app';
+
+  // [Zero-Cost FinOps] Read pre-computed Master Entity Graph (O(1) LCP < 1s)
+  let seoGraph = null;
+  try {
+    const graphPath = path.join(process.cwd(), 'public', 'data', 'seo-graph.json');
+    if (fs.existsSync(graphPath)) {
+      seoGraph = JSON.parse(fs.readFileSync(graphPath, 'utf8'));
+    }
+  } catch (err) {
+    console.warn("Failed to load seo-graph.json", err);
+  }
 
   return (
     <html lang="en" className="scroll-smooth">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <link rel="preconnect" href="https://pusqytkxmoytvmajjodb.supabase.co" />
+        <link rel="preconnect" href="https://cdn.onesignal.com" />
+        <link rel="preconnect" href="https://onesignal.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
         <meta name="theme-color" content="#1E3A8A" />
-        <StructuredData data={websiteSchema} />
+        <UnifiedStructuredData 
+          currentUrl={appUrl} 
+          pageTitle="LifeBloom Hub — Inclusive High-Yield Lifestyle Utility Platform"
+          pageDescription="LifeBloom Hub is an all-inclusive automated high-yield utility platform with smart tools for smart living, accessible travel, retirement planning, pet safety, and peer-reviewed medical checking."
+          locale="en"
+          entityType="WebSite"
+        />
+
+        {seoGraph && (
+          <script
+            type="application/json"
+            id="master-seo-entity-graph"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(seoGraph) }}
+          />
+        )}
         
         {/* Custom Meta & Scripts */}
         <meta name="impact-site-verification" content="c188c067-926f-4925-8c8b-e04b15769573" />
         <meta name="impact-site-verification" content="ca6b1edc-0537-4c76-89fe-cbb058b59229" />
         <meta name="google-site-verification" content="BsuKe58zHtvtyw7zN_tK9zTo_ZDK7qW533ds7-uoPEg" />
-        <script
-          {...{ nowprocket: "true" }}
-          data-noptimize="1"
-          data-cfasync="false"
-          data-wpfc-render="false"
-          {...{ "seraph-accel-crit": "1" }}
-          data-no-defer="1"
+        <Script
+          id="emrld-script"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
@@ -136,7 +155,9 @@ export default async function RootLayout({
         {process.env.IMPACT_VERIFICATION_TAG && (
           <meta name="impact-site-verification" content={process.env.IMPACT_VERIFICATION_TAG} />
         )}
-        <script
+        <Script
+          id="travelpayouts-script"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               // Travelpayouts Integration
@@ -227,8 +248,10 @@ export default async function RootLayout({
         />
         
         {/* OneSignal Setup */}
-        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-        <script
+        <Script id="onesignal-sdk" src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" strategy="lazyOnload" />
+        <Script
+          id="onesignal-init"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -294,7 +317,9 @@ export default async function RootLayout({
         <NextTopLoader color="#10B981" showSpinner={false} />
         <Toaster position="bottom-right" richColors />
 
-        <script
+        <Script
+          id="sw-register"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator) {

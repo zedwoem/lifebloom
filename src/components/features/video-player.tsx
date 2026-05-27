@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useMemo } from "react";
-import ReactPlayer from "react-player";
+import dynamic from "next/dynamic";
 import { Maximize2, Minimize2, Play, AlertCircle, Volume2, Type } from "lucide-react";
+
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 export interface TranscriptLine {
   start: number; // in seconds
@@ -182,6 +184,7 @@ export default function VideoPlayer({
             onClick={() => setIsCinemaMode(!isCinemaMode)}
             className="flex items-center justify-center w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-all"
             title={isCinemaMode ? "Exit Cinema Mode" : "Enter Cinema Mode"}
+            aria-label={isCinemaMode ? "Exit Cinema Mode" : "Enter Cinema Mode"}
           >
             {isCinemaMode ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
           </button>
@@ -214,6 +217,7 @@ export default function VideoPlayer({
                 onClick={() => setTextSize("normal")}
                 className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${textSize === "normal" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
                 title="Small Text"
+                aria-label="Small Text"
               >
                 A
               </button>
@@ -221,6 +225,7 @@ export default function VideoPlayer({
                 onClick={() => setTextSize("large")}
                 className={`w-7 h-7 flex items-center justify-center rounded-lg text-sm font-bold transition-all ${textSize === "large" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
                 title="Medium Text"
+                aria-label="Medium Text"
               >
                 A+
               </button>
@@ -228,6 +233,7 @@ export default function VideoPlayer({
                 onClick={() => setTextSize("extra")}
                 className={`w-7 h-7 flex items-center justify-center rounded-lg text-base font-extrabold transition-all ${textSize === "extra" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
                 title="Large Text"
+                aria-label="Large Text"
               >
                 A++
               </button>

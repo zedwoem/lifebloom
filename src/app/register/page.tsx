@@ -10,6 +10,7 @@ import Link from "next/link";
 export default function RegisterPage() {
   const { user, signInWithMagicLink, loading, signUpWithEmailPassword } = useAuth();
   const router = useRouter();
+  const locale = "en";
   
   // Form States
   const [email, setEmail] = useState("");

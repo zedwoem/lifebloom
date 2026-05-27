@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   totalValue: { fontSize: 18, fontWeight: 'bold', color: '#16a34a' }
 });
 
-const BudgetPDF = ({ area, costPerSqm, contingency, total, t }: any) => (
+const BudgetPDF = ({ area, costPerSqm, contingency, total }: any) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>Home Renovation Budget Plan</Text>
@@ -64,7 +64,7 @@ export function HomeBudgetCalculator() {
   const handleDownloadPDF = async () => {
     setIsGenerating(true);
     try {
-      const blob = await pdf(<BudgetPDF area={area} costPerSqm={costPerSqm} contingency={contingency} total={total} t={t} />).toBlob();
+      const blob = await pdf(<BudgetPDF area={area} costPerSqm={costPerSqm} contingency={contingency} total={total} />).toBlob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

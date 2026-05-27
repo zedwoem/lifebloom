@@ -3,24 +3,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ShieldCheck, LifeBuoy, FileText } from "lucide-react";
+import { BookOpen, ShieldCheck, LifeBuoy, FileText, Info, Mail } from "lucide-react";
 
 export default function SupportLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const locale = "en";
-
-  // Note: if localePrefix is 'as-needed', the default locale ('en') might not appear in pathname.
-  // Using next-intl Link is usually safer, but since we use next/link with manual prefixes, 
-  // we must ensure the locale is correctly prepended only if we want explicit paths, or just let next-intl's Link handle it.
-  // Actually, since we're using localePrefix: 'as-needed', it's better to just use relative or next-intl Link.
-  // We'll stick to manual for now, but locale is guaranteed correct now.
-  const localePath = locale === 'en' ? '' : ``;
 
   const MENU = [
-    { name: "Help Desk", href: `${localePath}/support`, icon: <LifeBuoy className="w-5 h-5" /> },
-    { name: "Terms of Service", href: `${localePath}/support/terms`, icon: <FileText className="w-5 h-5" /> },
-    { name: "Privacy Policy", href: `${localePath}/support/privacy`, icon: <ShieldCheck className="w-5 h-5" /> },
-    { name: "Knowledge Base", href: `${localePath}/support/knowledge`, icon: <BookOpen className="w-5 h-5" /> },
+    { name: "About LifeBloom", href: "/about", icon: <Info className="w-5 h-5" /> },
+    { name: "Help Desk", href: "/support", icon: <LifeBuoy className="w-5 h-5" /> },
+    { name: "Contact Support", href: "/support/contact", icon: <Mail className="w-5 h-5" /> },
+    { name: "Terms of Service", href: "/support/terms", icon: <FileText className="w-5 h-5" /> },
+    { name: "Privacy Policy", href: "/support/privacy", icon: <ShieldCheck className="w-5 h-5" /> },
+    { name: "Knowledge Base", href: "/support/knowledge", icon: <BookOpen className="w-5 h-5" /> },
   ];
 
   return (

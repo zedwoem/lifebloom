@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 const TRANSLATIONS = {
   en: {
@@ -188,9 +189,9 @@ export function PetMatchmaker() {
                 <div>
                   <h4 className="font-bold text-lg text-slate-800 mb-1">{breed.name}</h4>
                   <p className="text-slate-600 text-sm line-clamp-2">{breed.description}</p>
-                  <div className="mt-2 text-brand-blue font-bold cursor-pointer hover:underline text-xs">
+                  <Link href="/support/privacy" className="mt-2 block text-brand-blue font-bold hover:underline text-xs">
                     {t.seeInsurance}
-                  </div>
+                  </Link>
                 </div>
               </div>
             ))}

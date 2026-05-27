@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { AccessibleTripPlanner } from "@/components/calculators/trip-planner";
-import { TravelpayoutsWidget } from "@/components/calculators/travel-widget";
 import { DynamicNewsFeed } from '@/components/content/dynamic-news-feed';
 import { PillarVideoSection } from '@/components/content/pillar-video-section';
 
@@ -59,9 +58,6 @@ export default async function PillarPage({
           <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
             <AccessibleTripPlanner />
           </div>
-          
-          {/* Travelpayouts Flight & Hotel Search Widget */}
-          <TravelpayoutsWidget />
         </section>
 
         {/* Dynamic Video Section */}

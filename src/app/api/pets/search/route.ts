@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { RescueGroupsService } from '@/lib/services/rescueGroupsService';
+import { PetAPIService } from '@/lib/services/petAPIService';
 import { secureLogger } from '@/lib/utils/secureLogger';
 
 const PetSearchSchema = z.object({
@@ -16,16 +17,39 @@ export async function GET(req: Request) {
       limit: searchParams.get('limit') || undefined
     });
 
-    // Isolated service layer call with strictly typed TS interfaces
-    const animals = await RescueGroupsService.searchPets({
-      animalType: parsedParams.type,
-      limit: parsedParams.limit
-    });
+    const isDog = parsedParams.type === 'dog';
+    const limit = parsedParams.limit;
+
+    // Try fetching high-quality breed imagery from PetAPIService first
+    let premiumBreeds = [];
+    if (isDog) {
+      premiumBreeds = await PetAPIService.getDogBreeds(limit);
+    } else {
+      premiumBreeds = await PetAPIService.getCatBreeds(limit);
+    }
+
+    // Map premium breeds to the expected response format
+    let animals: any[] = premiumBreeds.map(b => ({
+      id: b.id,
+      url: b.image_url,
+      breeds: [{
+        name: b.name,
+        breed_group: b.description,
+        temperament: b.temperament
+      }]
+    }));
+
+    // If premium APIs return nothing, fallback to RescueGroups API
+    if (animals.length === 0) {
+      animals = await RescueGroupsService.searchPets({
+        animalType: parsedParams.type,
+        limit: limit
+      });
+    }
 
     return NextResponse.json({ animals });
   } catch (error: any) {
     secureLogger.error("Pet search route error", error);
-    // Prevent sensitive backend trace leakage
     return NextResponse.json({ error: "PET_SEARCH_FAILED", animals: [] }, { status: 400 });
   }
 }
