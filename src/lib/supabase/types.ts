@@ -295,6 +295,42 @@ export type Database = {
         }
         Relationships: []
       }
+      autopost_logs: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          error_message: string | null
+          hook_text: string | null
+          id: string
+          platform: string
+          post_url: string | null
+          status: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          error_message?: string | null
+          hook_text?: string | null
+          id?: string
+          platform: string
+          post_url?: string | null
+          status: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          error_message?: string | null
+          hook_text?: string | null
+          id?: string
+          platform?: string
+          post_url?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       b2b_placements: {
         Row: {
           contract_end: string
@@ -432,7 +468,10 @@ export type Database = {
           image_url: string | null
           ingested_at: string
           pillar: string | null
+          processing_error: string | null
+          processing_status: string
           published_at: string | null
+          raw_scraped_content: string | null
           slug: string
           source_hash: string
           source_url: string | null
@@ -444,7 +483,10 @@ export type Database = {
           image_url?: string | null
           ingested_at?: string
           pillar?: string | null
+          processing_error?: string | null
+          processing_status?: string
           published_at?: string | null
+          raw_scraped_content?: string | null
           slug: string
           source_hash: string
           source_url?: string | null
@@ -456,7 +498,10 @@ export type Database = {
           image_url?: string | null
           ingested_at?: string
           pillar?: string | null
+          processing_error?: string | null
+          processing_status?: string
           published_at?: string | null
+          raw_scraped_content?: string | null
           slug?: string
           source_hash?: string
           source_url?: string | null
