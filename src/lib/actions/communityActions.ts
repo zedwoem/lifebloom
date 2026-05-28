@@ -1,6 +1,7 @@
 "use server";
 
-import { createClient, createPoolClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
+import { createPoolClient } from "@/lib/supabase/pooler";
 import { revalidatePath } from "next/cache";
 import DOMPurify from 'isomorphic-dompurify';
 import { z } from "zod";

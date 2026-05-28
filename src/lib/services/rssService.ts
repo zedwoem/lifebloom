@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import { PILLARS } from '@/lib/constants/pillars';
-import nlp from 'compromise';
 import { createServiceClient } from '@/lib/supabase/server';
 import Parser from 'rss-parser';
 import { AutopostService, IngestedItem } from '@/lib/services/autopostService';
@@ -94,13 +93,6 @@ function generateHash(title: string, link: string): string {
   return crypto.createHash('sha256').update(normalizedStr).digest('hex');
 }
 
-function cleanContent(rawText: string): string {
-  if (!rawText) return '';
-  const noHtml = rawText.replace(/<[^>]*>?/gm, '');
-  const doc = nlp(noHtml);
-  doc.normalize({ whitespace: true, punctuation: true, case: false, unicode: true });
-  return doc.text();
-}
 
 function slugify(title: string, hashId: string): string {
   const base = title

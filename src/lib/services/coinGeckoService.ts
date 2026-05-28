@@ -1,5 +1,6 @@
 import { fetchWithTimeout } from "@/lib/utils/apiTimeout";
 import { secureLogger } from "@/lib/utils/secureLogger";
+import { redis } from "@/lib/upstash";
 
 export interface CoinPriceResult {
   usdPrice: number;
@@ -64,6 +65,14 @@ export class CoinGeckoService {
    * Fetches the current simple price of a coin/asset (e.g. 'bitcoin', 'ethereum')
    */
   static async getAssetPrice(assetId: string): Promise<CoinPriceResult> {
+    const cacheKey = `cg:price:${assetId}`;
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) return typeof cached === 'string' ? JSON.parse(cached) : cached;
+    } catch (e) {
+      secureLogger.error('Upstash Redis cache read failed', e);
+    }
+
     const url = `${this.baseUrl}/simple/price?ids=${assetId}&vs_currencies=usd&include_24hr_change=true`;
     
     try {
@@ -73,11 +82,20 @@ export class CoinGeckoService {
       }, 4000);
       
       if (response && response[assetId]) {
-        return {
+        const result = {
           usdPrice: response[assetId].usd,
           change24h: response[assetId].usd_24h_change || 0,
           lastUpdated: new Date().toISOString()
         };
+
+        try {
+          // Cache for 15 minutes to aggressively save free-tier limits
+          await redis.set(cacheKey, JSON.stringify(result), { ex: 900 });
+        } catch (e) {
+          secureLogger.error('Upstash Redis cache write failed', e);
+        }
+
+        return result;
       }
       throw new Error(`Invalid CoinGecko response for asset: ${assetId}`);
     } catch (error: any) {

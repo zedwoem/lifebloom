@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EmbedGenerator } from '@/components/ui/embed-generator';
 import { AlertCircle, FileText, Plus, X } from 'lucide-react';
+import { ContextualPartnerCard } from '@/components/features/ContextualPartnerCard';
+import { fetchRecommendations } from '@/lib/actions/monetizationActions';
+import type { ScoredProduct } from '@/lib/services/contextualMatcherService';
 import { Document, Page, Text, View, StyleSheet, pdf, Link as PdfLink } from '@react-pdf/renderer';
 
 const pdfStyles = StyleSheet.create({
@@ -53,6 +56,7 @@ export function DrugInteractionChecker() {
   const [drugs, setDrugs] = useState<string[]>(['Lisinopril', 'Ibuprofen']);
   const [newDrug, setNewDrug] = useState('');
   const [result, setResult] = useState<{ severity: 'Low' | 'Medium' | 'High', description: string } | null>(null);
+  const [recommendations, setRecommendations] = useState<ScoredProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useTrackView('senior/drug-checker', 'tool', 'Drug Interaction Checker', 'senior');
@@ -74,7 +78,11 @@ export function DrugInteractionChecker() {
     if (drugs.length < 2) return;
     setIsLoading(true);
     try {
-      const res = await checkMultiDrugInteractions(drugs);
+      const [res, recs] = await Promise.all([
+        checkMultiDrugInteractions(drugs),
+        fetchRecommendations('senior', 'drug-interaction-checker', { drugsCount: drugs.length }, 1)
+      ]);
+      setRecommendations(recs);
       if (res) {
         setResult(res);
       } else {
@@ -196,6 +204,16 @@ export function DrugInteractionChecker() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {recommendations.length > 0 && (
+          <div className="mt-6 animate-fade-in-up">
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Rekomendasi Ahli</h3>
+            <ContextualPartnerCard 
+              product={recommendations[0]} 
+              calculatorSlug="drug-interaction-checker" 
+            />
           </div>
         )}
 

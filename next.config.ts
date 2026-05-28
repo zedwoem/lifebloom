@@ -25,7 +25,9 @@ const nextConfig = {
       { protocol: 'https' as const, hostname: 'm.media-amazon.com' },
       { protocol: 'https' as const, hostname: 'images.unsplash.com' },
       { protocol: 'https' as const, hostname: 'api.qrserver.com' },
-      { protocol: 'https' as const, hostname: 'ui-avatars.com' }
+      { protocol: 'https' as const, hostname: 'ui-avatars.com' },
+      { protocol: 'https' as const, hostname: 'pusqytkxmoytvmajjodb.supabase.co' },
+      { protocol: 'https' as const, hostname: 'www.awin1.com' }
     ],
   },
   async headers() {
@@ -49,6 +51,7 @@ export default withSentryConfig(
     org: "zedwoem",
     project: "javascript-nextjs",
     silent: !process.env.CI,
+    hideSourceMaps: true,
     widenClientFileUpload: true,
     tunnelRoute: "/monitoring",
     webpack: {

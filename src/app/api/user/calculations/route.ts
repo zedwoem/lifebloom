@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { Ratelimit } from "@upstash/ratelimit";
+import { redis } from "@/lib/upstash";
 
 export async function POST(req: Request) {
   try {
@@ -28,21 +30,26 @@ export async function POST(req: Request) {
     }
 
     // Pemicu Gamifikasi: awardPoints (+15 Bloom Points)
-    // Dijalankan secara asinkron tanpa memblokir respon ke pengguna
-    const awardPointsPromise = (async () => {
-      const { error } = await supabase.rpc("award_points_secure", {
-        user_id_param: user.id,
-        amount: 15
-      });
-      if (error) {
-        console.error("[Calculations Gamification Error]:", error.message);
-      }
-    })();
+    // Terapkan perlindungan Race Condition: Maksimal 3 kali per hari per user.
+    const ratelimit = new Ratelimit({
+      redis: redis,
+      limiter: Ratelimit.slidingWindow(3, "24 h"),
+    });
 
-    if (typeof (req as any).waitUntil === 'function') {
-      (req as any).waitUntil(awardPointsPromise);
+    const { success: rateLimitSuccess } = await ratelimit.limit(`gamification_${user.id}_${calculatorSlug}`);
+
+    if (rateLimitSuccess) {
+      after(async () => {
+        const { error } = await supabase.rpc("award_points_secure", {
+          user_id_param: user.id,
+          amount: 15
+        });
+        if (error) {
+          console.error("[Calculations Gamification Error]:", error.message);
+        }
+      });
     } else {
-      awardPointsPromise.catch(console.error);
+      console.log(`[Gamification RateLimit] User ${user.id} reached daily cap for ${calculatorSlug}`);
     }
 
     return NextResponse.json({ 

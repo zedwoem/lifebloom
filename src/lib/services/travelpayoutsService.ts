@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { secureLogger } from '@/lib/utils/secureLogger';
+import { redis } from '@/lib/upstash';
 
 interface FlightPriceResponse {
   airline: string;
@@ -43,6 +44,14 @@ export class TravelpayoutsService {
     const startTime = Date.now();
     const cleanOrigin = origin.toUpperCase().trim();
     const cleanDest = destination.toUpperCase().trim();
+
+    const cacheKey = `tp:flights:${cleanOrigin}:${cleanDest}:${departDate || 'any'}:${returnDate || 'any'}`;
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) return typeof cached === 'string' ? JSON.parse(cached) : cached;
+    } catch (e) {
+      secureLogger.error('Upstash Redis read error', e);
+    }
 
     try {
       // 1. Query Database Cache First (Filter by direct=true and check expiration TTL)
@@ -161,7 +170,13 @@ export class TravelpayoutsService {
           });
       }
 
-      return deals.slice(0, 3);
+      const finalDeals = deals.slice(0, 3);
+      try {
+        // Cache for 6 hours in Redis
+        await redis.set(cacheKey, JSON.stringify(finalDeals), { ex: 21600 });
+      } catch (e) {}
+
+      return finalDeals;
 
     } catch (error: any) {
       secureLogger.error('Travelpayouts Service Error:', error);
