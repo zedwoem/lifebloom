@@ -405,9 +405,7 @@ export async function generateMetadata({
         languages: {
           'x-default': `/en/article/${slug}`,
           'en': `/en/article/${slug}`,
-          'id': `/id/article/${slug}`,
-          'es': `/es/article/${slug}`,
-        }
+                            }
       },
       openGraph: {
         title: `${article.title} | LifeBloom Hub`,

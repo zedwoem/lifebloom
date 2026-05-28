@@ -48,9 +48,7 @@ export async function generateMetadata({
       languages: {
         'x-default': `/en/support/${doc}`,
         'en': `/en/support/${doc}`,
-        'id': `/id/support/${doc}`,
-        'es': `/es/support/${doc}`,
-      }
+                      }
     }
   };
 }

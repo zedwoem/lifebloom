@@ -22,20 +22,18 @@ export async function generateMetadata({
   };
 
   return {
-    title: titles[locale] || titles.en,
-    description: descriptions[locale] || descriptions.en,
+    title: titles.en,
+    description: descriptions.en,
     alternates: {
       canonical: '/videos',
       languages: {
         'x-default': '/en/videos',
         'en': '/en/videos',
-        'id': '/id/videos',
-        'es': '/es/videos',
-      }
+                      }
     },
     openGraph: {
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       url: `https://lifebloomhub.vercel.app/videos`,
       type: 'website',
       images: [

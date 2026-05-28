@@ -47,7 +47,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
   const triggerRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale as string || 'en';
+  const locale = "en";
 
   // Initial fetch of dynamic trending data
   useEffect(() => {

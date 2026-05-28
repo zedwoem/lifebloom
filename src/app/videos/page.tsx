@@ -39,9 +39,7 @@ export async function generateMetadata({
       languages: {
         'x-default': `/en/videos`,
         'en': `/en/videos`,
-        'id': `/id/videos`,
-        'es': `/es/videos`,
-      }
+                      }
     },
     openGraph: {
       title: t.title,

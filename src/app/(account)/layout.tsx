@@ -13,7 +13,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push(`/${params.locale}/login`);
+      router.push(`/login`);
     }
   }, [user, loading, router, params.locale]);
 

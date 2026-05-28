@@ -49,9 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         'x-default': `/en/videos/${slug}`,
         'en': `/en/videos/${slug}`,
-        'id': `/id/videos/${slug}`,
-        'es': `/es/videos/${slug}`,
-      }
+                      }
     },
     openGraph: {
       title: `${video.title} | LifeBloom Academy`,

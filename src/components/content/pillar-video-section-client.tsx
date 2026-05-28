@@ -34,7 +34,7 @@ export function PillarVideoSectionClient({ videos, locale }: PillarVideoSectionC
               {'Video Guides & Masterclasses'}
             </h2>
             <p className="text-slate-500 text-sm font-medium">
-              {locale === 'id' ? 'Tonton penjelasan interaktif dari para pakar kami.' : 'Watch comprehensive walkthroughs by our trusted experts.'}
+              {'Watch comprehensive walkthroughs by our trusted experts.'}
             </p>
           </div>
         </div>

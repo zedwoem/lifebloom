@@ -33,21 +33,19 @@ export async function generateMetadata({}): Promise<Metadata> {
   const ogImage = `${baseUrl}/images/tools/budget-renovator-og.png`;
 
   return {
-    title: titles[locale] || titles.en,
-    description: descriptions[locale] || descriptions.en,
+    title: titles.en,
+    description: descriptions.en,
     keywords: toolKeywords,
     alternates: {
       canonical: '/home-living/budget-renovator',
       languages: {
         'x-default': '/en/home-living/budget-renovator',
         'en': '/en/home-living/budget-renovator',
-        'id': '/id/home-living/budget-renovator',
-        'es': '/es/home-living/budget-renovator',
-      }
+                      }
     },
     openGraph: {
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       url: `${baseUrl}/home-living/budget-renovator`,
       type: 'website',
       images: [
@@ -55,14 +53,14 @@ export async function generateMetadata({}): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: titles[locale] || titles.en
+          alt: titles.en
         }
       ]
     },
     twitter: {
       card: 'summary_large_image',
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       images: [ogImage]
     }
   };
@@ -79,17 +77,11 @@ export default async function BudgetRenovatorPage({
   const faqItems = [
     {
       question: "How does the home renovation calculator estimate my costs?",
-      answer: locale === 'id'
-        ? "Kalkulator ini menggunakan tarif rata-rata material dan upah per meter persegi di berbagai area rumah seperti dapur, kamar mandi, atau ruang keluarga untuk merumuskan estimasi anggaran yang mendekati realitas pasar."
-        : "This calculator aggregates typical labor rates and raw material averages per square foot across multiple rooms (like kitchen, bath, or living areas) to compile realistic home renovation budgets."
+      answer: "This calculator aggregates typical labor rates and raw material averages per square foot across multiple rooms (like kitchen, bath, or living areas) to compile realistic home renovation budgets."
     },
     {
-      question: locale === 'id'
-        ? "Dapatkah saya menyimpan atau mengunduh laporan anggaran ini?"
-        : "Can I save or download this renovation budget breakdown?",
-      answer: locale === 'id'
-        ? "Ya. Alat kami dilengkapi dengan fitur ekspor instan di bagian akhir kalkulasi untuk mengunduh rincian anggaran dalam format PDF terstruktur secara gratis."
-        : "Yes. Our tool features an instant export button to compile your calculated renovation cost parameters into a structured, downloadable PDF report for free."
+      question: "Can I save or download this renovation budget breakdown?",
+      answer: "Yes. Our tool features an instant export button to compile your calculated renovation cost parameters into a structured, downloadable PDF report for free."
     }
   ];
 
@@ -98,7 +90,7 @@ export default async function BudgetRenovatorPage({
       <UnifiedStructuredData
         currentUrl={`${baseUrl}/home-living/budget-renovator`}
         pageTitle={'Home Renovation Budget Calculator'}
-        pageDescription={locale === 'id' ? 'Hitung biaya renovasi rumah mandiri Anda secara instan dan unduh berkas laporannya.' : 'Calculate custom house renovation costs dynamically.'}
+        pageDescription={'Calculate custom house renovation costs dynamically.'}
         locale={locale}
         entityType="SoftwareApplication"
         entitySpecificData={{
@@ -118,16 +110,14 @@ export default async function BudgetRenovatorPage({
           href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
-          <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}
+          <ChevronLeft className="w-5 h-5" /> {'Back to Home'}
         </Link>
         <div className="animate-fade-in">
           <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2 Atkinson-font">
-            {locale === 'id' ? 'Kalkulator Anggaran Renovasi' : 'Home Renovation Budget Calculator'}
+            {'Home Renovation Budget Calculator'}
           </h1>
           <p className="text-lg text-slate-500 mb-10">
-            {locale === 'id' 
-              ? 'Hitung perkiraan biaya renovasi rumah mandiri Anda secara instan dan unduh berkas laporannya.'
-              : 'Calculate your home remodeling costs dynamically and download custom budget reports.'}
+            {'Calculate your home remodeling costs dynamically and download custom budget reports.'}
           </p>
           <HydrationGuard fallbackHeight="h-[600px]">
             <HomeBudgetCalculator />

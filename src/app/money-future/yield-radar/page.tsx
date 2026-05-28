@@ -33,21 +33,19 @@ export async function generateMetadata({}): Promise<Metadata> {
   const ogImage = `${baseUrl}/images/tools/yield-radar-og.png`;
 
   return {
-    title: titles[locale] || titles.en,
-    description: descriptions[locale] || descriptions.en,
+    title: titles.en,
+    description: descriptions.en,
     keywords: toolKeywords,
     alternates: {
       canonical: '/money-future/yield-radar',
       languages: {
         'x-default': '/en/money-future/yield-radar',
         'en': '/en/money-future/yield-radar',
-        'id': '/id/money-future/yield-radar',
-        'es': '/es/money-future/yield-radar',
-      }
+                      }
     },
     openGraph: {
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       url: `${baseUrl}/money-future/yield-radar`,
       type: 'website',
       images: [
@@ -55,14 +53,14 @@ export async function generateMetadata({}): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: titles[locale] || titles.en
+          alt: titles.en
         }
       ]
     },
     twitter: {
       card: 'summary_large_image',
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       images: [ogImage]
     }
   };
@@ -79,17 +77,11 @@ export default async function YieldRadarPage({
   const faqItems = [
     {
       question: "How does the Yield Radar help me choose safe investments?",
-      answer: locale === 'id'
-        ? "Yield Radar membandingkan instrumen berisiko rendah seperti Surat Berharga Negara (SBN) dan deposito perbankan yang dijamin LPS, memetakan tingkat pengembalian bersih (net yield) setelah pajak secara transparan."
-        : "The Yield Radar aggregates and compares low-risk vehicles including sovereign government treasury bonds and state-backed fixed deposits, highlighting clean net yields after tax."
+      answer: "The Yield Radar aggregates and compares low-risk vehicles including sovereign government treasury bonds and state-backed fixed deposits, highlighting clean net yields after tax."
     },
     {
-      question: locale === 'id'
-        ? "Seberapa sering data suku bunga diperbarui?"
-        : "How often are the interest rate yields updated?",
-      answer: locale === 'id'
-        ? "Data obligasi negara dan suku bunga dasar deposito diperbarui secara berkala berdasarkan rilis resmi bank sentral dan kementerian keuangan."
-        : "Sovereign treasury rates and baseline bank deposit yields are updated systematically based on central bank releases and official treasury auctions."
+      question: "How often are the interest rate yields updated?",
+      answer: "Sovereign treasury rates and baseline bank deposit yields are updated systematically based on central bank releases and official treasury auctions."
     }
   ];
 
@@ -98,7 +90,7 @@ export default async function YieldRadarPage({
       <UnifiedStructuredData
         currentUrl={`${baseUrl}/money-future/yield-radar`}
         pageTitle={'Real-Time Yield Radar'}
-        pageDescription={locale === 'id' ? 'Perbandingan tingkat imbal hasil obligasi negara dan deposito teratas secara real-time.' : 'Compare yield rates across secure government bonds.'}
+        pageDescription={'Compare yield rates across secure government bonds.'}
         locale={locale}
         entityType="SoftwareApplication"
         entitySpecificData={{
@@ -118,16 +110,14 @@ export default async function YieldRadarPage({
           href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
-          <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}
+          <ChevronLeft className="w-5 h-5" /> {'Back to Home'}
         </Link>
         <div className="animate-fade-in">
           <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2 Atkinson-font">
             Yield Radar
           </h1>
           <p className="text-lg text-slate-500 mb-10">
-            {locale === 'id' 
-              ? 'Perbandingan tingkat imbal hasil obligasi negara dan deposito teratas secara real-time.'
-              : 'Real-time comparisons of sovereign treasury bonds and top high-yield fixed deposits.'}
+            {'Real-time comparisons of sovereign treasury bonds and top high-yield fixed deposits.'}
           </p>
           <HydrationGuard fallbackHeight="h-[400px]">
             <YieldRadar />

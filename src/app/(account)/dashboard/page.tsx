@@ -10,7 +10,7 @@ export default function UnifiedMultiRoleDashboard() {
   const { profile, signOut, loading } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale || "en";
+  const locale = "en";
 
   const activeRole = profile?.role || "user";
 

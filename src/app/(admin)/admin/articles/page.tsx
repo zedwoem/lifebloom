@@ -14,7 +14,7 @@ export default function AdminArticlesPage() {
   const { profile } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale || "en";
+  const locale = "en";
   const supabase = createClient();
 
   const [articles, setArticles] = useState<any[]>([]);

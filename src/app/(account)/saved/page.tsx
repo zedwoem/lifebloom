@@ -27,7 +27,7 @@ export default function UserWorkspacePage() {
   const { profile } = useAuth();
   const { savedItems, loading, toggleSaveItem } = useSavedItems();
   const params = useParams();
-  const locale = params.locale || "en";
+  const locale = "en";
   
   const [textSize, setTextSize] = useState<"A-" | "A" | "A+">("A");
 

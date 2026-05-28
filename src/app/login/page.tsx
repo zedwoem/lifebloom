@@ -10,7 +10,7 @@ export default function LoginPage() {
   const { user, signInWithGoogle, loading, signInWithEmailPassword } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale as string || 'en';
+  const locale = "en";
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");

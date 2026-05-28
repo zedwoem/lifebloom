@@ -416,7 +416,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-bold transition-all hover:scale-110 min-h-[48px] ${isBookmarked ? 'bg-brand-green border-brand-green text-white shadow-lg' : highContrast ? 'border-yellow-300 text-yellow-300 hover:bg-yellow-300 hover:text-black' : 'border-slate-200 text-slate-600 hover:border-brand-green hover:text-brand-green'}`}
           >
             <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} /> 
-            {isBookmarked ? ("Saved") : (locale === 'id' ? "Simpan" : "Save")}
+            {isBookmarked ? ("Saved") : ("Save")}
           </button>
           
           <button 

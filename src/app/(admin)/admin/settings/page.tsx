@@ -14,7 +14,7 @@ export default function AdminSettingsPage() {
   const { profile } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale || "en";
+  const locale = "en";
   const supabase = createClient();
 
   const [settings, setSettings] = useState<any[]>([]);

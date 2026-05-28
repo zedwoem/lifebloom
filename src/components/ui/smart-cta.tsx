@@ -37,7 +37,7 @@ export function SmartCTA({
         setShowModal(true);
       } else {
         // Build return URL or just redirect to login
-        router.push(`/${params.locale}/login`);
+        router.push(`/login`);
       }
     }
   };
@@ -60,7 +60,7 @@ export function SmartCTA({
           <div className="flex flex-col gap-3 mt-6">
             <Button 
               className="w-full text-lg py-6 bg-brand-green hover:bg-brand-green/90"
-              onClick={() => router.push(`/${params.locale}/login`)}
+              onClick={() => router.push(`/login`)}
             >
               Sign In Now
             </Button>

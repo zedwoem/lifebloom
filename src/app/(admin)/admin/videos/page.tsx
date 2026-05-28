@@ -14,7 +14,7 @@ export default function AdminVideosPage() {
   const { profile } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale as string || "en";
+  const locale = "en";
   const supabase = createClient();
 
   const [url, setUrl] = useState("");

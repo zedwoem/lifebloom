@@ -58,7 +58,7 @@ export function DynamicNewsFeedClient({ articles, locale, pillarSlug }: DynamicN
               {'Latest Insights & Expert Articles'}
             </h2>
             <p className={`opacity-80 ${highContrast ? 'text-yellow-300' : 'text-slate-500'}`}>
-              {locale === 'id' ? 'Informasi terpercaya yang dikurasi khusus untuk Anda.' : 'Curated updates tailored for you.'}
+              {'Curated updates tailored for you.'}
             </p>
           </div>
         </div>
@@ -112,7 +112,7 @@ export function DynamicNewsFeedClient({ articles, locale, pillarSlug }: DynamicN
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <span className={`text-sm font-bold uppercase tracking-wider ${highContrast ? 'text-yellow-300' : 'text-brand-green-dark'} ${idx === 0 ? 'bg-brand-green/10 px-3 py-1 rounded-full' : ''}`}>
-                    {idx === 0 ? `🔥 ${locale === 'id' ? 'Utama' : 'Featured'} • ${article.source}` : article.source}
+                    {idx === 0 ? `🔥 ${'Featured'} • ${article.source}` : article.source}
                   </span>
                   <span className={`text-sm opacity-70`}>{article.date}</span>
                 </div>
@@ -124,7 +124,7 @@ export function DynamicNewsFeedClient({ articles, locale, pillarSlug }: DynamicN
                 </p>
               </div>
               <div className={`inline-flex items-center font-bold ${highContrast ? 'text-yellow-300' : 'text-brand-blue group-hover:text-brand-green transition-colors'}`}>
-                {locale === 'id' ? 'Baca Selengkapnya' : 'Read Article'} <ExternalLink className="w-4 h-4 ml-2" />
+                {'Read Article'} <ExternalLink className="w-4 h-4 ml-2" />
               </div>
             </article>
           </Link>

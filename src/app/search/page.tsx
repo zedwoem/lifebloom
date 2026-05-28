@@ -16,7 +16,7 @@ function SearchResultsContent() {
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();
-  const resolvedLocale = (params.locale as string) || 'en';
+  const resolvedLocale = "en";
   
   const initialQuery = searchParams.get('q') || '';
   const [localQuery, setLocalQuery] = useState(initialQuery);

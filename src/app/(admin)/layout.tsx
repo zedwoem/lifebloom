@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!loading) {
       if (!user || profile?.role !== 'admin') {
         // Firewall: Redirect non-admins strictly to standard dashboard
-        router.push(`/${params.locale}/dashboard`);
+        router.push(`/dashboard`);
       }
     }
   }, [user, profile, loading, router, params.locale]);
@@ -44,22 +44,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         
         <nav className="flex flex-col gap-2 flex-1">
-          <Link href={`/${params.locale}/admin`} className="flex items-center gap-3 px-4 py-3 bg-brand-green/20 text-brand-green rounded-xl font-semibold hover:bg-brand-green/30 transition-colors">
+          <Link href={`/admin`} className="flex items-center gap-3 px-4 py-3 bg-brand-green/20 text-brand-green rounded-xl font-semibold hover:bg-brand-green/30 transition-colors">
             <LayoutDashboard className="w-5 h-5" /> Dashboard
           </Link>
-          <button className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
-            <Users className="w-5 h-5" /> User Management
-          </button>
-          <button className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
-            <Activity className="w-5 h-5" /> Analytics Logs
-          </button>
-          <button className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
-            <Settings className="w-5 h-5" /> Platform Config
-          </button>
+          <Link href={`/admin/users`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Users className="w-5 h-5" /> Users
+          </Link>
+          <Link href={`/admin/comments`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Activity className="w-5 h-5" /> Comments
+          </Link>
+          <Link href={`/admin/articles`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Activity className="w-5 h-5" /> Articles
+          </Link>
+          <Link href={`/admin/videos`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Activity className="w-5 h-5" /> Videos
+          </Link>
+          <Link href={`/admin/autopost`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Settings className="w-5 h-5" /> Autopost
+          </Link>
+          <Link href={`/admin/sources`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Settings className="w-5 h-5" /> RSS Sources
+          </Link>
+          <Link href={`/admin/cron`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Activity className="w-5 h-5" /> Cron Triggers
+          </Link>
+          <Link href={`/admin/settings`} className="flex items-center gap-3 px-4 py-3 text-slate-300 rounded-xl font-semibold hover:bg-slate-800 transition-colors text-left">
+            <Settings className="w-5 h-5" /> Settings
+          </Link>
         </nav>
         
         <div className="pt-6 border-t border-slate-800 mt-auto">
-          <Link href={`/${params.locale}/dashboard`}>
+          <Link href={`/dashboard`}>
             <button className="w-full py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-semibold transition-colors">
               &larr; Exit Admin Mode
             </button>

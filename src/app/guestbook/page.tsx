@@ -23,9 +23,7 @@ export async function generateMetadata({
       languages: {
         'x-default': '/en/guestbook',
         'en': '/en/guestbook',
-        'id': '/id/guestbook',
-        'es': '/es/guestbook',
-      }
+                      }
     }
   };
 }

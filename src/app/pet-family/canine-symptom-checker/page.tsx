@@ -33,21 +33,19 @@ export async function generateMetadata({}): Promise<Metadata> {
   const ogImage = `${baseUrl}/images/tools/canine-symptom-checker-og.png`;
 
   return {
-    title: titles[locale] || titles.en,
-    description: descriptions[locale] || descriptions.en,
+    title: titles.en,
+    description: descriptions.en,
     keywords: toolKeywords,
     alternates: {
       canonical: '/pet-family/canine-symptom-checker',
       languages: {
         'x-default': '/en/pet-family/canine-symptom-checker',
         'en': '/en/pet-family/canine-symptom-checker',
-        'id': '/id/pet-family/canine-symptom-checker',
-        'es': '/es/pet-family/canine-symptom-checker',
-      }
+                      }
     },
     openGraph: {
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       url: `${baseUrl}/pet-family/canine-symptom-checker`,
       type: 'website',
       images: [
@@ -55,14 +53,14 @@ export async function generateMetadata({}): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: titles[locale] || titles.en
+          alt: titles.en
         }
       ]
     },
     twitter: {
       card: 'summary_large_image',
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       images: [ogImage]
     }
   };
@@ -79,17 +77,11 @@ export default async function CanineSymptomCheckerPage({
   const faqItems = [
     {
       question: "How does the Canine Symptom Checker work?",
-      answer: locale === 'id'
-        ? "Alat ini menggunakan struktur pohon keputusan klinis berbasis tingkat keparahan gejala untuk membantu pemilik hewan mengidentifikasi kondisi darurat (merah), perhatian mendesak (kuning), atau perawatan mandiri di rumah (hijau)."
-        : "This tool utilizes a clinical-based decision tree categorized by symptom severity to help pet owners distinguish between red-flag emergencies, yellow-flag urgent conditions, and green-flag safe home-care situations."
+      answer: "This tool utilizes a clinical-based decision tree categorized by symptom severity to help pet owners distinguish between red-flag emergencies, yellow-flag urgent conditions, and green-flag safe home-care situations."
     },
     {
-      question: locale === 'id'
-        ? "Apakah alat ini dapat menggantikan dokter hewan?"
-        : "Can this symptom checker replace a professional vet visit?",
-      answer: locale === 'id'
-        ? "Tidak. Alat ini murni bersifat edukatif dan bertujuan sebagai skrining awal mandiri. Jika anjing Anda menunjukkan tanda lesu ekstrem, pendarahan, atau kesulitan bernapas, segera bawa ke klinik hewan terdekat."
-        : "No. This tool is purely educational and meant for initial self-screening helper guide. If your canine shows extreme lethargy, heavy bleeding, or breathing difficulty, seek professional veterinary care immediately."
+      question: "Can this symptom checker replace a professional vet visit?",
+      answer: "No. This tool is purely educational and meant for initial self-screening helper guide. If your canine shows extreme lethargy, heavy bleeding, or breathing difficulty, seek professional veterinary care immediately."
     }
   ];
 
@@ -98,7 +90,7 @@ export default async function CanineSymptomCheckerPage({
       <UnifiedStructuredData
         currentUrl={`${baseUrl}/pet-family/canine-symptom-checker`}
         pageTitle={'Canine Symptom Checker'}
-        pageDescription={locale === 'id' ? 'Panduan klasifikasi gejala penyakit anjing untuk mendeteksi tingkat risiko darurat secara mandiri.' : 'Evaluate your dog symptoms instantly using our decision tree.'}
+        pageDescription={'Evaluate your dog symptoms instantly using our decision tree.'}
         locale={locale}
         entityType="SoftwareApplication"
         entitySpecificData={{
@@ -118,16 +110,14 @@ export default async function CanineSymptomCheckerPage({
           href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
-          <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}
+          <ChevronLeft className="w-5 h-5" /> {'Back to Home'}
         </Link>
         <div className="animate-fade-in">
           <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2 Atkinson-font">
             Canine Symptom Checker
           </h1>
           <p className="text-lg text-slate-500 mb-10">
-            {locale === 'id' 
-              ? 'Panduan klasifikasi gejala penyakit anjing untuk mendeteksi tingkat risiko darurat secara mandiri dari rumah.'
-              : 'Dog symptom classification guide to detect emergency risk levels independently from home.'}
+            {'Dog symptom classification guide to detect emergency risk levels independently from home.'}
           </p>
           <HydrationGuard fallbackHeight="h-[400px]">
             <CanineSymptomDecisionTree />

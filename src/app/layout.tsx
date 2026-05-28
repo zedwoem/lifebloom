@@ -30,8 +30,7 @@ export async function generateMetadata({}): Promise<Metadata> {
       languages: {
         'x-default': '/',
         'en': '/',
-        'id': '/',
-        'es': '/'
+                'es': '/'
       }
     },
     openGraph: {
@@ -356,6 +355,9 @@ export default async function RootLayout({
                 <Link href={`/money-future`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
                   Wealth
                 </Link>
+                <Link href={`/guestbook`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
+                  Community
+                </Link>
                 <Link href={`/support`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
                   Helpdesk
                 </Link>
@@ -379,17 +381,27 @@ export default async function RootLayout({
           </main>
 
           <footer className="bg-white border-t border-slate-200 py-16 mt-12 pb-32 md:pb-16">
-            <div className="max-w-[1120px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-              <div>
+            <div className="max-w-[1120px] mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+              <div className="md:col-span-2">
                 <h4 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>LifeBloom Hub</h4>
-                <p className="text-sm text-slate-500 max-w-sm">
+                <p className="text-sm text-slate-500 max-w-sm mx-auto md:mx-0">
                   A safe, ad-free harbor. We don’t track your cookies, and we don’t sell your data. We build tools for those who depend on you.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-6 text-sm font-bold text-slate-600">
-                <Link href={`/join-us`} className="hover:text-[#006948] min-h-[44px] flex items-center justify-center">Partner With Us</Link>
-                <Link href={`/support/privacy`} className="hover:text-[#006948] min-h-[44px] flex items-center justify-center">Privacy Policy</Link>
-                <Link href={`/support/terms`} className="hover:text-[#006948] min-h-[44px] flex items-center justify-center">Terms of Service</Link>
+              <div className="flex flex-col gap-3 text-sm font-bold text-slate-600">
+                <h5 className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-2">Explore Hub</h5>
+                <Link href={`/senior`} className="hover:text-[#006948] transition-colors">Senior Care</Link>
+                <Link href={`/money-future`} className="hover:text-[#006948] transition-colors">Wealth Optimization</Link>
+                <Link href={`/home-living`} className="hover:text-[#006948] transition-colors">Smart Home</Link>
+                <Link href={`/pet-family`} className="hover:text-[#006948] transition-colors">Pet Family</Link>
+                <Link href={`/travel`} className="hover:text-[#006948] transition-colors">Accessible Travel</Link>
+              </div>
+              <div className="flex flex-col gap-3 text-sm font-bold text-slate-600">
+                <h5 className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-2">Company & Legal</h5>
+                <Link href={`/join-us`} className="hover:text-[#006948] transition-colors">Partner With Us</Link>
+                <Link href={`/support`} className="hover:text-[#006948] transition-colors">Help Center</Link>
+                <Link href={`/support/privacy`} className="hover:text-[#006948] transition-colors">Privacy Policy</Link>
+                <Link href={`/support/terms`} className="hover:text-[#006948] transition-colors">Terms of Service</Link>
               </div>
             </div>
           </footer>

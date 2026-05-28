@@ -37,7 +37,7 @@ export default function AdminAutopostPage() {
   const { profile } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale || "en";
+  const locale = "en";
   const supabase = createClient();
 
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);

@@ -33,21 +33,19 @@ export async function generateMetadata({}): Promise<Metadata> {
   const ogImage = `${baseUrl}/images/tools/retirement-planner-og.png`;
 
   return {
-    title: titles[locale] || titles.en,
-    description: descriptions[locale] || descriptions.en,
+    title: titles.en,
+    description: descriptions.en,
     keywords: toolKeywords,
     alternates: {
       canonical: '/money-future/retirement-planner',
       languages: {
         'x-default': '/en/money-future/retirement-planner',
         'en': '/en/money-future/retirement-planner',
-        'id': '/id/money-future/retirement-planner',
-        'es': '/es/money-future/retirement-planner',
-      }
+                      }
     },
     openGraph: {
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       url: `${baseUrl}/money-future/retirement-planner`,
       type: 'website',
       images: [
@@ -55,14 +53,14 @@ export async function generateMetadata({}): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: titles[locale] || titles.en
+          alt: titles.en
         }
       ]
     },
     twitter: {
       card: 'summary_large_image',
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       images: [ogImage]
     }
   };
@@ -79,17 +77,11 @@ export default async function RetirementPlannerPage({
   const faqItems = [
     {
       question: "How does this retirement planning calculator work?",
-      answer: locale === 'id'
-        ? "Kalkulator ini memproyeksikan dana masa depan Anda menggunakan rumus bunga majemuk dengan opsi inflasi dan pengali resesi untuk mensimulasikan daya beli masa depan secara realistis."
-        : "This calculator projects your future savings using compound interest while integrating dynamic inflation adjusting variables and market recessions to model true purchasing power."
+      answer: "This calculator projects your future savings using compound interest while integrating dynamic inflation adjusting variables and market recessions to model true purchasing power."
     },
     {
-      question: locale === 'id'
-        ? "Mengapa faktor inflasi penting dimasukkan dalam perhitungan pensiun?"
-        : "Why is inflation adjustment critical in retirement calculations?",
-      answer: locale === 'id'
-        ? "Inflasi mengurangi daya beli uang Anda dari waktu ke waktu. Uang Rp1 Miliar hari ini tidak akan memiliki daya beli yang sama 20 tahun lagi. Menyesuaikan inflasi (misalnya 3-4% per tahun) memastikan target tabungan Anda mencerminkan biaya hidup yang realistis."
-        : "Inflation reduces the purchasing power of your money over time. Adjusting for standard inflation (e.g., 3-4% annually) ensures your target retirement nest egg reflects realistic future living costs."
+      question: "Why is inflation adjustment critical in retirement calculations?",
+      answer: "Inflation reduces the purchasing power of your money over time. Adjusting for standard inflation (e.g., 3-4% annually) ensures your target retirement nest egg reflects realistic future living costs."
     }
   ];
 
@@ -98,7 +90,7 @@ export default async function RetirementPlannerPage({
       <UnifiedStructuredData
         currentUrl={`${baseUrl}/money-future/retirement-planner`}
         pageTitle={'Retirement Planner Calculator'}
-        pageDescription={locale === 'id' ? 'Hitung dana pensiun Anda secara realistis dengan simulasi inflasi.' : 'Calculate your retirement fund realistically with inflation adjustments.'}
+        pageDescription={'Calculate your retirement fund realistically with inflation adjustments.'}
         locale={locale}
         entityType="SoftwareApplication"
         entitySpecificData={{
@@ -118,16 +110,14 @@ export default async function RetirementPlannerPage({
           href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
-          <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}
+          <ChevronLeft className="w-5 h-5" /> {'Back to Home'}
         </Link>
         <div className="animate-fade-in">
           <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2 Atkinson-font">
-            {locale === 'id' ? 'Kalkulator Pensiun' : 'Retirement Planner'}
+            {'Retirement Planner'}
           </h1>
           <p className="text-lg text-slate-500 mb-10">
-            {locale === 'id' 
-              ? 'Prediksikan pertumbuhan dana pensiun Anda secara realistis dengan simulasi inflasi dan resesi.'
-              : 'Project your retirement nest egg with inflation and recession simulator offsets.'}
+            {'Project your retirement nest egg with inflation and recession simulator offsets.'}
           </p>
           <HydrationGuard fallbackHeight="h-[600px]">
             <RetirementCalculator />

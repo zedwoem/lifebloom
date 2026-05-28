@@ -5,7 +5,7 @@ import JsonLdFAQ from '@/components/seo/json-ld-faq';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
-const locale = "en" as string;
+const locale = "en";
 
 export async function generateMetadata({}): Promise<Metadata> {
   
@@ -32,21 +32,19 @@ export async function generateMetadata({}): Promise<Metadata> {
   const ogImage = `${baseUrl}/images/tools/trip-planner-og.png`;
 
   return {
-    title: titles[locale] || titles.en,
-    description: descriptions[locale] || descriptions.en,
+    title: titles.en,
+    description: descriptions.en,
     keywords: toolKeywords,
     alternates: {
       canonical: '/travel/trip-planner',
       languages: {
         'x-default': '/en/travel/trip-planner',
         'en': '/en/travel/trip-planner',
-        'id': '/id/travel/trip-planner',
-        'es': '/es/travel/trip-planner',
-      }
+                      }
     },
     openGraph: {
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       url: `${baseUrl}/travel/trip-planner`,
       type: 'website',
       images: [
@@ -54,14 +52,14 @@ export async function generateMetadata({}): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: titles[locale] || titles.en
+          alt: titles.en
         }
       ]
     },
     twitter: {
       card: 'summary_large_image',
-      title: titles[locale] || titles.en,
-      description: descriptions[locale] || descriptions.en,
+      title: titles.en,
+      description: descriptions.en,
       images: [ogImage]
     }
   };
@@ -78,17 +76,11 @@ export default async function TripPlannerPage({
   const faqItems = [
     {
       question: "How does this travel budget planner help my trip planning?",
-      answer: locale === 'id'
-        ? "Alat ini membagi biaya perjalanan Anda secara dinamis berdasarkan penginapan, makan, transportasi, dan aktivitas, sembari memperhitungkan preferensi aksesibilitas untuk wisatawan senior."
-        : "This planner dynamically segments your trip expenses across lodging, meals, transport, and activities while integrating accessibility checks specifically helpful for senior travelers."
+      answer: "This planner dynamically segments your trip expenses across lodging, meals, transport, and activities while integrating accessibility checks specifically helpful for senior travelers."
     },
     {
-      question: locale === 'id'
-        ? "Apakah ada saran keamanan khusus untuk pelancong berkebutuhan khusus?"
-        : "Are there specific security tips for travelers with special accessibility needs?",
-      answer: locale === 'id'
-        ? "Ya. Kami menyertakan daftar cek khusus seperti ketersediaan ramp, pintu darurat lebar, lift, serta kemudahan transportasi umum lokal di kota tujuan Anda."
-        : "Yes. Our tool embeds verified checklist items covering ramp access, doorway clearance, elevators, and local public transit ease for destination safety."
+      question: "Are there specific security tips for travelers with special accessibility needs?",
+      answer: "Yes. Our tool embeds verified checklist items covering ramp access, doorway clearance, elevators, and local public transit ease for destination safety."
     }
   ];
 
@@ -97,7 +89,7 @@ export default async function TripPlannerPage({
       <UnifiedStructuredData
         currentUrl={`${baseUrl}/travel/trip-planner`}
         pageTitle={'Accessible Trip Planner'}
-        pageDescription={locale === 'id' ? 'Rencanakan perjalanan Anda dengan rincian biaya yang tepat dan ramah aksesibilitas.' : 'Plan your next journey with customized travel budgets.'}
+        pageDescription={'Plan your next journey with customized travel budgets.'}
         locale={locale}
         entityType="SoftwareApplication"
         entitySpecificData={{
@@ -117,17 +109,15 @@ export default async function TripPlannerPage({
           href={``} 
           className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
         >
-          <ChevronLeft className="w-5 h-5" /> {locale === 'id' ? 'Kembali ke Beranda' : 'Back to Home'}
+          <ChevronLeft className="w-5 h-5" /> {'Back to Home'}
         </Link>
         
         <div className="animate-fade-in mb-8">
           <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight mb-2 Atkinson-font">
-            {locale === 'id' ? 'Perencana Anggaran Perjalanan' : 'Trip Budget & Route Planner'}
+            {'Trip Budget & Route Planner'}
           </h1>
           <p className="text-lg text-slate-500">
-            {locale === 'id' 
-              ? 'Rencanakan perjalanan liburan Anda berikutnya secara presisi, hemat, dan ramah aksesibilitas.'
-              : 'Audit hotel accessibility details and manage standard daily trip spend parameters.'}
+            {'Audit hotel accessibility details and manage standard daily trip spend parameters.'}
           </p>
         </div>
 
