@@ -82,6 +82,8 @@ import { Toaster } from 'sonner';
 import fs from 'fs';
 import path from 'path';
 
+import { HeaderNavbar } from '@/components/ui/header-navbar';
+
 export default async function RootLayout({
   children
 }: {
@@ -341,36 +343,7 @@ export default async function RootLayout({
                 <span className="truncate hidden sm:block">LifeBloom Hub</span>
               </Link>
               
-              {/* Desktop Linear Nav */}
-              <nav className="hidden md:flex items-center gap-8">
-                <Link href={`/`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
-                  Home
-                </Link>
-                <Link href={`/videos`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
-                  Videos
-                </Link>
-                <Link href={`/senior`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
-                  Senior Care
-                </Link>
-                <Link href={`/money-future`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
-                  Wealth
-                </Link>
-                <Link href={`/guestbook`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
-                  Community
-                </Link>
-                <Link href={`/support`} className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center min-h-[52px]">
-                  Helpdesk
-                </Link>
-                <div className="h-6 w-px bg-slate-200 mx-2"></div>
-                <div className="w-[200px]">
-                  <GlobalSearch />
-                </div>
-                <NavbarUserStatus />
-              </nav>
-
-              <div className="md:hidden flex items-center gap-3">
-                <GlobalSearch />
-              </div>
+              <HeaderNavbar />
             </div>
           </header>
 

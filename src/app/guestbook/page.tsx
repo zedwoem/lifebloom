@@ -17,13 +17,13 @@ export async function generateMetadata({
   
   return {
     title: 'Community Support Guestbook | LifeBloom Hub',
-    description: 'Bagikan pesan hangat, dukungan moral, dan kata semangat positif untuk lansia tepercaya di Dinding Komunitas LifeBloom Hub.',
+    description: 'Share warm words, moral support, and positive encouragement for seniors in the LifeBloom Hub community wall.',
     alternates: {
       canonical: '/guestbook',
       languages: {
         'x-default': '/en/guestbook',
         'en': '/en/guestbook',
-                      }
+      }
     }
   };
 }
@@ -54,7 +54,7 @@ export default async function GuestbookPage({
     '@context': 'https://schema.org',
     '@type': 'WebPage',
     name: 'LifeBloom Hub Community Support Guestbook',
-    description: 'Dinding dukungan moral. Bagikan pesan hangat dan semangat positif untuk lansia tepercaya kita!',
+    description: 'A community wall of support and encouragement. Share your warm wishes with our beloved senior community!',
     publisher: {
       '@type': 'Organization',
       name: 'LifeBloom Hub',
@@ -90,10 +90,10 @@ export default async function GuestbookPage({
               className="text-3xl md:text-5xl font-black text-slate-800 tracking-tight"
               style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}
             >
-              Dinding Dukungan Lansia
+              Senior Care Support Wall
             </h1>
             <p className="text-slate-500 text-base md:text-lg max-w-xl mx-auto leading-relaxed font-semibold">
-              Kirim kata-kata penyemangat, cinta, atau masukan hangat Anda untuk mendukung kesehatan emosional lansia di sekitar kita.
+              Share comforting words, encouragement, or warm messages to support the emotional well-being of seniors in our community.
             </p>
           </div>
         </section>

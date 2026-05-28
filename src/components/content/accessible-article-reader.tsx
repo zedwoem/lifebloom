@@ -282,10 +282,13 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
       {/* Top Navigation Bar with Accessibility Controls - HIDDEN ON PRINT */}
       <div className={`sticky top-0 w-full z-50 print:hidden ${stickyHeaderClasses}`}>
         <div className="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <Link href={``} className={`inline-flex items-center font-semibold transition-colors ${iconClasses}`}>
+          <button 
+            onClick={() => window.history.back()} 
+            className={`inline-flex items-center font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg px-2 py-1 ${iconClasses}`}
+          >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Back
-          </Link>
+          </button>
           
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             {/* ACCESSIBILITY CONTROLS */}

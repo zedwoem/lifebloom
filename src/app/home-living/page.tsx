@@ -56,10 +56,10 @@ export default async function PillarPage({
 
         {/* Above-the-fold Interactive Widgets */}
         <section className="w-full max-w-4xl mx-auto space-y-8 mb-12">
-          <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+          <div id="budget-renovator" className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
             <HomeBudgetCalculator />
           </div>
-          <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+          <div id="smart-matcher" className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
             <SmartHomeMatcher />
           </div>
         </section>

@@ -21,14 +21,14 @@ export function PartnershipRegistrationCTA() {
           </div>
           
           <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
-            Tingkatkan Otoritas Anda. <br className="hidden md:block"/>
+            Elevate Your Authority. <br className="hidden md:block"/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-green to-teal-300">
-              Jangkau Jutaan Lansia & Keluarga.
+              Reach Millions of Seniors & Families.
             </span>
           </h2>
           
           <p className="text-lg md:text-xl text-slate-300 mb-8 max-w-xl">
-            LifeBloom Hub membuka pintu kemitraan resmi untuk Pakar Medis, Penasihat Finansial, Organisasi Nirlaba, hingga *Brand* Inklusif. Daftarkan profil entitas Anda untuk diverifikasi oleh sistem.
+            LifeBloom Hub opens doors for official partnerships with Medical Experts, Financial Advisors, Non-Profits, and Inclusive Brands. Register your entity profile for system verification.
           </p>
 
           <div className="w-full mt-6 bg-white/10 rounded-xl p-4 border border-white/20 backdrop-blur-sm">

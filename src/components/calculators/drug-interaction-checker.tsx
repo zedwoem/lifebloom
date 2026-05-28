@@ -80,14 +80,14 @@ export function DrugInteractionChecker() {
       } else {
         setResult({
           severity: 'Low',
-          description: 'Tidak ada interaksi mayor yang terdeteksi pada database OpenFDA.'
+          description: 'No major interactions detected in the OpenFDA database.'
         });
       }
     } catch (err) {
       console.error(err);
       setResult({
         severity: 'Low',
-        description: 'Potensi masalah komunikasi dengan API FDA. Harap konsultasikan ke dokter.'
+        description: 'Potential communication issue with the FDA API. Please consult a doctor.'
       });
     } finally {
       setIsLoading(false);

@@ -67,7 +67,7 @@ export function RealtimeGuestbook({
 
     const newEntry: GuestbookEntry = {
       id: Math.random().toString(),
-      author_name: "Anda (Mengirim...)",
+      author_name: "You (Sending...)",
       content: content.trim(),
       created_at: new Date().toISOString(),
     };
@@ -77,7 +77,7 @@ export function RealtimeGuestbook({
 
     const res = await submitGuestbookAction({ content: content.trim() });
     if (!res.success) {
-      alert("Gagal mengirim pesan: " + res.error);
+      alert("Failed to send message: " + res.error);
     }
   }
 
@@ -94,10 +94,10 @@ export function RealtimeGuestbook({
             className="text-xl md:text-2xl font-black text-slate-800 tracking-tight"
             style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}
           >
-            Buku Tamu Komunitas
+            Community Guestbook
           </h3>
           <p className="text-slate-500 text-sm md:text-base leading-relaxed">
-            Dinding dukungan moral. Bagikan pesan hangat dan semangat positif untuk lansia tepercaya kita!
+            Wall of moral support. Share warm messages and positive encouragement for our seniors!
           </p>
         </div>
       </div>
@@ -108,17 +108,17 @@ export function RealtimeGuestbook({
           <input 
             name="content" 
             type="text" 
-            placeholder="Tuliskan pesan semangat singkat Anda disini..." 
+            placeholder="Write your short encouragement message here..." 
             required 
             maxLength={100}
             className="flex-1 p-4 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-rose-400 focus:outline-none h-[52px] font-semibold text-sm md:text-base shadow-sm transition-all"
-            aria-label="Pesan Buku Tamu"
+            aria-label="Guestbook Message"
           />
           <Button 
             type="submit" 
             className="bg-rose-500 hover:bg-rose-600 text-white rounded-2xl h-[52px] px-8 font-black text-base shadow-md transition-all active:scale-95 cursor-pointer"
           >
-            Kirim Pesan
+            Send Message
           </Button>
         </form>
       ) : (
@@ -126,14 +126,14 @@ export function RealtimeGuestbook({
           <div className="flex items-center gap-3">
             <Lock className="w-5 h-5 text-slate-400 shrink-0" />
             <p className="text-sm font-semibold text-slate-600 text-center md:text-left leading-relaxed">
-              Anda harus masuk untuk ikut menulis di Dinding Dukungan Buku Tamu.
+              You must be logged in to write on the Guestbook Support Wall.
             </p>
           </div>
           <button 
             onClick={() => router.push(`/login?redirect=guestbook`)}
             className="w-full md:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-950 text-white font-black rounded-xl text-xs shadow-sm transition-all cursor-pointer min-h-[44px]"
           >
-            Masuk / Register
+            Login / Register
           </button>
         </div>
       )}
@@ -142,7 +142,7 @@ export function RealtimeGuestbook({
       <div 
         className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar"
         role="feed"
-        aria-label="Pesan-pesan Dukungan Buku Tamu"
+        aria-label="Guestbook Support Messages"
       >
         {optimisticEntries.map((entry) => (
           <div 
@@ -161,7 +161,7 @@ export function RealtimeGuestbook({
         
         {optimisticEntries.length === 0 && (
           <p className="text-center text-slate-400 py-8 font-medium">
-            Belum ada pesan yang disematkan. Jadilah yang pertama memberikan semangat hangat!
+            No messages pinned yet. Be the first to share warm encouragement!
           </p>
         )}
       </div>

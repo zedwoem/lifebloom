@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { PetMatchmaker } from "@/components/calculators/pet-matchmaker";
+import { CanineSymptomDecisionTree } from "@/components/calculators/pet-planner";
 import { DynamicNewsFeed } from '@/components/content/dynamic-news-feed';
 import { PillarVideoSection } from '@/components/content/pillar-video-section';
 
@@ -33,7 +34,7 @@ export default async function PillarPage({
         
         {/* Navigation Breadcrumb */}
         <Link 
-          href={``}
+          href={`/`}
           className="inline-flex items-center gap-2 text-primary hover:text-primary-container mb-8 transition-all font-bold group min-h-[52px]"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -55,8 +56,11 @@ export default async function PillarPage({
 
         {/* Above-the-fold Interactive Widgets */}
         <section className="w-full max-w-4xl mx-auto space-y-8 mb-12">
-          <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+          <div id="matchmaker" className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
             <PetMatchmaker />
+          </div>
+          <div id="canine-symptom" className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+            <CanineSymptomDecisionTree />
           </div>
         </section>
 

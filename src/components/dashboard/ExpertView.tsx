@@ -62,7 +62,7 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
         setPendingQna(qData || []);
       } catch (err: any) {
         console.error("[ExpertView] Failed to fetch questions from database:", err);
-        setQnaError("Sistem Q&A tidak dapat dimuat saat ini. Hubungi tim IT.");
+        setQnaError("Q&A system cannot be loaded right now. Contact IT team.");
       } finally {
         setIsLoadingQna(false);
       }
@@ -104,11 +104,11 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
   // Submit Answer handler
   const handleSubmitAnswer = async (id: string) => {
     if (!expertResponse.trim()) {
-      toast.error("Silakan tulis pesan verifikasi atau opini klinis Anda.");
+      toast.error("Please write your verification message or clinical opinion.");
       return;
     }
 
-    toast.loading("Mengirim tanggapan pakar...");
+    toast.loading("Submitting expert response...");
     try {
       const res = await submitQuestionAnswer({
         questionId: id,
@@ -116,15 +116,15 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
       });
 
       if (res.success) {
-        toast.success("Tanggapan pakar terverifikasi berhasil disimpan.");
+        toast.success("Verified expert response saved successfully.");
         setPendingQna(prev => prev.filter((q) => q.id !== id));
         setActiveAnswerId(null);
         setExpertResponse("");
       } else {
-        toast.error(res.error || "Gagal menyimpan jawaban.");
+        toast.error(res.error || "Failed to save answer.");
       }
     } catch (err: any) {
-      toast.error("Terjadi kesalahan teknis: " + err.message);
+      toast.error("Technical error occurred: " + err.message);
     } finally {
       toast.dismiss();
     }
@@ -155,7 +155,7 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
               onClick={signOut}
               className="px-4 py-2 text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-2xl font-bold text-sm border border-rose-100 transition-all flex items-center gap-2 cursor-pointer min-h-[44px]"
             >
-              <LogOut className="w-4 h-4" /> Keluar
+              <LogOut className="w-4 h-4" /> Logout
             </button>
           </div>
         </div>
@@ -166,22 +166,22 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
         <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <span className="text-xs font-black text-emerald-700 uppercase tracking-widest block mb-1">
-              Spesialis Terverifikasi E-E-A-T
+              E-E-A-T Verified Specialist
             </span>
             <h2 
               className="text-2xl md:text-3xl font-black tracking-tight text-slate-800"
               style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}
             >
-              Selamat datang kembali, {profile?.display_name || "Bapak/Ibu Pakar"}
+              Welcome back, {profile?.display_name || "Expert"}
             </h2>
             <p className="text-slate-500 text-base md:text-lg mt-1 leading-relaxed max-w-2xl">
-              Portal kolaborasi Anda untuk memverifikasi istilah medis, menjawab pertanyaan warga, dan berkontribusi pada standar keilmuan LifeBloom Hub.
+              Your collaboration portal to verify medical terms, answer community questions, and contribute to the scientific standards of LifeBloom Hub.
             </p>
           </div>
           
           <div className="flex items-center gap-2 px-5 py-3 bg-emerald-50 text-emerald-800 rounded-2xl border border-emerald-100 font-bold min-h-[52px]">
             <Shield className="w-5 h-5 text-emerald-700" />
-            Akun Ahli: <span className="uppercase ml-1">{profile?.role || "expert"}</span>
+            Expert Account: <span className="uppercase ml-1">{profile?.role || "expert"}</span>
           </div>
         </div>
       </section>
@@ -197,9 +197,9 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
               <Eye className="w-6 h-6 text-emerald-700" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Pembaca Artikel</span>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Article Readers</span>
               <strong className="text-xl md:text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                {expertStats.totalViews.toLocaleString()} Warga
+                {expertStats.totalViews.toLocaleString()} Members
               </strong>
             </div>
           </Card>
@@ -209,9 +209,9 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
               <CheckCircle className="w-6 h-6 text-emerald-700" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Artikel Senior Terindeks</span>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Indexed Senior Articles</span>
               <strong className="text-xl md:text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                {expertStats.fdaTerms} Panduan (E-E-A-T)
+                {expertStats.fdaTerms} Guides (E-E-A-T)
               </strong>
             </div>
           </Card>
@@ -221,7 +221,7 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
               <Award className="w-6 h-6 text-emerald-700" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Indeks Dampak Klinis</span>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Clinical Impact Index</span>
               <strong className="text-xl md:text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
                 {expertStats.clinicalImpact}
               </strong>
@@ -238,23 +238,23 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
             </div>
             <div>
               <h3 className="text-xl md:text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                Tulis Panduan Klinis & Peer-Review
+                Write Clinical Guide & Peer-Review
               </h3>
               <p className="text-slate-500 text-sm md:text-base leading-relaxed">
-                Bagikan panduan medis jargon-free. Editor sistem akan memindai istilah obat dengan API FDA otomatis.
+                Share jargon-free medical guides. The system editor will automatically scan drug terms with the FDA API.
               </p>
             </div>
           </div>
 
           <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/50 space-y-4">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Format Penulisan Minimalis</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Minimalist Writing Format</span>
             <textarea 
               className="w-full h-32 bg-white rounded-2xl border border-slate-200 p-4 font-sans text-base text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-sm placeholder:text-slate-400 transition-all resize-none"
-              placeholder="Tulis panduan atau review medis Anda di sini... gunakan layout yang ramah aksestabilitas..."
+              placeholder="Write your medical guide or review here... use an accessibility-friendly layout..."
             />
             <div className="flex justify-end">
               <button className="px-6 py-3 bg-emerald-800 text-white font-black rounded-2xl text-sm transition-all hover:bg-emerald-950 shadow-md active:scale-95 cursor-pointer min-h-[44px]">
-                Ajukan Panduan Pakar
+                Submit Expert Guide
               </button>
             </div>
           </div>
@@ -272,14 +272,14 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
                   Clinical Q&A Stream
                 </h3>
                 <p className="text-slate-500 text-sm md:text-base leading-relaxed">
-                  Pertanyaan kesehatan, finansial, dan gizi warga yang memerlukan opini atau verifikasi ahli.
+                  Health, financial, and nutritional questions from members requiring expert opinion or verification.
                 </p>
               </div>
             </div>
             
             {!isLoadingQna && !qnaError && (
               <span className="px-3.5 py-1 bg-emerald-50 text-emerald-800 text-xs font-black rounded-full border border-emerald-100">
-                {pendingQna.length} Menunggu Jawaban
+                {pendingQna.length} Awaiting Answer
               </span>
             )}
           </div>
@@ -295,7 +295,7 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
           ) : pendingQna.length === 0 ? (
             <div className="p-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-300">
               <p className="text-slate-400 font-bold text-sm md:text-base">
-                🎉 Luar biasa! Tidak ada pertanyaan warga tertunda saat ini.
+                🎉 Excellent! No pending member questions right now.
               </p>
             </div>
           ) : (
@@ -306,7 +306,7 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
                     <div>
                       <strong className="text-slate-800 block text-lg font-black">{q.author_name}</strong>
                       <span className="text-[10px] text-emerald-800 font-extrabold uppercase bg-emerald-100/60 px-2.5 py-1 rounded-full border border-emerald-200 mt-2 inline-block">
-                        Pilar: {q.pillar || "Senior Living"}
+                        Pillar: {q.pillar || "Senior Living"}
                       </span>
                     </div>
                     <span className="text-xs text-slate-400 font-medium">
@@ -323,7 +323,7 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
                       <textarea
                         value={expertResponse}
                         onChange={(e) => setExpertResponse(e.target.value)}
-                        placeholder="Tulis opini klinis, referensi tepercaya, atau anjuran profesional tepercaya Anda..."
+                        placeholder="Write your clinical opinion, trusted references, or professional advice..."
                         className="w-full h-32 p-4 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-600 text-slate-800 text-sm md:text-base font-semibold shadow-sm resize-none leading-relaxed transition-all"
                       />
                       <div className="flex justify-end gap-3">
@@ -331,13 +331,13 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
                           onClick={() => { setActiveAnswerId(null); setExpertResponse(""); }}
                           className="px-4 py-2.5 text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-2xl font-bold text-xs min-h-[44px] transition-all cursor-pointer border border-slate-200"
                         >
-                          Batal
+                          Cancel
                         </button>
                         <button 
                           onClick={() => handleSubmitAnswer(q.id)}
                           className="px-6 py-2.5 bg-emerald-800 text-white hover:bg-emerald-950 rounded-2xl font-black text-xs min-h-[44px] shadow-sm transition-all cursor-pointer"
                         >
-                          Kirim Verifikasi Medis
+                          Submit Medical Verification
                         </button>
                       </div>
                     </div>
@@ -346,7 +346,7 @@ export function ExpertView({ profile, signOut, locale }: ExpertViewProps) {
                       onClick={() => { setActiveAnswerId(q.id); setExpertResponse(""); }}
                       className="px-4 py-2.5 bg-white border border-slate-200 text-emerald-800 hover:bg-emerald-50/20 hover:border-emerald-700/40 rounded-2xl font-black text-xs transition-all min-h-[44px] flex items-center gap-1.5 cursor-pointer shadow-sm"
                     >
-                      <Edit3 className="w-4 h-4 text-emerald-700" /> Tulis Tanggapan Ahli
+                      <Edit3 className="w-4 h-4 text-emerald-700" /> Write Expert Response
                     </button>
                   )}
                 </div>

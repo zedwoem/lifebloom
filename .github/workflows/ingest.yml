@@ -1,0 +1,22 @@
+name: Ingest Schedule
+
+on:
+  schedule:
+    # Run every 4 hours
+    - cron: '0 */4 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  run-ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Supabase Edge Function (Ingest)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          echo "Triggering LifeBloom Hub ingestion..."
+          curl -X POST "${SUPABASE_URL}/functions/v1/ingest" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"pillar": "all", "source": "github-actions"}'

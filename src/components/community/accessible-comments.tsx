@@ -56,7 +56,7 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
     });
 
     if (!res.success) {
-      alert("Gagal mengirim komentar untuk moderasi: " + res.error);
+      alert("Failed to submit comment for moderation: " + res.error);
     }
   }
 
@@ -103,7 +103,7 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
               : ''
           }`}
           role="comment"
-          aria-label={`Komentar dari ${comment.author_name}`}
+          aria-label={`Comment from ${comment.author_name}`}
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
@@ -120,7 +120,7 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
             
             {depth > 0 && (
               <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 bg-emerald-100/60 text-emerald-800 rounded-full border border-emerald-200/35">
-                Balasan
+                Reply
               </span>
             )}
           </div>
@@ -138,7 +138,7 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
               }}
               className="text-xs font-black text-emerald-700 flex items-center gap-1.5 hover:underline focus:outline-none focus:ring-2 focus:ring-emerald-600 rounded-xl px-3 py-1.5 bg-slate-50 border border-slate-200/60 shadow-sm hover:bg-emerald-50/30 transition-all cursor-pointer h-[32px]"
             >
-              <CornerDownRight className="w-3.5 h-3.5" /> Balas
+              <CornerDownRight className="w-3.5 h-3.5" /> Reply
             </button>
           </div>
         </div>
@@ -154,21 +154,21 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
   };
 
   return (
-    <div className="space-y-8 mt-12 border-t border-slate-200/80 pt-8" aria-label="Komentar Artikel">
+    <div className="space-y-8 mt-12 border-t border-slate-200/80 pt-8" aria-label="Article Comments">
       <div className="flex items-center gap-3">
         <MessageSquare className="w-6 h-6 text-emerald-700" />
         <h3 
           className="text-xl md:text-2xl font-black text-slate-800 tracking-tight" 
           style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}
         >
-          Diskusi Komunitas ({optimisticComments.length})
+          Community Discussion ({optimisticComments.length})
         </h3>
       </div>
 
       {commentTree.length === 0 ? (
         <div className="p-8 text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-300/80">
           <p className="text-slate-500 font-medium text-sm md:text-base">
-            Belum ada komentar untuk artikel ini. Mari mulai diskusinya!
+            No comments yet for this article. Start the discussion!
           </p>
         </div>
       ) : (
@@ -183,12 +183,12 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
           <div className="mb-4 p-3 bg-emerald-50/60 border border-emerald-100 rounded-2xl flex items-center justify-between">
             <span className="text-xs md:text-sm text-emerald-800 font-semibold flex items-center gap-1.5">
               <CornerDownRight className="w-4 h-4" /> 
-              Membalas komentar dari <strong className="font-extrabold">{getParentAuthor()}</strong>
+              Replying to comment from <strong className="font-extrabold">{getParentAuthor()}</strong>
             </span>
             <button 
               onClick={() => setReplyTo(null)}
               className="p-1 hover:bg-emerald-100 rounded-full transition-colors text-emerald-700"
-              aria-label="Batalkan balasan"
+              aria-label="Cancel reply"
             >
               <X className="w-4 h-4" />
             </button>
@@ -199,20 +199,20 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
           className="font-black text-slate-800 mb-4 text-base md:text-lg"
           style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}
         >
-          {replyTo ? "Tuliskan Balasan Anda" : "Tinggalkan Pendapat Anda"}
+          {replyTo ? "Write Your Reply" : "Leave Your Thoughts"}
         </h4>
 
         <form ref={formRef} action={handleAction} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label htmlFor="name-input" className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">
-                Nama Lengkap (Wajib)
+                Full Name (Required)
               </label>
               <input 
                 id="name-input"
                 name="name" 
                 type="text" 
-                placeholder="cth: Ibu Budi" 
+                placeholder="e.g. John Doe" 
                 required 
                 className="w-full p-4 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-600 focus:outline-none h-[52px] text-sm md:text-base font-semibold shadow-sm transition-all"
               />
@@ -220,13 +220,13 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
             
             <div className="space-y-1">
               <label htmlFor="email-input" className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">
-                Email (Opsional - Tidak Dipublikasikan)
+                Email (Optional - Not Published)
               </label>
               <input 
                 id="email-input"
                 name="email" 
                 type="email" 
-                placeholder="cth: budi@email.com" 
+                placeholder="e.g. john@email.com" 
                 className="w-full p-4 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-600 focus:outline-none h-[52px] text-sm md:text-base font-semibold shadow-sm transition-all"
               />
             </div>
@@ -234,12 +234,12 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
           
           <div className="space-y-1">
             <label htmlFor="content-input" className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">
-              Pesan Komentar
+              Comment Message
             </label>
             <textarea 
               id="content-input"
               name="content" 
-              placeholder="Tuliskan saran, pertanyaan, atau masukan berharga Anda disini..." 
+              placeholder="Write your valuable suggestions, questions, or feedback here..." 
               required 
               rows={4}
               className="w-full p-4 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-600 focus:outline-none resize-none text-sm md:text-base font-semibold shadow-sm transition-all leading-relaxed"
@@ -251,7 +251,7 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
               type="submit" 
               className="bg-emerald-800 hover:bg-emerald-950 text-white rounded-2xl h-[52px] px-8 font-black text-base transition-all shadow-md active:scale-95 cursor-pointer"
             >
-              Kirim Komentar
+              Submit Comment
             </Button>
             {replyTo && (
               <Button 
@@ -260,13 +260,13 @@ export function AccessibleComments({ articleId, initialComments = [] }: { articl
                 onClick={() => setReplyTo(null)} 
                 className="h-[52px] rounded-2xl font-bold border-slate-300 hover:bg-slate-100 cursor-pointer"
               >
-                Batal
+                Cancel
               </Button>
             )}
           </div>
           
           <p className="text-xs text-slate-500 mt-2 font-medium">
-            * Demi kenyamanan bersama, komentar baru akan melalui proses moderasi moderator sebelum tampil secara publik.
+            * For community safety, new comments will go through moderation before appearing publicly.
           </p>
         </form>
       </div>

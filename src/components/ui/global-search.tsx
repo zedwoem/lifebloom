@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
-import { Search, Command, ArrowRight, TrendingUp, Sparkles, Hash, X } from 'lucide-react';
+import { Search, Command, ArrowRight, TrendingUp, Sparkles, Hash, X, Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -31,7 +31,7 @@ const CATEGORIES = [
   { name: "Travel", path: "travel", color: "bg-teal-50 text-teal-700 hover:bg-teal-100" }
 ];
 
-export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'hero' }) {
+export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'hero' | 'icon' }) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [dbResults, setDbResults] = useState<{ item: any }[]>([]);
@@ -195,29 +195,42 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
   };
 
   const isHero = variant === 'hero';
+  const isIcon = variant === 'icon';
 
   return (
-    <div className="w-full">
+    <div className={isIcon ? "" : "w-full"}>
       {/* Trigger Button Mockup */}
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className={`w-full flex items-center justify-between text-left transition-all ${
-          isHero
-            ? "px-5 py-4 bg-white border border-slate-200/80 rounded-3xl shadow-xl hover:shadow-2xl text-slate-400 font-medium text-lg min-h-[64px]"
-            : "px-4 py-2 bg-slate-100/80 hover:bg-slate-200/50 rounded-full text-slate-500 font-medium text-sm min-h-[44px]"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <Search className={isHero ? "w-6 h-6 text-slate-400" : "w-4 h-4 text-slate-400"} />
-          <span>{isHero ? "Search topics, tools, articles..." : "Search topics..."}</span>
-        </div>
-        <div className="flex items-center gap-1 opacity-50 bg-slate-200/50 px-2 py-0.5 rounded-lg text-xs font-mono">
-          <span className="text-[10px]">⌘</span>
-          <span className="text-[10px]">K</span>
-        </div>
-      </button>
+      {isIcon ? (
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="flex items-center justify-center p-3 bg-[#FAF8F3] hover:bg-[#F2EFE9] rounded-full border border-slate-200/60 text-slate-600 hover:text-[#006948] transition-all hover:scale-105 active:scale-95 shadow-2xs shrink-0 cursor-pointer min-h-[44px] min-w-[44px]"
+          aria-label="Open Search Command Palette"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+      ) : (
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className={`w-full flex items-center justify-between text-left transition-all ${
+            isHero
+              ? "px-5 py-4 bg-white border border-slate-200/80 rounded-3xl shadow-xl hover:shadow-2xl text-slate-400 font-medium text-lg min-h-[64px]"
+              : "px-4 py-2 bg-slate-100/80 hover:bg-slate-200/50 rounded-full text-slate-500 font-medium text-sm min-h-[44px]"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <Search className={isHero ? "w-6 h-6 text-slate-400" : "w-4 h-4 text-slate-400"} />
+            <span>{isHero ? "Search topics, tools, articles..." : "Search topics..."}</span>
+          </div>
+          <div className="flex items-center gap-1 opacity-50 bg-slate-200/50 px-2 py-0.5 rounded-lg text-xs font-mono">
+            <span className="text-[10px]">⌘</span>
+            <span className="text-[10px]">K</span>
+          </div>
+        </button>
+      )}
 
       {/* frosten glass Command Palette Modal */}
       {isOpen && (
@@ -344,6 +357,42 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
                               {cat.name}
                             </Link>
                           ))}
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-3">
+                          <Calculator className="w-4 h-4 text-emerald-600" /> Quick Tools
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link 
+                            href="/senior#drug-checker" 
+                            onClick={() => setIsOpen(false)}
+                            className="p-3 bg-rose-50/50 hover:bg-rose-100/60 text-rose-800 rounded-2xl border border-rose-100/50 text-xs font-bold text-center transition-all hover:scale-[1.02]"
+                          >
+                            Drug Checker
+                          </Link>
+                          <Link 
+                            href="/money-future#retirement-planner" 
+                            onClick={() => setIsOpen(false)}
+                            className="p-3 bg-amber-50/50 hover:bg-amber-100/60 text-amber-800 rounded-2xl border border-amber-100/50 text-xs font-bold text-center transition-all hover:scale-[1.02]"
+                          >
+                            Retirement Planner
+                          </Link>
+                          <Link 
+                            href="/home-living#smart-matcher" 
+                            onClick={() => setIsOpen(false)}
+                            className="p-3 bg-orange-50/50 hover:bg-orange-100/60 text-orange-800 rounded-2xl border border-orange-100/50 text-xs font-bold text-center transition-all hover:scale-[1.02]"
+                          >
+                            Smart Matcher
+                          </Link>
+                          <Link 
+                            href="/pet-family#canine-symptom" 
+                            onClick={() => setIsOpen(false)}
+                            className="p-3 bg-indigo-50/50 hover:bg-indigo-100/60 text-indigo-800 rounded-2xl border border-indigo-100/50 text-xs font-bold text-center transition-all hover:scale-[1.02]"
+                          >
+                            Symptom Triage
+                          </Link>
                         </div>
                       </div>
                     </div>

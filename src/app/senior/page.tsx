@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { DrugInteractionChecker } from "@/components/calculators/drug-interaction-checker";
+import { MobilitySafetyChecklist } from "@/components/calculators/mobility-safety-checklist";
 import { DynamicNewsFeed } from '@/components/content/dynamic-news-feed';
 import { PillarVideoSection } from '@/components/content/pillar-video-section';
 
@@ -33,7 +34,7 @@ export default async function PillarPage({
         
         {/* Navigation Breadcrumb */}
         <Link 
-          href={``}
+          href={`/`}
           className="inline-flex items-center gap-2 text-primary hover:text-primary-container mb-8 transition-all font-bold group min-h-[52px]"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -53,10 +54,13 @@ export default async function PillarPage({
           </p>
         </header>
 
-        {/* Tool-First: Above-the-fold Interactive Widget */}
+        {/* Tool-First: Above-the-fold Interactive Widgets */}
         <section className="w-full max-w-4xl mx-auto space-y-8 mb-12">
-          <div className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+          <div id="drug-checker" className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
             <DrugInteractionChecker />
+          </div>
+          <div id="mobility-planner" className="bg-white rounded-3xl p-8 border border-border soft-shadow transition-all duration-300">
+            <MobilitySafetyChecklist />
           </div>
         </section>
 

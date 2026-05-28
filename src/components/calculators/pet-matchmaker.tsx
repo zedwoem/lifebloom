@@ -27,31 +27,11 @@ const TRANSLATIONS = {
       { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Fast runner but loves to lounge around the house." }
     ]
   },
-  id: {
-    title: "Pencocok Hewan Peliharaan",
-    subtitle: "Temukan ras anjing ideal berdasarkan gaya hidup, ruang tinggal, dan ketersediaan aktivitas harian Anda.",
-    labelSpace: "Ruang Tinggal Anda",
-    spaceSmall: "Kecil (Apartemen)",
-    spaceLarge: "Besar (Rumah dengan Halaman)",
-    labelTime: "Waktu Luang Harian untuk Aktivitas Hewan",
-    timeLow: "Sedikit (< 1 Jam)",
-    timeMedium: "Sedang (1 - 2 Jam)",
-    timeHigh: "Banyak (> 2 Jam)",
-    btnSubmit: "Analisis Kecocokan",
-    btnSubmitLoading: "Menganalisis Kecocokan...",
-    resultsTitle: "Ras yang Direkomendasikan:",
-    seeInsurance: "Lihat Opsi Asuransi Hewan →",
-    breeds: [
-      { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Sangat bersahabat dan membutuhkan banyak aktivitas fisik." },
-      { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Sempurna untuk apartemen, tingkat energi sedang." },
-      { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Pelari cepat tetapi sangat suka bersantai di dalam rumah." }
-    ]
-  }
 };
 
 export function PetMatchmaker() {
   const params = useParams();
-  const locale = (params?.locale as string) === "id" ? "id" : "en";
+  const locale = "en";
   const t = TRANSLATIONS[locale];
 
   const [space, setSpace] = useState<"small" | "large" | "">("");

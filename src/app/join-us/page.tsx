@@ -15,17 +15,43 @@ export default async function B2BPitchDeckPage({}) {
 
       <div className="max-w-[1120px] mx-auto px-6 relative z-10">
         
+        {/* PERSONAL SIGNUP BANNER FOR CAREGIVERS & FAMILIES */}
+        <div className="mb-12 p-6 bg-emerald-50 border border-emerald-150 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xs animate-fade-in">
+          <div className="text-center sm:text-left">
+            <h4 className="text-slate-900 font-black text-base" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+              Looking to join as a caregiver, family, or senior?
+            </h4>
+            <p className="text-slate-600 text-xs mt-1 font-semibold">
+              Create your personal profile to save calculation history, track custom prescription lists, and post on our community wall.
+            </p>
+          </div>
+          <div className="flex gap-2.5 shrink-0">
+            <Link 
+              href="/login" 
+              className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-all shadow-2xs min-h-[38px] flex items-center"
+            >
+              Log In
+            </Link>
+            <Link 
+              href="/register" 
+              className="px-4 py-2.5 bg-[#006948] hover:bg-[#005439] text-white rounded-xl text-xs font-bold transition-all shadow-xs min-h-[38px] flex items-center"
+            >
+              Sign Up Free
+            </Link>
+          </div>
+        </div>
+        
         {/* HERO HEADER */}
-        <header className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm tracking-wide border border-slate-200 shadow-sm mb-6">
+        <header className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-800 font-bold text-xs uppercase tracking-widest border border-emerald-200/50 shadow-2xs mb-6">
             LifeBloom B2B Partnerships
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight mb-6" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
             Integrate Contextually.<br/>
-            <span className="text-[#006948]">Convert Natively.</span>
+            <span className="text-[#006948]">Build Enduring Trust.</span>
           </h1>
-          <p className="text-xl text-slate-600 leading-relaxed font-medium">
-            Standard banner ads are dying. High-net-worth families seek clean, zero-adware tools. Partner with Lifebloom to embed your brand&apos;s solutions right at the exact moment a user needs them.
+          <p className="text-lg text-slate-600 leading-relaxed font-medium">
+            Standard banner advertisements degrade trust. Multigenerational families seek quiet, ad-free environments. Partner with LifeBloom to contextually integrate your brand&apos;s senior solutions right when users are actively seeking guidance.
           </p>
         </header>
 

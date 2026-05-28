@@ -19,25 +19,25 @@ const styles = StyleSheet.create({
 const ChecklistPDF = ({ rooms }: { rooms: string[] }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <Text style={styles.header}>Mobility Safety Checklist (Panduan CDC STEADI)</Text>
+      <Text style={styles.header}>Mobility Safety Checklist (CDC STEADI Guide)</Text>
       
       {rooms.map((room, idx) => (
         <View key={idx} style={styles.section}>
           <Text style={styles.label}>{idx + 1}. Area {room}</Text>
-          <Text style={styles.item}>- Pastikan jalur berjalan bebas dari kabel atau perabotan.</Text>
-          <Text style={styles.item}>- Gunakan pencahayaan yang terang.</Text>
-          {room === "Kamar Mandi" && (
-            <Text style={styles.item}>- Pasang pegangan (Grab Bars) di dekat toilet dan shower.</Text>
+          <Text style={styles.item}>- Ensure walkways are free of cords or furniture.</Text>
+          <Text style={styles.item}>- Use bright lighting.</Text>
+          {room === "Bathroom" && (
+            <Text style={styles.item}>- Install Grab Bars near toilet and shower.</Text>
           )}
-          {room === "Tangga" && (
-            <Text style={styles.item}>- Pastikan pegangan tangan kokoh di kedua sisi.</Text>
+          {room === "Stairs" && (
+            <Text style={styles.item}>- Ensure sturdy handrails on both sides.</Text>
           )}
         </View>
       ))}
 
       <View style={styles.sponsorBox}>
-        <Text style={styles.sponsorTitle}>Sponsor: Solusi Mobilitas Aman</Text>
-        <Text style={styles.sponsorText}>Dapatkan diskon 15% untuk instalasi Grab Bar anti-slip dari mitra B2B kami. Tunjukkan dokumen ini kepada agen terdekat.</Text>
+        <Text style={styles.sponsorTitle}>Sponsor: Safe Mobility Solutions</Text>
+        <Text style={styles.sponsorText}>Get a 15% discount on anti-slip Grab Bar installation from our B2B partners. Show this document to your local agent.</Text>
       </View>
     </Page>
   </Document>
@@ -47,7 +47,7 @@ export function MobilitySafetyChecklist() {
   const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const rooms = ["Ruang Tamu", "Kamar Tidur", "Kamar Mandi", "Dapur", "Tangga"];
+  const rooms = ["Living Room", "Bedroom", "Bathroom", "Kitchen", "Stairs"];
 
   const toggleRoom = (room: string) => {
     setSelectedRooms(prev => 
@@ -79,11 +79,11 @@ export function MobilitySafetyChecklist() {
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold text-slate-800 mb-4">Mobility Safety Checklist</h2>
         <p className="text-lg text-slate-600 mb-6">
-          Buat daftar periksa keselamatan ruang untuk meminimalisasi risiko jatuh pada lansia di rumah, mengacu pada inisiatif STEADI dari CDC.
+          Create a room safety checklist to minimize the risk of falls for seniors at home, referencing the CDC's STEADI initiative.
         </p>
 
         <div className="space-y-4 mb-8">
-          <label className="block text-lg font-bold text-slate-700">Pilih Area yang Ingin Dievaluasi:</label>
+          <label className="block text-lg font-bold text-slate-700">Select Areas to Evaluate:</label>
           <div className="flex flex-wrap gap-3">
             {rooms.map(room => (
               <Button
@@ -103,7 +103,7 @@ export function MobilitySafetyChecklist() {
           disabled={isGenerating || selectedRooms.length === 0}
           className="w-full min-h-[48px] text-lg bg-brand-green text-white font-bold"
         >
-          {isGenerating ? "Membuat PDF..." : "Cetak Checklist Lengkap (PDF)"}
+          {isGenerating ? "Generating PDF..." : "Print Full Checklist (PDF)"}
         </Button>
       </div>
     </ClientOnly>

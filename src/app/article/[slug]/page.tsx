@@ -370,9 +370,9 @@ Instructions:
 export async function generateMetadata({ 
   params 
 }: { 
-  params: Promise<{ slug: string; locale: string }> 
+  params: Promise<{ slug: string }> 
 }): Promise<Metadata> {
-  const { slug, locale } = await params;
+  const { slug } = await params;
   try {
     const article = await getArticleData(slug, locale);
     if (!article) return {};
@@ -441,9 +441,9 @@ export async function generateMetadata({
 export default async function ArticleReaderPage({
   params
 }: {
-  params: Promise<{ locale: string; slug: string }>
+  params: Promise<{ slug: string }>
 }) {
-  const { locale, slug } = await params;
+  const { slug } = await params;
   const article = await getArticleData(slug, locale);
 
   if (!article) notFound();
