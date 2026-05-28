@@ -31,32 +31,7 @@ export async function GET(req: NextRequest) {
     const isMock = !apiKey || apiKey === "your_youtube_api_key_here";
 
     if (isMock) {
-      // Robust and realistic Elder Wellness / Financial mock data for graceful testing
-      const mockDb: Record<string, any> = {
-        "dQw4w9WgXcQ": {
-          title: "Rick Astley - Never Gonna Give You Up (Official Music Video)",
-          description: "The official video for 'Never Gonna Give You Up' by Rick Astley. Essential wellness and musical nostalgia for generational cognitive exercises.",
-          thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
-          duration: "3:33",
-          provider: "youtube",
-          warning: "Using local mock fallback. Set YOUTUBE_API_KEY in .env.local to query real live data."
-        },
-        "default": {
-          title: `Panduan Kesehatan Lansia & Nutrisi Makro (Video #${videoId})`,
-          description: "Sebuah video informatif berdurasi penuh mengenai nutrisi penting, pola makan ramah pencernaan, serta olahraga ringan terarah untuk menunjang kebugaran lansia di atas usia 65 tahun.",
-          thumbnail: `https://images.unsplash.com/photo-1543333995-a78aea2eee52?q=80&w=640&auto=format&fit=crop`,
-          duration: "12:45",
-          provider: "youtube",
-          warning: "Using local mock fallback. Set YOUTUBE_API_KEY in .env.local to query real live data."
-        }
-      };
-
-      const result = mockDb[videoId] || {
-        ...mockDb["default"],
-        title: `Multimedia Integration Guide for Elder Care (#${videoId})`
-      };
-
-      return NextResponse.json(result);
+      return NextResponse.json({ error: "YouTube API key is not configured. Please set YOUTUBE_API_KEY in your environment variables." }, { status: 500 });
     }
 
     // Call real YouTube Data API v3

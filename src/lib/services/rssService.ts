@@ -476,9 +476,9 @@ export async function enrichScrapedContentWithAI(
   category: string,
   locale: string = 'en'
 ): Promise<{ contentHtml: string; description: string; keywords: string[] }> {
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey) {
-    throw new Error('Missing GEMINI_API_KEY');
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  if (!openRouterKey) {
+    throw new Error('Missing OPENROUTER_API_KEY');
   }
 
   // Strict Internal Linking Mapping
@@ -547,28 +547,32 @@ IMPORTANT: Respond ONLY with the raw JSON object. Do not wrap in markdown code b
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+      `https://openrouter.ai/api/v1/chat/completions`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openRouterKey}`,
+          "HTTP-Referer": "https://lifebloomhub.com",
+          "X-Title": "LifeBloom Hub"
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json"
-          }
+          model: "deepseek/deepseek-chat", // DeepSeek via OpenRouter (cheap, reasoning)
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" }
         }),
-        signal: AbortSignal.timeout(12000)
+        signal: AbortSignal.timeout(30000)
       }
     );
 
     if (!res.ok) {
-      throw new Error(`Gemini API HTTP ${res.status}`);
+      throw new Error(`OpenRouter API HTTP ${res.status}`);
     }
 
     const resData = await res.json();
-    const rawJson = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+    const rawJson = resData.choices?.[0]?.message?.content;
     if (!rawJson) {
-      throw new Error("Empty response from Gemini API");
+      throw new Error("Empty response from OpenRouter API");
     }
 
     const cleanResult = JSON.parse(rawJson.trim());
@@ -578,7 +582,7 @@ IMPORTANT: Respond ONLY with the raw JSON object. Do not wrap in markdown code b
       keywords: cleanResult.keywords || []
     };
   } catch (err: any) {
-    console.error("[Gemini Enrichment] Failed:", err.message);
+    console.error("[OpenRouter/DeepSeek Enrichment] Failed:", err.message);
     throw err;
   }
 }
@@ -637,8 +641,8 @@ export async function processPendingArticlesBatch(limit: number = 5): Promise<{ 
           ? article.content_html.replace(/<[^>]*>/g, '').trim().slice(0, 500) 
           : '';
         
-        const geminiKey = process.env.GEMINI_API_KEY;
-        if (!geminiKey) throw new Error('Missing GEMINI_API_KEY for direct AI fallback.');
+        const openRouterKey = process.env.OPENROUTER_API_KEY;
+        if (!openRouterKey) throw new Error('Missing OPENROUTER_API_KEY for direct AI fallback.');
         
         console.log(`[Queue Processor] Generating direct AI content for "${article.title}"...`);
         const generationPrompt = `Write a highly informative, detailed, 600-word professional article in English for senior citizens about the topic: "${article.title}". 
@@ -648,26 +652,31 @@ Instructions:
 1. Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, and bullet lists.
 2. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
         
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+        const openRouterRes = await fetch(
+          `https://openrouter.ai/api/v1/chat/completions`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${openRouterKey}`,
+              "HTTP-Referer": "https://lifebloomhub.com"
+            },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: generationPrompt }] }]
+              model: "deepseek/deepseek-chat",
+              messages: [{ role: "user", content: generationPrompt }]
             }),
-            signal: AbortSignal.timeout(12000)
+            signal: AbortSignal.timeout(30000)
           }
         );
 
-        if (!geminiRes.ok) {
-          throw new Error(`Gemini AI generation fallback failed with HTTP ${geminiRes.status}`);
+        if (!openRouterRes.ok) {
+          throw new Error(`OpenRouter AI generation fallback failed with HTTP ${openRouterRes.status}`);
         }
 
-        const resData = await geminiRes.json();
-        const generatedText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+        const resData = await openRouterRes.json();
+        const generatedText = resData.choices?.[0]?.message?.content;
         if (!generatedText || generatedText.trim().length < 100) {
-          throw new Error('Gemini direct generation returned empty content.');
+          throw new Error('OpenRouter direct generation returned empty content.');
         }
 
         scraped = {

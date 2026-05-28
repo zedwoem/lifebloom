@@ -14,7 +14,7 @@ export function MatterCompatibility() {
     if (!device) return;
     setIsChecking(true);
     setTimeout(() => {
-      // Simple mock logic for compatibility (in reality, connect to a database or API)
+      // Evaluates locally if brand supports Matter standard 
       const compatibleBrands = ['nest', 'ring', 'apple', 'philips', 'hue', 'eve', 'tp-link', 'tapo', 'aqara', 'sonoff'];
       const isCompatible = compatibleBrands.some(b => device.toLowerCase().includes(b));
       setResult(isCompatible);

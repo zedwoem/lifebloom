@@ -6,48 +6,31 @@ const locale = "en" as string;
 
 export default async function AboutPage({}) {
   
-  const isIndonesian = locale === 'id';
-
-  // Localized Content Map
   const content = {
-    heroBadge: isIndonesian ? "Tentang LifeBloom Hub" : "About LifeBloom Hub",
-    heroTitle: isIndonesian ? "Kejelasan Di Atas Kebisingan." : "Clarity Over Noise.",
-    heroTitleSpan: isIndonesian ? "Solusi Di Atas Iklan." : "Solutions Over Ads.",
-    heroSubtitle: isIndonesian ? 
-      "Kami percaya teknologi harus bekerja untuk Anda, bukan mengeksploitasi data Anda. LifeBloom Hub adalah pelabuhan aman yang bebas adware untuk keluarga dan lansia." : 
-      "We believe everyday technology should serve you, not exploit your profile. LifeBloom Hub is a clean, ad-free sanctuary for multigenerational families.",
+    heroBadge: "About LifeBloom Hub",
+    heroTitle: "Clarity Over Noise.",
+    heroTitleSpan: "Solutions Over Ads.",
+    heroSubtitle: "We believe everyday technology should serve you, not exploit your profile. LifeBloom Hub is a clean, ad-free sanctuary for multigenerational families.",
     
-    sectionTitle: isIndonesian ? "Prinsip Utama Kami" : "Our Core Principles",
+    sectionTitle: "Our Core Principles",
     
-    card1Title: isIndonesian ? "Tanpa Adware & Cookies Pihak Ketiga" : "Ad-Free & Tracker-Free",
-    card1Desc: isIndonesian ? 
-      "Kami tidak menjual cookie, memajang iklan pop-up yang mengganggu, atau membagikan riwayat pencarian medis/keuangan Anda kepada pihak ketiga." : 
-      "We never display tracking ads, compile profiles, or sell your medical/financial inputs. Your calculations are private by design.",
+    card1Title: "Ad-Free & Tracker-Free",
+    card1Desc: "We never display tracking ads, compile profiles, or sell your medical/financial inputs. Your calculations are private by design.",
     
-    card2Title: isIndonesian ? "Metrik Klinis & Finansial Terverifikasi" : "Verified E-E-A-T Standards",
-    card2Desc: isIndonesian ? 
-      "Seluruh kalkulator dan artikel kesehatan/keuangan kami ditinjau oleh pakar terakreditasi (terintegrasi ORCID & Wikidata) untuk akurasi tertinggi." : 
-      "Our tools, calculators, and articles are curated and reviewed by accredited experts (integrated with ORCID & Wikidata) for maximum trust.",
+    card2Title: "Verified E-E-A-T Standards",
+    card2Desc: "Our tools, calculators, and articles are curated and reviewed by accredited experts (integrated with ORCID & Wikidata) for maximum trust.",
 
-    card3Title: isIndonesian ? "Kejelasan Aksesibilitas Universal" : "Universal Accessibility",
-    card3Desc: isIndonesian ? 
-      "Dirancang dengan kontras warna tinggi, navigasi keyboard lengkap, dan antarmuka ramah lansia yang memenuhi kepatuhan standar WCAG." : 
-      "Built with high color contrast, full keyboard navigation, and cognitive-friendly interfaces aligned with WCAG accessibility standards.",
+    card3Title: "Universal Accessibility",
+    card3Desc: "Built with high color contrast, full keyboard navigation, and cognitive-friendly interfaces aligned with WCAG accessibility standards.",
 
-    teamTitle: isIndonesian ? "Visi Multigenerasional Kami" : "Our Multigenerational Vision",
-    teamP1: isIndonesian ? 
-      "Didirikan untuk menjembatani kesenjangan antara teknologi modern dan kebutuhan lansia, LifeBloom Hub menyediakan alat hitung praktis untuk membantu perencanaan masa depan, kesejahteraan keluarga, dan perawatan rumah tinggal yang ramah aksesibilitas." : 
-      "Founded to bridge the gap between modern digital tools and senior citizens, LifeBloom Hub provides robust, high-utility tools to calculate retirement funds, assess drug safety, and plan accessible smart home renovations.",
-    teamP2: isIndonesian ? 
-      "Kami berkomitmen untuk terus menyediakan platform yang tenang, bersih, dan tepercaya untuk membantu Anda merawat mereka yang bergantung pada Anda." : 
-      "We are committed to maintaining a calm, clean, and reliable harbor to assist you in managing the security of those who depend on you.",
+    teamTitle: "Our Multigenerational Vision",
+    teamP1: "Founded to bridge the gap between modern digital tools and senior citizens, LifeBloom Hub provides robust, high-utility tools to calculate retirement funds, assess drug safety, and plan accessible smart home renovations.",
+    teamP2: "We are committed to maintaining a calm, clean, and reliable harbor to assist you in managing the security of those who depend on you.",
 
-    ctaTitle: isIndonesian ? "Ingin Berkolaborasi?" : "Interested in Collaborating?",
-    ctaDesc: isIndonesian ? 
-      "Apakah Anda seorang praktisi kesehatan terverifikasi atau instansi yang ingin menyajikan solusi terintegrasi secara etis?" : 
-      "Are you an accredited clinical expert or a brand seeking to embed highly contextual solutions natively?",
-    ctaButtonPrimary: isIndonesian ? "Ajukan Kemitraan / Pakar" : "Join as Expert / Partner",
-    ctaButtonSecondary: isIndonesian ? "Hubungi Dukungan" : "Contact Support"
+    ctaTitle: "Interested in Collaborating?",
+    ctaDesc: "Are you an accredited clinical expert or a brand seeking to embed highly contextual solutions natively?",
+    ctaButtonPrimary: "Join as Expert / Partner",
+    ctaButtonSecondary: "Contact Support"
   };
 
   return (

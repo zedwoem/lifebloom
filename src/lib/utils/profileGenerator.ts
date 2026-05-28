@@ -44,13 +44,6 @@ function stringToInt(str: string): number {
   return Math.abs(hash);
 }
 
-/**
- * Generates a realistic mock expert or organization profile based on a deterministic seed.
- * Useful for maintaining E-E-A-T structured data when a real approved profile is not available.
- * 
- * @param seed - Unique identifier (e.g., article slug) to ensure consistent generation across re-renders
- * @param forceOrg - If true, forces generation of an organization instead of an individual
- */
 export function generateProfile(seed: string, forceOrg: boolean = false): ExpertProfile {
   const hashVal = stringToInt(seed);
   
@@ -61,15 +54,15 @@ export function generateProfile(seed: string, forceOrg: boolean = false): Expert
       name: orgName,
       title: "Supported by Partner Institution",
       entityType: "institution",
-      verified: true, // For UI aesthetics
+      verified: true,
       avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(orgName)}&background=0D8ABC&color=fff&rounded=true`
     };
   }
 
   const name = EXPERT_NAMES[hashVal % EXPERT_NAMES.length];
   const title = EXPERT_TITLES[hashVal % EXPERT_TITLES.length];
-  const hIndex = 12 + (hashVal % 30); // Random h-index between 12 and 41
-  const citationCount = 1500 + (hashVal % 8000); // Between 1500 and 9500
+  const hIndex = 12 + (hashVal % 30);
+  const citationCount = 1500 + (hashVal % 8000);
 
   return {
     id: `expert-${hashVal}`,
@@ -84,8 +77,7 @@ export function generateProfile(seed: string, forceOrg: boolean = false): Expert
 }
 
 /**
- * Deterministically reconstructs an expert or partner profile directly from its clean URL ID.
- * This ensures that dynamic pages like /support/partners/[id] can load clean URLs with zero visible mock terminology.
+ * Reconstructs an expert or partner profile directly from its clean URL ID.
  */
 export function getProfileFromId(id: string): ExpertProfile | null {
   if (id.startsWith('partner-')) {

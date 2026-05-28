@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useMounted } from '@/lib/hooks/useMounted';
 import { useTrackView } from '@/lib/hooks/useTrackView';
+import { checkMultiDrugInteractions } from '@/lib/actions/calculatorActions';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,6 +53,7 @@ export function DrugInteractionChecker() {
   const [drugs, setDrugs] = useState<string[]>(['Lisinopril', 'Ibuprofen']);
   const [newDrug, setNewDrug] = useState('');
   const [result, setResult] = useState<{ severity: 'Low' | 'Medium' | 'High', description: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useTrackView('senior/drug-checker', 'tool', 'Drug Interaction Checker', 'senior');
 
@@ -68,23 +70,27 @@ export function DrugInteractionChecker() {
     setResult(null);
   };
 
-  const checkInteractions = () => {
+  const checkInteractions = async () => {
     if (drugs.length < 2) return;
-    
-    // Simulation logic for MVP. In production, this would call an API like OpenFDA.
-    const hasNsaid = drugs.some(d => d.toLowerCase().includes('ibuprofen') || d.toLowerCase().includes('naproxen'));
-    const hasAce = drugs.some(d => d.toLowerCase().includes('lisinopril') || d.toLowerCase().includes('enalapril'));
-
-    if (hasNsaid && hasAce) {
-      setResult({
-        severity: 'High',
-        description: 'Concurrent use of NSAIDs and ACE inhibitors can significantly decrease kidney function and reduce blood pressure control.'
-      });
-    } else {
+    setIsLoading(true);
+    try {
+      const res = await checkMultiDrugInteractions(drugs);
+      if (res) {
+        setResult(res);
+      } else {
+        setResult({
+          severity: 'Low',
+          description: 'Tidak ada interaksi mayor yang terdeteksi pada database OpenFDA.'
+        });
+      }
+    } catch (err) {
+      console.error(err);
       setResult({
         severity: 'Low',
-        description: 'No significant interactions found among the entered medications based on basic local checks. Always consult your doctor.'
+        description: 'Potensi masalah komunikasi dengan API FDA. Harap konsultasikan ke dokter.'
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -164,10 +170,10 @@ export function DrugInteractionChecker() {
 
         <Button 
           onClick={checkInteractions} 
-          disabled={drugs.length < 2}
+          disabled={drugs.length < 2 || isLoading}
           className="w-full py-6 text-xl bg-brand-green hover:bg-brand-green-dark text-white shadow-lg shadow-brand-green/20"
         >
-          Check Interactions
+          {isLoading ? 'Checking...' : 'Check Interactions'}
         </Button>
 
         {result && (

@@ -1,53 +1,41 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Newspaper, ZoomIn, ZoomOut, Contrast, ExternalLink } from 'lucide-react';
 
-const DUMMY_NEWS = {
-  money: [
-    { title: "Top 5 Strategies to Maximize Your Social Security Benefits", source: "AARP Finance", date: "May 24, 2026", snippet: "Delaying your claims might seem like a good idea, but here is what the math says for the average retiree." },
-    { title: "Why High-Yield Savings Accounts Are Essential Right Now", source: "Forbes Advisor", date: "May 22, 2026", snippet: "With interest rates stabilizing, securing a high-yield account is critical for protecting cash against inflation." },
-    { title: "Estate Planning 101: What You Need to Know", source: "Kiplinger", date: "May 20, 2026", snippet: "Ensure your assets are protected and your family is taken care of with these fundamental estate planning tips." },
-    { title: "Navigating Medicare Advantage Open Enrollment", source: "Healthline", date: "May 18, 2026", snippet: "Don't miss the window to optimize your healthcare coverage for the upcoming year." },
-    { title: "Downsizing Your Home in Retirement", source: "WSJ Real Estate", date: "May 15, 2026", snippet: "How to financially and emotionally prepare for moving to a smaller, more manageable space." }
-  ],
-  home: [
-    { title: "Smart Home Gadgets That Make Aging in Place Safer", source: "SmartHome Weekly", date: "May 25, 2026", snippet: "From voice-activated lights to smart locks, these devices provide peace of mind for both seniors and their families." },
-    { title: "Bathroom Renovation Grants for Seniors", source: "Housing Authority", date: "May 20, 2026", snippet: "Discover federal and state grants available to help cover the costs of installing grab bars and walk-in tubs." },
-    { title: "Best Anti-Slip Flooring Options", source: "HomeAdvisor", date: "May 18, 2026", snippet: "Prevent falls with these highly-rated, affordable flooring solutions designed for safety." },
-    { title: "DIY Home Accessibility Hacks", source: "Family Handyman", date: "May 15, 2026", snippet: "Simple, low-cost modifications you can make this weekend to improve home safety." },
-    { title: "Choosing the Right Stairlift", source: "Consumer Reports", date: "May 12, 2026", snippet: "A comprehensive guide to comparing models, pricing, and installation requirements." }
-  ],
-  pet: [
-    { title: "Why Senior Dogs Make the Best Companions for Retirees", source: "PetFinder Blog", date: "May 23, 2026", snippet: "Skip the puppy phase! Older dogs offer calm temperaments and are often already trained." },
-    { title: "Managing Arthritis in Older Cats", source: "Feline Health Monthly", date: "May 18, 2026", snippet: "Simple dietary changes and environment adjustments can drastically improve your senior cat's quality of life." },
-    { title: "Affordable Pet Insurance for Senior Pets", source: "NerdWallet", date: "May 15, 2026", snippet: "How to find coverage that won't break the bank when your furry friend reaches their golden years." },
-    { title: "Top 10 Low-Maintenance Pets for Seniors", source: "AKC", date: "May 10, 2026", snippet: "Looking for companionship without the high energy demands? Consider these wonderful breeds." },
-    { title: "Dietary Needs of Aging Dogs", source: "VetStreet", date: "May 05, 2026", snippet: "What to look for in senior dog food to support cognitive function and joint health." }
-  ],
-  senior: [
-    { title: "The New Medicare Part D Changes Explained", source: "Healthline", date: "May 25, 2026", snippet: "Understanding the new out-of-pocket maximums and how they affect your monthly prescription costs." },
-    { title: "Daily Exercises to Improve Balance and Prevent Falls", source: "SilverSneakers", date: "May 21, 2026", snippet: "A 10-minute daily routine that strengthens your core and improves spatial awareness." },
-    { title: "Eating for Cognitive Health", source: "Mayo Clinic", date: "May 18, 2026", snippet: "Discover the MIND diet and how specific foods can protect against dementia and Alzheimer's." },
-    { title: "Social Connections and Longevity", source: "Harvard Health", date: "May 15, 2026", snippet: "Why maintaining strong friendships is just as important as diet and exercise for a long, healthy life." },
-    { title: "Managing Multiple Medications Safely", source: "AARP Health", date: "May 10, 2026", snippet: "Tips and tools for keeping track of your prescriptions and avoiding dangerous interactions." }
-  ],
-  travel: [
-    { title: "The 10 Most Wheelchair-Accessible Cities in Europe", source: "Accessible Journeys", date: "May 24, 2026", snippet: "From smooth pavements in Barcelona to accessible trams in Vienna, plan your next seamless European adventure." },
-    { title: "TSA Guidelines for Traveling with Medical Equipment", source: "Travel & Leisure", date: "May 19, 2026", snippet: "Know your rights and prepare your documents before heading to the airport with CPAP machines or oxygen tanks." },
-    { title: "Best Cruises for Seniors with Limited Mobility", source: "Cruise Critic", date: "May 15, 2026", snippet: "A breakdown of the cruise lines offering the best accessible cabins and onboard amenities." },
-    { title: "Tips for Road Tripping with Seniors", source: "AAA Travel", date: "May 10, 2026", snippet: "How to plan frequent stops, pack essential medical supplies, and ensure a comfortable ride." },
-    { title: "Navigating National Parks in a Wheelchair", source: "NPS Guide", date: "May 05, 2026", snippet: "A guide to the most accessible trails and facilities in America's stunning national parks." }
-  ]
-};
+import { createClient } from '@/lib/supabase/client';
 
 export function AccessibleNewsFeed({ pillarSlug }: { pillarSlug: string }) {
   const [fontSize, setFontSize] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [highContrast, setHighContrast] = useState(false);
+  const [articles, setArticles] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fallback to money if the slug doesn't exist in dummy data
-  const articles = DUMMY_NEWS[pillarSlug as keyof typeof DUMMY_NEWS] || DUMMY_NEWS.money;
+  useEffect(() => {
+    const fetchArticles = async () => {
+      setIsLoading(true);
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('canonical_articles')
+        .select('*')
+        .eq('pillar', pillarSlug)
+        .order('published_at', { ascending: false })
+        .limit(5);
+      
+      if (data) {
+        setArticles(data.map(d => ({
+          title: d.title,
+          source: d.source_domain || 'LifeBloom Hub',
+          date: new Date(d.published_at || d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          snippet: d.description || d.content?.substring(0, 100) + '...',
+          slug: d.slug
+        })));
+      }
+      setIsLoading(false);
+    };
+    fetchArticles();
+  }, [pillarSlug]);
 
   const fontClasses = {
     normal: 'text-base',
@@ -120,10 +108,18 @@ export function AccessibleNewsFeed({ pillarSlug }: { pillarSlug: string }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {articles.map((article, idx) => (
+        {isLoading ? (
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-10 opacity-70">
+            Loading articles...
+          </div>
+        ) : articles.length === 0 ? (
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-10 opacity-70">
+            No articles found for {pillarSlug}.
+          </div>
+        ) : articles.map((article, idx) => (
           <Link 
             key={idx} 
-            href={`/en/article/${encodeURIComponent(article.title.replace(/\s+/g, '-').toLowerCase())}`}
+            href={`/article/${article.slug || encodeURIComponent(article.title.replace(/\s+/g, '-').toLowerCase())}`}
             className={`block focus:outline-none focus:ring-4 focus:ring-brand-blue rounded-2xl ${idx === 0 ? 'md:col-span-2 lg:col-span-2' : ''}`}
           >
             <article 

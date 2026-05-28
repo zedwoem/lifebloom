@@ -33,14 +33,14 @@ function ContactFormContent() {
         setFormData(prev => ({
           ...prev,
           category: 'sponsor_inquiry',
-          message: prev.message || `Halo, kami tertarik untuk berdiskusi mengenai kemitraan atau penawaran sponsor terkait ID Mitra: ${partnerId}.`
+          message: prev.message || `Hello, we are interested in discussing partnership or sponsorship opportunities regarding Partner ID: ${partnerId}.`
         }));
       } else if (ref.startsWith('expert_')) {
         const expertSlug = ref.replace('expert_', '');
         setFormData(prev => ({
           ...prev,
           category: 'expert_join',
-          message: prev.message || `Halo, saya adalah seorang pakar klinis terverifikasi (ID: ${expertSlug}) yang ingin bergabung atau berkontribusi dalam pembuatan artikel edukatif.`
+          message: prev.message || `Hello, I am a verified clinical expert (ID: ${expertSlug}) interested in joining or contributing educational articles.`
         }));
       }
     }
@@ -63,10 +63,10 @@ function ContactFormContent() {
           message: '',
         });
       } else {
-        setStatus({ error: res.error || 'Terjadi kesalahan saat mengirim formulir.' });
+        setStatus({ error: res.error || 'An error occurred while submitting the form.' });
       }
     } catch (err: any) {
-      setStatus({ error: err.message || 'Terjadi kesalahan jaringan.' });
+      setStatus({ error: err.message || 'Network error occurred.' });
     } finally {
       setIsPending(false);
     }
@@ -80,7 +80,7 @@ function ContactFormContent() {
         href={`/support`}
         className="inline-flex items-center gap-2 text-brand-green hover:text-brand-green-dark mb-8 transition-all font-bold min-h-[44px]"
       >
-        <ArrowLeft className="w-4 h-4" /> Kembali ke Help Desk
+        <ArrowLeft className="w-4 h-4" /> Back to Help Desk
       </Link>
 
       <Card className="border border-slate-200 shadow-soft-ambient rounded-3xl overflow-hidden bg-white">
@@ -91,10 +91,10 @@ function ContactFormContent() {
             </div>
             <div>
               <CardTitle className="text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                Hubungi Kami
+                Contact Us
               </CardTitle>
               <CardDescription className="text-slate-500">
-                Punya pertanyaan, tawaran kemitraan, atau ingin berkontribusi? Kirimkan pesan Anda di bawah ini.
+                Have questions, partnership offers, or want to contribute? Send us a message below.
               </CardDescription>
             </div>
           </div>
@@ -105,9 +105,9 @@ function ContactFormContent() {
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-6 rounded-2xl flex items-start gap-4 mb-6">
               <CheckCircle className="w-6 h-6 text-emerald-600 shrink-0 mt-1" />
               <div>
-                <h4 className="font-bold text-lg mb-1">Pesan Berhasil Dikirim!</h4>
+                <h4 className="font-bold text-lg mb-1">Message Sent Successfully!</h4>
                 <p className="text-sm text-emerald-700 leading-relaxed">
-                  Terima kasih atas pesan Anda. Tim dukungan atau verifikasi kami akan segera menghubungi Anda melalui email dalam waktu 24 jam.
+                  Thank you for your message. Our support or verification team will contact you via email within 24 hours.
                 </p>
               </div>
             </div>
@@ -117,7 +117,7 @@ function ContactFormContent() {
             <div className="bg-rose-50 border border-rose-200 text-rose-800 p-6 rounded-2xl flex items-start gap-4 mb-6">
               <AlertCircle className="w-6 h-6 text-rose-600 shrink-0 mt-1" />
               <div>
-                <h4 className="font-bold text-lg mb-1">Pengiriman Gagal</h4>
+                <h4 className="font-bold text-lg mb-1">Submission Failed</h4>
                 <p className="text-sm text-rose-700">{status.error}</p>
               </div>
             </div>
@@ -126,14 +126,14 @@ function ContactFormContent() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label htmlFor="contact-name" className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                <User className="w-4 h-4 text-slate-400" /> Nama Lengkap
+                <User className="w-4 h-4 text-slate-400" /> Full Name
               </label>
               <Input
                 id="contact-name"
                 name="name"
                 type="text"
                 required
-                placeholder="Masukkan nama lengkap Anda..."
+                placeholder="Enter your full name..."
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 className="h-[52px] rounded-xl border-slate-200"
@@ -142,14 +142,14 @@ function ContactFormContent() {
 
             <div className="space-y-2">
               <label htmlFor="contact-email" className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                <Mail className="w-4 h-4 text-slate-400" /> Alamat Email
+                <Mail className="w-4 h-4 text-slate-400" /> Email Address
               </label>
               <Input
                 id="contact-email"
                 name="email"
                 type="email"
                 required
-                placeholder="nama@perusahaan.com"
+                placeholder="name@company.com"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 className="h-[52px] rounded-xl border-slate-200"
@@ -158,13 +158,13 @@ function ContactFormContent() {
 
             <div className="space-y-2">
               <label htmlFor="contact-company" className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                <Building className="w-4 h-4 text-slate-400" /> Nama Instansi / Perusahaan <span className="text-xs text-slate-400 font-normal">(Opsional)</span>
+                <Building className="w-4 h-4 text-slate-400" /> Organization / Company Name <span className="text-xs text-slate-400 font-normal">(Optional)</span>
               </label>
               <Input
                 id="contact-company"
                 name="companyName"
                 type="text"
-                placeholder="Contoh: PT Medika Utama..."
+                placeholder="E.g. Main Medical Clinic..."
                 value={formData.companyName}
                 onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
                 className="h-[52px] rounded-xl border-slate-200"
@@ -172,7 +172,7 @@ function ContactFormContent() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="contact-category" className="text-sm font-bold text-slate-700">Kategori Pesan</label>
+              <label htmlFor="contact-category" className="text-sm font-bold text-slate-700">Message Category</label>
               <select
                 id="contact-category"
                 name="category"
@@ -180,22 +180,22 @@ function ContactFormContent() {
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as any }))}
                 className="w-full h-[52px] px-4 rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green"
               >
-                <option value="general">Tanya Jawab Umum</option>
-                <option value="expert_join">Pendaftaran Kontributor / Pakar</option>
-                <option value="sponsor_inquiry">Kemitraan & Penawaran Sponsor</option>
+                <option value="general">General Inquiry</option>
+                <option value="expert_join">Contributor / Expert Registration</option>
+                <option value="sponsor_inquiry">Partnership & Sponsorship</option>
               </select>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="contact-message" className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                <MessageSquare className="w-4 h-4 text-slate-400" /> Isi Pesan
+                <MessageSquare className="w-4 h-4 text-slate-400" /> Message
               </label>
               <textarea
                 id="contact-message"
                 name="message"
                 required
                 rows={5}
-                placeholder="Tulis pesan lengkap Anda di sini..."
+                placeholder="Write your full message here..."
                 value={formData.message}
                 onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                 className="w-full p-4 rounded-xl border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green placeholder:text-slate-400"
@@ -207,7 +207,7 @@ function ContactFormContent() {
               disabled={isPending}
               className="w-full h-[52px] bg-brand-green hover:bg-brand-green-dark text-white font-bold rounded-xl text-base shadow-md transition-colors"
             >
-              {isPending ? 'Sedang mengirim...' : 'Kirim Pesan Sekarang'}
+              {isPending ? 'Sending...' : 'Send Message Now'}
             </Button>
           </form>
         </div>
@@ -218,7 +218,7 @@ function ContactFormContent() {
 
 export default function ContactPage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-slate-500 font-bold text-lg">Memuat formulir kontak...</div>}>
+    <Suspense fallback={<div className="text-center py-20 text-slate-500 font-bold text-lg">Loading contact form...</div>}>
       <ContactFormContent />
     </Suspense>
   );

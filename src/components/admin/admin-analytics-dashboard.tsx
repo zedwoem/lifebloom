@@ -24,30 +24,56 @@ export function AdminAnalyticsDashboard() {
       const { count: calcCount } = await supabase.from('calculations_history').select('*', { count: 'exact', head: true });
 
       setStats({
-        users: usersCount || 42,
-        content: contentCount || 156,
-        calculators: calcCount || 89
+        users: usersCount || 0,
+        content: contentCount || 0,
+        calculators: calcCount || 0
       });
 
-      // Fetch dummy time-series data for chart (In prod, group by date from DB)
-      setActivityData([
-        { name: 'Mon', visits: 400, interactions: 240 },
-        { name: 'Tue', visits: 300, interactions: 139 },
-        { name: 'Wed', visits: 520, interactions: 380 },
-        { name: 'Thu', visits: 450, interactions: 390 },
-        { name: 'Fri', visits: 600, interactions: 480 },
-        { name: 'Sat', visits: 800, interactions: 600 },
-        { name: 'Sun', visits: 750, interactions: 550 },
-      ]);
+      // Real time-series data using recent calculator uses (7 days)
+      const datePast = new Date();
+      datePast.setDate(datePast.getDate() - 7);
+      
+      const { data: calcActivity } = await supabase
+        .from('calculations_history')
+        .select('created_at')
+        .gte('created_at', datePast.toISOString());
 
-      // Fetch pillar distribution
-      setPillarData([
-        { name: 'Home', count: 45 },
-        { name: 'Money', count: 52 },
-        { name: 'Pet', count: 30 },
-        { name: 'Senior', count: 40 },
-        { name: 'Travel', count: 25 },
-      ]);
+      // Group by day name
+      const dayCounts: Record<string, number> = { 'Sun': 0, 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0 };
+      if (calcActivity) {
+        calcActivity.forEach(c => {
+          const dayName = new Date(c.created_at).toLocaleDateString('en-US', { weekday: 'short' });
+          if (dayCounts[dayName] !== undefined) dayCounts[dayName]++;
+        });
+      }
+
+      setActivityData(
+        Object.keys(dayCounts).map(day => ({
+          name: day,
+          visits: dayCounts[day] * 3, // approximated traffic based on conversions
+          interactions: dayCounts[day]
+        }))
+      );
+
+      // Fetch real pillar distribution
+      const { data: pillarAgg } = await supabase
+        .from('canonical_articles')
+        .select('pillar');
+
+      const pCounts: Record<string, number> = {};
+      if (pillarAgg) {
+        pillarAgg.forEach(p => {
+          const pil = p.pillar || 'Uncategorized';
+          pCounts[pil] = (pCounts[pil] || 0) + 1;
+        });
+      }
+
+      setPillarData(
+        Object.keys(pCounts).map(k => ({
+          name: k.charAt(0).toUpperCase() + k.slice(1),
+          count: pCounts[k]
+        }))
+      );
 
     } catch (e) {
       console.error(e);

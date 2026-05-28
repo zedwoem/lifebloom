@@ -21,14 +21,9 @@ export async function fetchYouTubeMetadata(videoUrl: string) {
 
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey || apiKey === "your_youtube_api_key_here") {
-    // Return mock data if running locally without real key to avoid blocking UI development
     return { 
-      success: true, 
-      data: {
-        embedId: videoId,
-        title: "Mocked YouTube Video Title (API Key Missing)",
-        description: "This is a mock description because the YouTube API key is missing or invalid in the environment variables."
-      }
+      success: false, 
+      error: "YouTube API key is not configured. Please set YOUTUBE_API_KEY in your environment variables."
     };
   }
 

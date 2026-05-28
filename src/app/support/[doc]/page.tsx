@@ -74,7 +74,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ doc: 
     .process(data.content);
   const contentHtml = processedContent.toString();
 
-  const lastUpdated = new Date(data.last_updated_at || Date.now()).toLocaleDateString('id-ID', {
+  const lastUpdated = new Date(data.last_updated_at || Date.now()).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -99,7 +99,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ doc: 
           <article className="prose prose-slate max-w-none prose-headings:text-foreground prose-headings:font-bold prose-p:leading-relaxed prose-p:mb-6 prose-a:text-primary">
             <header className="mb-8 border-b border-border pb-6">
               <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">{data.title}</h1>
-              <p className="text-on-surface-variant text-[14px]">Terakhir diperbarui: {lastUpdated}</p>
+              <p className="text-on-surface-variant text-[14px]">Last updated: {lastUpdated}</p>
             </header>
 
             <div 

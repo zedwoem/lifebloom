@@ -77,13 +77,7 @@ export async function scrapeLiveCDRates(): Promise<ScrapedDeal[]> {
 
     // If scraper succeeded but DOM changed, provide our dynamic fallback 
     // to ensure the UI demonstration works flawlessly for the MVP
-    if (deals.length === 0) {
-      const fallback = getFallbackDeals();
-      try {
-        const redis = Redis.fromEnv();
-        await redis.set("cache:scraped_cd_rates", fallback, { ex: 86400 }); // Cache fallback for 24h
-      } catch (e) {}
-      return fallback;
+      return [];
     }
 
     // Cache successfully scraped deals in Redis for 24 hours
@@ -96,17 +90,7 @@ export async function scrapeLiveCDRates(): Promise<ScrapedDeal[]> {
 
   } catch (error) {
     console.error("Scraper encountered an error or was blocked by Cloudflare:", error);
-    // Return graceful fallback data so the Senior UI doesn't break
-    return getFallbackDeals();
+    // Return empty array instead of graceful fallback data so the UI doesn't render fake data
+    return [];
   }
-}
-
-function getFallbackDeals(): ScrapedDeal[] {
-  return [
-    { bankName: "Marcus by Goldman Sachs", apy: "5.10%", term: "12 Months", minDeposit: "$500" },
-    { bankName: "Capital One 360", apy: "5.00%", term: "11 Months", minDeposit: "$0" },
-    { bankName: "Discover Bank", apy: "4.70%", term: "18 Months", minDeposit: "$2,500" },
-    { bankName: "Ally Bank", apy: "4.50%", term: "12 Months", minDeposit: "$0" },
-    { bankName: "Synchrony Bank", apy: "4.65%", term: "14 Months", minDeposit: "$0" },
-  ];
 }

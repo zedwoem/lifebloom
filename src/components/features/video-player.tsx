@@ -163,6 +163,7 @@ export default function VideoPlayer({
           height="100%"
           playing={playing}
           controls={true}
+          light={true}
           onPlay={handlePlay}
           onPause={() => setPlaying(false)}
           onProgress={({ playedSeconds }: { playedSeconds: number }) => setCurrentTime(playedSeconds)}

@@ -33,29 +33,31 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     console.error("Failed to log bot crawler activity:", err);
   }
 
-  // Here you would normally fetch data from Supabase based on the slug
-  // For MVP, we use mock content
-  const rawMarkdown = `
-# Content for ${slug}
+    // Here you would normally fetch data from Supabase based on the slug
+    const { data: article } = await adminSupabase
+      .from('canonical_articles')
+      .select('title, content, description')
+      .eq('slug', slug)
+      .single();
 
-This is a semantic, minimal representation.
+    if (!article) {
+      return new NextResponse("Article not found", { status: 404 });
+    }
 
-## AEO Direct Answer Box
-LifeBloom Hub provides inclusive, high-yield utility calculations for multigenerational families.
+    const rawMarkdown = `
+# ${article.title}
 
-## Data Comparison
-| Type | Value |
-| --- | --- |
-| Yield | 7.5% |
-| Inflation | 2.5% |
-  `;
+${article.description ? `> ${article.description}\n` : ''}
 
-  // Parse Markdown to Semantic HTML using unified/remark
-  const processedContent = await remark()
-    .use(html)
-    .process(rawMarkdown);
+${article.content}
+    `;
 
-  const contentHtml = processedContent.toString();
+    // Parse Markdown to Semantic HTML using unified/remark
+    const processedContent = await remark()
+      .use(html)
+      .process(rawMarkdown);
+
+    const contentHtml = processedContent.toString();
 
   // Return Semantic HTML directly, devoid of Tailwind/JS/Navigation
   const responseHtml = `
