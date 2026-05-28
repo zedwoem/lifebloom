@@ -6,6 +6,25 @@ Format Catatan: `[TANGGAL] - [PHASE] - [ISSUE] - [RESOLUTION]`
 
 ---
 
+## [2026-05-28]
+
+- **[2026-05-28] - [PHASE 5: SINGLE POST RECOVERY] - [Broken Article Images] - [RESOLUTION]**
+  - Migrated article featured images from next/image to standard HTML `<img>` elements in `accessible-article-reader.tsx`, completely bypassing Next.js domain remote pattern restrictions to load original publisher source images (e.g. Wheelchair Travel, Points Guy) dynamically.
+  - Replaced dynamic Unsplash search endpoints with highly curated, working static Unsplash photo URLs mapped by pillar inside `page.tsx` for clean fallback loading.
+
+- **[2026-05-28] - [PHASE 5: SINGLE POST RECOVERY] - [DRM Copy/Right-click Blocker] - [RESOLUTION]**
+  - Removed all custom `onCopy`, `onContextMenu` overrides and the CSS `select-none` text selection blocker from `accessible-article-reader.tsx` to enable seamless inspection, debugging, and normal user navigation.
+
+- **[2026-05-28] - [PHASE 5: SINGLE POST RECOVERY] - [Blank Video Player] - [RESOLUTION]**
+  - Configurations mapped `video.embed_id || video.video_id` in `VideoDetailClient.tsx` to supply a resilient fallback to `VideoPlayer` if `embed_id` is blank.
+  - Deployed an error-checking validation overlay inside `video-player.tsx` to prevent blank player crashes on missing or null video identifiers.
+
+- **[2026-05-28] - [PHASE 5: SINGLE POST RECOVERY] - [TypeScript Compiler Failures] - [RESOLUTION]**
+  - Bridged database schema mismatch inside `contextualMatcherService.ts` by mapping Supabase table outputs directly to the weighted scoring engine's expected `ProductRecord` interface.
+  - Removed invalid `.eq('converted', true)` filters from `usage/page.tsx` and modified the calculations history asynchronous import `unstable_after` in `calculations/route.ts`.
+  - Escaped all raw quotes and apostrophes in active pages and calculators to satisfy ESLint validator standards.
+  - Fixed table parsing regex in `systemCheck.ts` to ignore `IF NOT EXISTS` captures as table name `if`.
+
 ## [2026-05-26]
 
 - **[2026-05-26] - [PHASE 1: TYPE-SAFETY] - [Supabase Outdated Typings] - [RECONCILIATION]**

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "system-check": "npx tsx scripts/systemCheck.ts",
     "content:sync": "source .env.local && curl -s -X GET http://localhost:3000/api/cron/rss-ingest -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\n\" && curl -s -X GET http://localhost:3000/api/cron/process-queue -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\nSync Complete\"",
     "doctor": "npx react-doctor@latest"
   },

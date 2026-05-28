@@ -82,15 +82,6 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
     }
   };
 
-  const handleCopy = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    toast.warning("Copying disabled. Please use the Share & Embed widget below.");
-  };
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    toast.warning("Right-click disabled to protect our expert content.");
-  };
 
   const processedContent = article?.content ? article.content.replace(
     /<a([^>]+)>/gi,
@@ -274,9 +265,7 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
   return (
     <article 
-      className={`min-h-screen pb-20 transition-colors duration-300 ${containerClasses} select-none`}
-      onCopy={handleCopy}
-      onContextMenu={handleContextMenu}
+      className={`min-h-screen pb-20 transition-colors duration-300 ${containerClasses}`}
     >
       
       {/* Top Navigation Bar with Accessibility Controls - HIDDEN ON PRINT */}
@@ -397,13 +386,10 @@ export function AccessibleArticleReader({ article, locale, slug }: { article: an
 
         {/* Featured Image */}
         <figure className={`mb-12 rounded-3xl overflow-hidden relative shadow-lg border animate-slide-up w-full h-[400px] ${highContrast ? 'border-yellow-300 grayscale' : 'border-slate-100'}`} style={{ animationDelay: '0.1s' }}>
-          <Image 
+          <img 
             src={article.imageUrl || "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80"} 
             alt={article.title} 
-            fill
-            sizes="(max-width: 768px) 100vw, 800px"
-            priority
-            className="object-cover"
+            className="w-full h-full object-cover"
           />
         </figure>
 

@@ -50,7 +50,7 @@ export default async function PillarPage({
             {pillar.label}
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            Pets are family too. Whether you're looking to adopt a new companion that matches your lifestyle, or need guidance understanding a sudden symptom, our tools are here to help keep your furry friends happy and healthy.
+            Pets are family too. Whether you&apos;re looking to adopt a new companion that matches your lifestyle, or need guidance understanding a sudden symptom, our tools are here to help keep your furry friends happy and healthy.
           </p>
         </header>
 

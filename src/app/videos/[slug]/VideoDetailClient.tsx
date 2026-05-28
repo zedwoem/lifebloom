@@ -225,7 +225,7 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
           </h1>
 
           <VideoPlayer
-            videoId={video.embed_id}
+            videoId={video.embed_id || video.video_id}
             platform="youtube"
             transcripts={video.segments}
           />

@@ -50,7 +50,7 @@ export default async function PillarPage({
             {pillar.label}
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            Create a living space that feels secure, comfortable, and easy to manage. Whether you're budgeting for accessible renovations or matching simple smart devices, we've got you covered.
+            Create a living space that feels secure, comfortable, and easy to manage. Whether you&apos;re budgeting for accessible renovations or matching simple smart devices, we&apos;ve got you covered.
           </p>
         </header>
 

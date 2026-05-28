@@ -74,7 +74,7 @@ export function SmartHomeMatcher() {
             </div>
             <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
               <p className="text-sm text-amber-800 font-medium">
-                <span className="font-bold">💡 Tip:</span> Devices with "Matter" certification work with almost any smart home app, meaning you don't need to learn a new system to use them.
+                <span className="font-bold">💡 Tip:</span> Devices with &quot;Matter&quot; certification work with almost any smart home app, meaning you don&apos;t need to learn a new system to use them.
               </p>
             </div>
           </div>

@@ -48,7 +48,7 @@ export class TravelpayoutsService {
     const cacheKey = `tp:flights:${cleanOrigin}:${cleanDest}:${departDate || 'any'}:${returnDate || 'any'}`;
     try {
       const cached = await redis.get(cacheKey);
-      if (cached) return typeof cached === 'string' ? JSON.parse(cached) : cached;
+      if (cached) return (typeof cached === 'string' ? JSON.parse(cached) : cached) as FlightPriceResponse[];
     } catch (e) {
       secureLogger.error('Upstash Redis read error', e);
     }

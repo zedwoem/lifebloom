@@ -42,13 +42,14 @@ export class ContextualMatcherService {
     try {
       const cachedData = await redis.get(cacheKey);
       if (cachedData) {
-        return typeof cachedData === 'string' ? JSON.parse(cachedData) : cachedData;
+        return (typeof cachedData === 'string' ? JSON.parse(cachedData) : cachedData) as ScoredProduct[];
       }
     } catch (cacheError) {
       console.error("[CME Cache Error] Failed to load from Upstash Redis:", cacheError);
     }
 
     // 2. Query Database Supabase (Fallback Path)
+    const supabase = createServiceClient();
     const { data: dbProducts, error } = await supabase
       .from('products')
       .select('*')
@@ -61,7 +62,26 @@ export class ContextualMatcherService {
     }
 
     // 3. Execute Weighted Scoring Engine
-    const scoredProducts: ScoredProduct[] = dbProducts.map((prod: ProductRecord) => {
+    const mappedProducts: ProductRecord[] = dbProducts.map((prod: any) => {
+      const specs = (prod.specs || {}) as Record<string, any>;
+      return {
+        id: prod.id,
+        name: prod.name,
+        description: prod.description || '',
+        pillar: prod.pillar,
+        image_url: prod.image_url || '',
+        target_url: prod.affiliate_url || '',
+        network: prod.vendor || 'direct',
+        network_product_id: prod.slug || '',
+        category: specs.category || (prod.pillar === 'senior' ? 'retirement' : 'general'),
+        tags: Array.isArray(specs.tags) ? specs.tags : (prod.description ? prod.description.toLowerCase().split(/\s+/) : []),
+        base_commission_rate: specs.base_commission_rate || 10.0,
+        is_recurring: specs.is_recurring || false,
+        priority_score: specs.priority_score || 50
+      };
+    });
+
+    const scoredProducts: ScoredProduct[] = mappedProducts.map((prod: ProductRecord) => {
       let score = prod.priority_score || 50;
       let reasons: string[] = [];
 

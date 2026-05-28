@@ -168,7 +168,7 @@ export default function LoginPage() {
         </Button>
 
         <div className="mt-6 text-center">
-          <p className="text-slate-500 font-medium">Don't have an account? <a href={`/register`} className="text-[#006948] font-bold hover:underline">Register now</a></p>
+          <p className="text-slate-500 font-medium">Don&apos;t have an account? <a href={`/register`} className="text-[#006948] font-bold hover:underline">Register now</a></p>
         </div>
 
         <div className="mt-8 text-center border-t border-slate-100 pt-6">

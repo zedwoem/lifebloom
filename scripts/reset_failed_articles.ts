@@ -14,19 +14,21 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function resetFailedArticles() {
   console.log("Resetting failed articles to pending...");
-  const { data, error, count } = await supabase
+  const { data, error } = await supabase
     .from('canonical_articles')
     .update({ 
       processing_status: 'pending',
       processing_error: null 
     })
     .in('processing_status', ['failed', 'processing'])
-    .select('id', { count: 'exact' });
+    .select('id');
 
   if (error) {
     console.error("Error resetting articles:", error);
     return;
   }
+
+  const count = data?.length || 0;
 
   console.log(`Successfully reset ${count} failed articles back to 'pending' status!`);
 }

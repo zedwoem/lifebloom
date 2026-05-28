@@ -50,7 +50,7 @@ export default async function PillarPage({
             {pillar.label}
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            Protecting those you love shouldn't be complicated. Use our trusted interactive tools to check daily medications, assess home mobility risks, and stay informed on the latest senior wellness advice.
+            Protecting those you love shouldn&apos;t be complicated. Use our trusted interactive tools to check daily medications, assess home mobility risks, and stay informed on the latest senior wellness advice.
           </p>
         </header>
 

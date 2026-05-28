@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse, unstable_after as after } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "@/lib/upstash";

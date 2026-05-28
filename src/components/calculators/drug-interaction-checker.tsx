@@ -294,7 +294,7 @@ export function DrugInteractionChecker() {
             🛡️ Safe Medication & Fall Prevention Guide
           </h3>
           <p className="text-sm md:text-base text-slate-600 font-medium leading-relaxed mb-4">
-            Taking multiple medications (polypharmacy) is one of the leading causes of balance issues and falls in older adults. For instance, combining blood pressure medications with standard pain relievers can lead to sudden lightheadedness. We're here to help you stay balanced and secure.
+            Taking multiple medications (polypharmacy) is one of the leading causes of balance issues and falls in older adults. For instance, combining blood pressure medications with standard pain relievers can lead to sudden lightheadedness. We&apos;re here to help you stay balanced and secure.
           </p>
           <ul className="text-sm text-slate-600 font-medium list-disc list-inside space-y-2">
             <li><strong>Keep an Active Log:</strong> Always write down every prescription, OTC drug, and herbal supplement you take.</li>

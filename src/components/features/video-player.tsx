@@ -155,6 +155,17 @@ export default function VideoPlayer({
 
   const renderPlayer = () => {
     const Player = ReactPlayer as any;
+    if (!videoId || videoId === "undefined" || videoId === "null") {
+      return (
+        <div className="flex flex-col items-center justify-center p-8 bg-slate-950 text-slate-200 rounded-2xl border border-slate-800 aspect-video w-full">
+          <AlertCircle className="w-12 h-12 text-rose-500 mb-4 animate-bounce" />
+          <h4 className="text-lg font-bold mb-2">Video ID Missing</h4>
+          <p className="text-sm text-slate-400 text-center max-w-md">
+            This video cannot be played because its identifier is missing or malformed.
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="relative aspect-video bg-slate-950 w-full overflow-hidden rounded-2xl group shadow-lg border border-slate-200/50">
         <Player

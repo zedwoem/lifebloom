@@ -92,17 +92,15 @@ Instructions:
 
             // Apply Unsplash image fallback if null
             if (!finalImageUrl) {
-              const pillarKeywords: Record<string, string> = {
-                'home-living': 'home-interior-decor',
-                'money-future': 'retirement-finance-wealth',
-                'pet-family': 'happy-pets-dogs',
-                'senior': 'healthy-aging-seniors',
-                'travel': 'wheelchair-accessible-travel',
-                'general': 'wellness'
+              const fallbackImages: Record<string, string> = {
+                'home-living': 'https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=1200&auto=format&fit=crop',
+                'money-future': 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=1200&auto=format&fit=crop',
+                'pet-family': 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=1200&auto=format&fit=crop',
+                'senior': 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=1200&auto=format&fit=crop',
+                'travel': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop',
+                'general': 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop'
               };
-              const keyword = pillarKeywords[canonicalArticle.pillar || 'general'] || pillarKeywords['general'];
-              const randomSeed = Math.abs(crypto.createHash('md5').update(canonicalArticle.title).digest().readInt32BE(0)) % 1000;
-              finalImageUrl = `https://images.unsplash.com/featured/1200x630/?${keyword}&sig=${randomSeed}`;
+              finalImageUrl = fallbackImages[canonicalArticle.pillar || 'general'] || fallbackImages['general'];
             }
 
             // Save back to DB to cache permanently
@@ -123,17 +121,15 @@ Instructions:
 
     // Apply Unsplash fallback image if still null
     if (!finalImageUrl) {
-      const pillarKeywords: Record<string, string> = {
-        'home-living': 'home-interior-decor',
-        'money-future': 'retirement-finance-wealth',
-        'pet-family': 'happy-pets-dogs',
-        'senior': 'healthy-aging-seniors',
-        'travel': 'wheelchair-accessible-travel',
-        'general': 'wellness'
+      const fallbackImages: Record<string, string> = {
+        'home-living': 'https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=1200&auto=format&fit=crop',
+        'money-future': 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=1200&auto=format&fit=crop',
+        'pet-family': 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=1200&auto=format&fit=crop',
+        'senior': 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=1200&auto=format&fit=crop',
+        'travel': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop',
+        'general': 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop'
       };
-      const keyword = pillarKeywords[canonicalArticle.pillar || 'general'] || pillarKeywords['general'];
-      const randomSeed = Math.abs(crypto.createHash('md5').update(canonicalArticle.title).digest().readInt32BE(0)) % 1000;
-      finalImageUrl = `https://images.unsplash.com/featured/1200x630/?${keyword}&sig=${randomSeed}`;
+      finalImageUrl = fallbackImages[canonicalArticle.pillar || 'general'] || fallbackImages['general'];
     }
 
     const { title: translatedTitle, contentHtml: translatedContentHtml } = await getOrCompileArticleTranslation(
