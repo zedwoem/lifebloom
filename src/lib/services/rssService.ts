@@ -823,7 +823,73 @@ IMPORTANT: Respond ONLY with the raw JSON object. Do not wrap in markdown code b
       keywords: cleanResult.keywords || cleanResult.seo_keywords || []
     };
   } catch (err: any) {
-    console.error("[Gemini Enrichment] JSON Parse Failure:", err.message);
+    console.error("[Gemini Enrichment] JSON Parse Failure, attempting robust regex fallback parsing...", err.message);
+    try {
+      let contentHtml = "";
+      
+      // Match content_html enclosed in backticks, double quotes, or single quotes
+      const contentHtmlMatch = rawJson.match(/"content_html"\s*:\s*`([\s\S]*?)`/) || 
+                               rawJson.match(/"content_html"\s*:\s*"([\s\S]*?)"/) ||
+                               rawJson.match(/"content_html"\s*:\s*'([\s\S]*?)'/);
+      if (contentHtmlMatch) {
+        contentHtml = contentHtmlMatch[1];
+      } else {
+        // Fallback to manual index matching
+        const contentKey = '"content_html"';
+        const startKeyIdx = rawJson.indexOf(contentKey);
+        if (startKeyIdx !== -1) {
+          const afterKey = rawJson.substring(startKeyIdx + contentKey.length);
+          const firstBrace = afterKey.indexOf(':');
+          if (firstBrace !== -1) {
+            const afterColon = afterKey.substring(firstBrace + 1).trim();
+            const quoteChar = afterColon[0];
+            if (quoteChar === '"' || quoteChar === "'" || quoteChar === '`') {
+              const endQuoteIdx = afterColon.indexOf(quoteChar, 1);
+              if (endQuoteIdx !== -1) {
+                contentHtml = afterColon.substring(1, endQuoteIdx);
+              }
+            }
+          }
+        }
+      }
+
+      if (contentHtml) {
+        contentHtml = contentHtml
+          .replace(/\\"/g, '"')
+          .replace(/\\n/g, '\n')
+          .replace(/\\r/g, '\r')
+          .replace(/\\t/g, '\t');
+      }
+
+      // Extract description
+      let description = "";
+      const descMatch = rawJson.match(/"description"\s*:\s*"([\s\S]*?)"/) ||
+                        rawJson.match(/"description"\s*:\s*'([\s\S]*?)'/);
+      if (descMatch) {
+        description = descMatch[1].replace(/\\"/g, '"');
+      }
+
+      // Extract keywords
+      let keywords: string[] = [];
+      const keywordsMatch = rawJson.match(/"keywords"\s*:\s*\[([\s\S]*?)\]/);
+      if (keywordsMatch) {
+        keywords = keywordsMatch[1]
+          .split(',')
+          .map(k => k.trim().replace(/^["'`]|["'`]$/g, ''))
+          .filter(Boolean);
+      }
+
+      if (contentHtml && contentHtml.trim().length > 100) {
+        console.log("[Gemini Enrichment] Regex fallback parsed contentHtml successfully! Length:", contentHtml.length);
+        return {
+          contentHtml,
+          description: description || "Enriched LifeBloom Hub advice.",
+          keywords
+        };
+      }
+    } catch (fallbackErr: any) {
+      console.error("[Gemini Enrichment] Regex fallback parsing also failed:", fallbackErr.message);
+    }
     throw err;
   }
 }
