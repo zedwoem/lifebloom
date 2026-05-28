@@ -7,15 +7,31 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Search as SearchIcon } from 'lucide-react';
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const locale = "en";
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
   const params = useParams();
+  const router = useRouter();
   const resolvedLocale = (params.locale as string) || 'en';
-  const query = searchParams.get('q') || '';
+  
+  const initialQuery = searchParams.get('q') || '';
+  const [localQuery, setLocalQuery] = useState(initialQuery);
+  const query = initialQuery;
+
+  useEffect(() => {
+    setLocalQuery(initialQuery);
+  }, [initialQuery]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (localQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(localQuery)}`);
+    }
+  };
 
   const fuse = useMemo(() => new Fuse(searchIndex, {
     keys: ['title', 'category', 'tags'],
@@ -39,22 +55,38 @@ function SearchResultsContent() {
   return (
     <div className="min-h-[70vh] bg-background py-12">
       <div className="container mx-auto px-6 max-w-4xl">
-        <div className="flex items-center gap-4 mb-10">
-          <div className="p-4 bg-brand-blue/10 rounded-2xl text-brand-blue">
-            <SearchIcon className="w-8 h-8" />
+        <div className="flex flex-col gap-6 mb-10">
+          <div className="flex items-center gap-4">
+            <div className="p-4 bg-emerald-500/10 rounded-2xl text-[#006948]">
+              <SearchIcon className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-slate-900 font-display">Search Results</h1>
+              <p className="text-slate-500 font-medium mt-1">
+                {query ? `Showing results for "${query}"` : 'Discover our resources and tools.'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-black text-brand-blue font-display">Search Results</h1>
-            <p className="text-slate-500 font-medium mt-1">
-              {query ? `Showing results for "${query}"` : 'Please enter a search query above.'}
-            </p>
-          </div>
+          
+          <form onSubmit={handleSearch} className="flex items-center gap-2 w-full max-w-2xl bg-white p-2 rounded-2xl border border-slate-200 shadow-sm focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+            <SearchIcon className="w-5 h-5 text-slate-400 ml-3" />
+            <input 
+              type="text" 
+              value={localQuery}
+              onChange={(e) => setLocalQuery(e.target.value)}
+              placeholder="What are you looking for?"
+              className="flex-1 bg-transparent border-none outline-none px-3 py-2 text-slate-800 placeholder:text-slate-400"
+            />
+            <button type="submit" className="px-6 py-2.5 bg-[#006948] text-white font-bold rounded-xl hover:bg-[#005439] transition-colors">
+              Search
+            </button>
+          </form>
         </div>
 
         {query && results.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 animate-fade-in">
             {results.map(({ item }) => {
-              const targetUrl = resolvedLocale === 'en' ? item.url : `/${resolvedLocale}${item.url}`;
+              const targetUrl = item.url;
               return (
                 <Link 
                   key={item.id}
@@ -87,7 +119,7 @@ function SearchResultsContent() {
           <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
             <h2 className="text-xl font-bold text-slate-700 mb-2">No exact matches found</h2>
             <p className="text-slate-500 mb-4">Try adjusting your keywords or browsing our categories.</p>
-            <Link href={resolvedLocale === 'en' ? '/' : `/${resolvedLocale}`} className="px-6 py-2 bg-emerald-100 text-emerald-800 rounded-full font-bold inline-block">Go Home</Link>
+            <Link href="/" className="px-6 py-2 bg-emerald-100 text-emerald-800 rounded-full font-bold inline-block hover:bg-emerald-200 transition-colors">Go Home</Link>
           </div>
         ) : null}
       </div>

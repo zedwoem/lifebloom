@@ -360,6 +360,9 @@ export default async function RootLayout({
                   Helpdesk
                 </Link>
                 <div className="h-6 w-px bg-slate-200 mx-2"></div>
+                <div className="w-[200px]">
+                  <GlobalSearch />
+                </div>
                 <NavbarUserStatus />
               </nav>
 
