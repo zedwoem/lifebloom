@@ -119,11 +119,11 @@ export default async function HomePage() {
           </div>
           
           <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight max-w-4xl mx-auto font-display" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-            Architecting the Future of Senior Care & Wealth Optimization.
+            Caring for Your Loved Ones Just Got a Little Easier.
           </h1>
           
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Discover a clean, ad-free sanctuary designed for multigenerational families. We empower you with real-time decision tools: FDA drug warnings, retirement yield projections, and barrier-free travel plans.
+          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mt-4">
+            Welcome to a peaceful, ad-free space designed for families and caregivers. From checking drug interactions to planning accessible trips, we provide trusted tools to help you support the people who matter most.
           </p>
         </header>
 

@@ -44,13 +44,13 @@ export default async function PillarPage({
         {/* Dynamic Category Header */}
         <header className="mb-12 max-w-article-max">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-bold mb-4">
-            Core Care Segment
+            Accessible Travel
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground font-display tracking-tight mb-4">
             {pillar.label}
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            A centralized inclusive travel planning hub equipped with step-by-step estimators and wheelchair-accessible itinerary helpers.
+            Traveling should be a joy for everyone. Discover accessible destinations, plan barrier-free itineraries, and map out comfortable budgets so you can focus on making memories.
           </p>
         </header>
 

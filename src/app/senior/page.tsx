@@ -44,13 +44,13 @@ export default async function PillarPage({
         {/* Dynamic Category Header */}
         <header className="mb-12 max-w-article-max">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-bold mb-4">
-            Core Care Segment
+            Senior Care & Health
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground font-display tracking-tight mb-4">
             {pillar.label}
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            A centralized wellness hub equipped with medical-grade interactive checkers, safety guidelines, and active care network updates for seniors.
+            Protecting those you love shouldn't be complicated. Use our trusted interactive tools to check daily medications, assess home mobility risks, and stay informed on the latest senior wellness advice.
           </p>
         </header>
 

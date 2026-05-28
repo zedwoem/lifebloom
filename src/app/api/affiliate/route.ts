@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse, unstable_after as after } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
@@ -6,7 +6,8 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "@/lib/upstash";
 import * as Sentry from '@sentry/nextjs';
 
-export const runtime = 'edge';
+// Standard serverless runtime to fully support Next.js 15 after() and background operations
+export const runtime = 'nodejs';
 
 // Strict validation of incoming request parameters using Zod Schema
 const affiliateQuerySchema = z.object({

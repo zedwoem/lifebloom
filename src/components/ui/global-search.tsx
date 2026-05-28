@@ -62,9 +62,16 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
     }
 
     import('@/lib/services/metricsService').then(({ MetricsService }) => {
-      MetricsService.getTrending(4).then(data => {
+      const timeoutPromise = new Promise<{ title: string; url: string }[]>((_, reject) =>
+        setTimeout(() => reject(new Error('Trending metrics timeout')), 1500)
+      );
+      
+      Promise.race([
+        MetricsService.getTrending(4),
+        timeoutPromise
+      ]).then((data: any) => {
         if (data && data.length > 0) {
-          setTrending(data.map(item => ({
+          setTrending(data.map((item: any) => ({
             title: item.title,
             url: `/${item.slug.startsWith('article') ? '' : ''}${item.slug}`
           })));

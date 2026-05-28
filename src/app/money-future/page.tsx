@@ -44,13 +44,13 @@ export default async function PillarPage({
         {/* Dynamic Category Header */}
         <header className="mb-12 max-w-article-max">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-bold mb-4">
-            Core Care Segment
+            Wealth & Legacy
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground font-display tracking-tight mb-4">
             {pillar.label}
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
-            A centralized secure financial planning hub designed to organize your retirement roadmap, family legacy, and yield optimization strategies gently.
+            Secure your financial peace of mind. Use our straightforward calculators to track retirement savings, find safe high-yield opportunities, and plan a comfortable future for your family without the confusing jargon.
           </p>
         </header>
 

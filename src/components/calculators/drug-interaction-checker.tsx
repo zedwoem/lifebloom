@@ -55,7 +55,7 @@ export function DrugInteractionChecker() {
   const isMounted = useMounted();
   const [drugs, setDrugs] = useState<string[]>(['Lisinopril', 'Ibuprofen']);
   const [newDrug, setNewDrug] = useState('');
-  const [result, setResult] = useState<{ severity: 'Low' | 'Medium' | 'High', description: string } | null>(null);
+  const [result, setResult] = useState<{ severity: 'Low' | 'Medium' | 'High', description: string, details?: { total_events: number, reactions: string[] } } | null>(null);
   const [recommendations, setRecommendations] = useState<ScoredProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,14 +88,16 @@ export function DrugInteractionChecker() {
       } else {
         setResult({
           severity: 'Low',
-          description: 'No major interactions detected in the OpenFDA database.'
+          description: 'No major interactions detected in the OpenFDA database.',
+          details: { total_events: 0, reactions: [] }
         });
       }
     } catch (err) {
       console.error(err);
       setResult({
         severity: 'Low',
-        description: 'Potential communication issue with the FDA API. Please consult a doctor.'
+        description: 'Potential communication issue with the FDA API. Please consult a doctor.',
+        details: { total_events: 0, reactions: [] }
       });
     } finally {
       setIsLoading(false);
@@ -124,6 +126,17 @@ export function DrugInteractionChecker() {
             </View>
           </View>
 
+          {result.details && result.details.reactions && result.details.reactions.length > 0 && (
+            <View style={pdfStyles.section}>
+              <Text style={pdfStyles.heading}>Reported Patient Clinical Symptoms:</Text>
+              <View style={pdfStyles.list}>
+                {result.details.reactions.map((r, i) => (
+                  <Text key={i} style={pdfStyles.text}>• {r}</Text>
+                ))}
+              </View>
+            </View>
+          )}
+
           <View style={pdfStyles.section}>
             <Text style={pdfStyles.heading}>Medical Reference Links:</Text>
             <PdfLink style={pdfStyles.link} src="https://medlineplus.gov/druginformation.html">
@@ -147,8 +160,8 @@ export function DrugInteractionChecker() {
   return (
     <Card className="p-8 max-w-2xl mx-auto border-2 border-brand-blue/10">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-black text-brand-blue mb-4">Drug Interaction Checker</h2>
-        <p className="text-lg text-slate-500">Check for potential adverse reactions between your daily medications.</p>
+        <h2 className="text-3xl font-black text-brand-blue mb-4" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Medication Safety Checker</h2>
+        <p className="text-lg text-slate-500">Gently review your daily prescriptions to ensure they work together safely.</p>
       </div>
 
       <div className="space-y-6">
@@ -185,22 +198,71 @@ export function DrugInteractionChecker() {
         </Button>
 
         {result && (
-          <div id="print-summary" className={`mt-8 p-6 rounded-2xl border-2 ${result.severity === 'High' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
-            <div className="flex items-start gap-4">
-              <AlertCircle className={`w-8 h-8 flex-shrink-0 ${result.severity === 'High' ? 'text-red-600' : 'text-green-600'}`} />
-              <div>
-                <h3 className={`text-2xl font-black mb-2 ${result.severity === 'High' ? 'text-red-700' : 'text-green-700'}`}>
-                  {result.severity} Risk Potential
-                </h3>
-                <p className="text-xl leading-relaxed text-slate-800 font-medium">
-                  {result.description}
-                </p>
-                
-                <div className="mt-6 pt-6 border-t border-current/20">
-                  <p className="text-sm font-bold uppercase tracking-wider mb-2 opacity-70">Current Medication List:</p>
-                  <ul className="list-disc list-inside text-lg font-bold">
-                    {drugs.map((d, i) => <li key={i}>{d}</li>)}
-                  </ul>
+          <div id="print-summary" className={`mt-8 p-6 md:p-8 rounded-3xl border-2 animate-fade-in ${
+            result.severity === 'High' 
+              ? 'bg-rose-50 border-rose-200' 
+              : result.severity === 'Medium'
+              ? 'bg-amber-50 border-amber-200'
+              : 'bg-emerald-50/50 border-emerald-100'
+          }`}>
+            <div className="flex flex-col gap-6">
+              <div className="flex items-start gap-4">
+                <AlertCircle className={`w-8 h-8 flex-shrink-0 mt-1 ${
+                  result.severity === 'High' 
+                    ? 'text-rose-600' 
+                    : result.severity === 'Medium'
+                    ? 'text-amber-500'
+                    : 'text-emerald-600'
+                }`} />
+                <div className="flex-1">
+                  <h3 className={`text-2xl font-black mb-2 ${
+                    result.severity === 'High' 
+                      ? 'text-rose-800' 
+                      : result.severity === 'Medium'
+                      ? 'text-amber-800'
+                      : 'text-emerald-800'
+                  }`}>
+                    {result.severity} Interaction Potential
+                  </h3>
+                  
+                  {/* Visual Severity Meter */}
+                  <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden my-4">
+                    <div className={`h-full transition-all duration-500 ${
+                      result.severity === 'High'
+                        ? 'w-full bg-rose-600'
+                        : result.severity === 'Medium'
+                        ? 'w-2/3 bg-amber-500'
+                        : 'w-1/3 bg-emerald-500'
+                    }`} />
+                  </div>
+
+                  <p className="text-lg leading-relaxed text-slate-700 font-medium">
+                    {result.description}
+                  </p>
+                  
+                  {result.details && result.details.reactions && result.details.reactions.length > 0 && (
+                    <div className="mt-5 pt-5 border-t border-slate-200/60">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Reported Clinical Symptoms:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {result.details.reactions.map((reaction, i) => (
+                          <span key={i} className="px-3 py-1 bg-white text-slate-700 border border-slate-200 text-xs font-bold rounded-lg shadow-sm">
+                            {reaction}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-6 pt-5 border-t border-slate-200/60">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Checked Medication Regimen:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {drugs.map((d, i) => (
+                        <span key={i} className="px-3 py-1 bg-slate-100 text-slate-800 text-sm font-bold rounded-full">
+                          💊 {d}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -209,7 +271,7 @@ export function DrugInteractionChecker() {
 
         {recommendations.length > 0 && (
           <div className="mt-6 animate-fade-in-up">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Rekomendasi Ahli</h3>
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3">Expert Recommendation</h3>
             <ContextualPartnerCard 
               product={recommendations[0]} 
               calculatorSlug="drug-interaction-checker" 
@@ -227,18 +289,17 @@ export function DrugInteractionChecker() {
         )}
 
         {/* Accessible Elder Advisory Guide Block */}
-        <div className="mt-8 p-6 bg-[#f5fff7] border border-[#006948]/20 rounded-2xl">
-          <h3 className="text-xl font-bold text-[#006948] mb-3 flex items-center gap-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-            🛡️ Safe Medication Advisory & Fall Prevention Guide
+        <div className="mt-8 p-6 bg-emerald-50/50 border border-emerald-100 rounded-2xl shadow-sm">
+          <h3 className="text-xl font-bold text-emerald-800 mb-3 flex items-center gap-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+            🛡️ Safe Medication & Fall Prevention Guide
           </h3>
-          <p className="text-sm text-slate-600 leading-relaxed mb-4">
-            Did you know that taking multiple medications (known as <strong>polypharmacy</strong>) is one of the leading causes of balance issues and falls in older adults? 
-            ACE inhibitors (for blood pressure) combined with standard NSAIDs (like Ibuprofen or Naproxen) can affect kidney function and lead to sudden lightheadedness.
+          <p className="text-sm md:text-base text-slate-600 font-medium leading-relaxed mb-4">
+            Taking multiple medications (polypharmacy) is one of the leading causes of balance issues and falls in older adults. For instance, combining blood pressure medications with standard pain relievers can lead to sudden lightheadedness. We're here to help you stay balanced and secure.
           </p>
-          <ul className="text-xs text-slate-500 list-disc list-inside space-y-2">
+          <ul className="text-sm text-slate-600 font-medium list-disc list-inside space-y-2">
             <li><strong>Keep an Active Log:</strong> Always write down every prescription, OTC drug, and herbal supplement you take.</li>
-            <li><strong>Timing Matters:</strong> Spacing out blood pressure medication can help prevent sudden drops in pressure upon standing (orthostatic hypotension).</li>
-            <li><strong>Consult Regularly:</strong> Bring your printed high-contrast Medication Summary Report to every doctor visit.</li>
+            <li><strong>Timing Matters:</strong> Spacing out blood pressure medication can help prevent sudden drops in pressure when standing.</li>
+            <li><strong>Consult Regularly:</strong> Print your high-contrast Medication Summary Report to share with your doctor.</li>
           </ul>
         </div>
 

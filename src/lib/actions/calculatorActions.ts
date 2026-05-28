@@ -137,7 +137,8 @@ export async function checkMultiDrugInteractions(drugs: string[]) {
     async (drugList: string[]) => {
       try {
         const query = drugList.map(d => `"${d}"`).join('+AND+');
-        const apiUrl = `https://api.fda.gov/drug/event.json?search=patient.drug.medicinalproduct:(${query})&limit=1`;
+        // Retrieve top 5 clinical events to aggregate the actual patient reactions
+        const apiUrl = `https://api.fda.gov/drug/event.json?search=patient.drug.medicinalproduct:(${query})&limit=5`;
         const openFdaKey = process.env.OPENFDA_API_KEY;
         const headers: HeadersInit = openFdaKey ? { 'Authorization': `Basic ${openFdaKey}` } : {};
 
@@ -145,22 +146,47 @@ export async function checkMultiDrugInteractions(drugs: string[]) {
         if (response.ok) {
           const data = await response.json();
           if (data.results && data.results.length > 0) {
+            // Aggregate unique patient reaction preferred terms (MedDRA)
+            const reactionsSet = new Set<string>();
+            data.results.forEach((result: any) => {
+              if (result.patient?.reaction) {
+                result.patient.reaction.forEach((r: any) => {
+                  if (r.reactionmeddrapt) {
+                    reactionsSet.add(r.reactionmeddrapt.toLowerCase());
+                  }
+                });
+              }
+            });
+
+            const topReactions = Array.from(reactionsSet)
+              .slice(0, 5)
+              .map(r => r.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
+
+            const reactionNote = topReactions.length > 0 
+              ? ` Commonly reported patient reactions include: ${topReactions.join(', ')}.`
+              : "";
+
             return {
               severity: 'High' as const,
-              description: `Potensi interaksi obat (Adverse Events) terdeteksi pada database klinis FDA untuk kombinasi: ${drugList.join(', ')}. Harap hubungi penyedia layanan medis Anda.`,
-              details: data.results[0]
+              description: `Potential drug interaction warning detected in clinical patient reports for: ${drugList.join(' + ')}.${reactionNote} Please consult a doctor or healthcare professional.`,
+              details: {
+                total_events: data.meta?.results?.total || data.results.length,
+                reactions: topReactions
+              }
             };
           }
         }
         return {
           severity: 'Low' as const,
-          description: `Tidak ditemukan riwayat interaksi mayor pada database OpenFDA untuk kombinasi: ${drugList.join(', ')}.`
+          description: `No major adverse events or interactions registered in the OpenFDA database for: ${drugList.join(' + ')}. Your combination appears generally compatible based on historical reports.`,
+          details: { total_events: 0, reactions: [] }
         };
       } catch (err) {
         console.error("[checkMultiDrugInteractions Action Error]:", err);
         return {
           severity: 'Low' as const,
-          description: `Fallback Sistem Lokal: Data interaksi untuk ${drugList.join(', ')} saat ini tidak dapat ditarik dari OpenFDA. Silakan gunakan panduan medis standar.`
+          description: `Medication Checker is temporarily offline. Fallback guidance: Spacing your medications at least 2 hours apart is a general safety best practice for ${drugList.join(' and ')}.`,
+          details: { total_events: 0, reactions: [] }
         };
       }
     },

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "content:sync": "source .env.local && curl -s -X GET http://localhost:3000/api/cron/rss-ingest -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\n\" && curl -s -X GET http://localhost:3000/api/cron/process-queue -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\nSync Complete\""
+    "content:sync": "source .env.local && curl -s -X GET http://localhost:3000/api/cron/rss-ingest -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\n\" && curl -s -X GET http://localhost:3000/api/cron/process-queue -H \"Authorization: Bearer $CRON_SECRET\" && echo \"\\nSync Complete\"",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -71,6 +72,7 @@
     "eslint-config-next": "15.0.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "postcss": "^8.4.38",
+    "react-doctor": "^0.2.10",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5"
   }

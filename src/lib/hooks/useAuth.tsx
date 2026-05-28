@@ -142,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     const res = await supabase.auth.signOut();
-    window.location.href = `/${profile?.default_locale || "en"}/login`;
+    window.location.href = `/login`;
     return res;
   };
 

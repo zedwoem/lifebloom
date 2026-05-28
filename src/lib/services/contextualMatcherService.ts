@@ -1,5 +1,5 @@
 import { redis } from '@/lib/upstash';
-import { supabase } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/server';
 
 export interface ProductRecord {
   id: string;

@@ -19,25 +19,25 @@ const styles = StyleSheet.create({
 const ChecklistPDF = ({ rooms }: { rooms: string[] }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <Text style={styles.header}>Mobility Safety Checklist (CDC STEADI Guide)</Text>
+      <Text style={styles.header}>Home Safety & Fall Prevention Guide</Text>
       
       {rooms.map((room, idx) => (
         <View key={idx} style={styles.section}>
-          <Text style={styles.label}>{idx + 1}. Area {room}</Text>
-          <Text style={styles.item}>- Ensure walkways are free of cords or furniture.</Text>
-          <Text style={styles.item}>- Use bright lighting.</Text>
+          <Text style={styles.label}>{idx + 1}. {room}</Text>
+          <Text style={styles.item}>- Ensure walkways are clear of rugs, cords, or clutter.</Text>
+          <Text style={styles.item}>- Improve lighting with nightlights or brighter bulbs.</Text>
           {room === "Bathroom" && (
-            <Text style={styles.item}>- Install Grab Bars near toilet and shower.</Text>
+            <Text style={styles.item}>- Install sturdy grab bars near the toilet and inside the shower/tub.</Text>
           )}
           {room === "Stairs" && (
-            <Text style={styles.item}>- Ensure sturdy handrails on both sides.</Text>
+            <Text style={styles.item}>- Ensure sturdy handrails are installed securely on both sides.</Text>
           )}
         </View>
       ))}
 
       <View style={styles.sponsorBox}>
-        <Text style={styles.sponsorTitle}>Sponsor: Safe Mobility Solutions</Text>
-        <Text style={styles.sponsorText}>Get a 15% discount on anti-slip Grab Bar installation from our B2B partners. Show this document to your local agent.</Text>
+        <Text style={styles.sponsorTitle}>Expert Recommendation</Text>
+        <Text style={styles.sponsorText}>Keep this guide handy or share it with your family to ensure a safe, comfortable living environment. Proper installations can prevent 80% of household falls.</Text>
       </View>
     </Page>
   </Document>
@@ -76,24 +76,31 @@ export function MobilitySafetyChecklist() {
 
   return (
     <ClientOnly fallbackHeight="h-[500px]">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4">Mobility Safety Checklist</h2>
-        <p className="text-lg text-slate-600 mb-6">
-          Create a room safety checklist to minimize the risk of falls for seniors at home, referencing the CDC's STEADI initiative.
-        </p>
+      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 max-w-2xl mx-auto mt-8">
+        <div className="mb-8 border-b border-slate-100 pb-6 text-center md:text-left">
+          <h2 className="text-2xl md:text-3xl font-black text-emerald-800 tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+            Home Safety & Fall Prevention
+          </h2>
+          <p className="text-slate-500 font-medium mt-2 leading-relaxed">
+            Select the areas of your home to generate a personalized, printable guide that helps keep you and your loved ones safe.
+          </p>
+        </div>
 
         <div className="space-y-4 mb-8">
-          <label className="block text-lg font-bold text-slate-700">Select Areas to Evaluate:</label>
+          <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Select Areas to Evaluate:</label>
           <div className="flex flex-wrap gap-3">
             {rooms.map(room => (
-              <Button
+              <button
                 key={room}
-                variant={selectedRooms.includes(room) ? "primary" : "outline"}
-                className={`min-h-[48px] px-6 text-lg ${selectedRooms.includes(room) ? "bg-brand-blue text-white" : ""}`}
                 onClick={() => toggleRoom(room)}
+                className={`px-5 py-3 rounded-xl text-base font-bold transition-all shadow-sm ${
+                  selectedRooms.includes(room) 
+                    ? "bg-emerald-600 text-white ring-2 ring-emerald-600 ring-offset-2" 
+                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                }`}
               >
                 {room}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
@@ -101,9 +108,9 @@ export function MobilitySafetyChecklist() {
         <Button 
           onClick={handleDownloadPDF} 
           disabled={isGenerating || selectedRooms.length === 0}
-          className="w-full min-h-[48px] text-lg bg-brand-green text-white font-bold"
+          className="w-full h-14 text-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-transform active:scale-[0.98] disabled:opacity-50"
         >
-          {isGenerating ? "Generating PDF..." : "Print Full Checklist (PDF)"}
+          {isGenerating ? "Generating Guide..." : "Print Your Safety Guide (PDF)"}
         </Button>
       </div>
     </ClientOnly>

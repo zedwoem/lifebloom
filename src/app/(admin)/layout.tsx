@@ -14,13 +14,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const params = useParams();
 
   useEffect(() => {
-    if (!loading) {
-      if (!user || profile?.role !== 'admin') {
-        // Firewall: Redirect non-admins strictly to standard dashboard
-        router.push(`/dashboard`);
-      }
+    if (loading) return;
+    
+    // Wait for profile resolution if user is present
+    if (user && profile === null) return;
+
+    if (!user || profile?.role !== 'admin') {
+      // Firewall: Redirect non-admins strictly to standard dashboard
+      router.push(`/dashboard`);
     }
-  }, [user, profile, loading, router, params.locale]);
+  }, [user, profile, loading, router]);
 
   if (loading) {
     return (

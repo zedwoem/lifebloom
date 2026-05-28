@@ -55,7 +55,7 @@ export function HeaderNavbar() {
             type="button"
             className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center gap-1.5 py-4 outline-none focus:text-[#006948]"
           >
-            Insights <ChevronDown className="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform duration-200" />
+            Guides & Advice <ChevronDown className="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform duration-200" />
           </button>
           
           <div className="absolute top-[68px] left-[-20px] w-64 bg-white rounded-2xl border border-slate-200/60 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-2 group-hover:translate-y-0 transition-all duration-200 p-3 space-y-1 z-50">
@@ -67,8 +67,8 @@ export function HeaderNavbar() {
                 <Newspaper className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-800 block">Article Hub</span>
-                <span className="text-[10px] text-slate-400 font-medium leading-relaxed block mt-0.5">Curated, senior-centric guides</span>
+                <span className="text-xs font-bold text-slate-800 block">Read Articles</span>
+                <span className="text-[10px] text-slate-400 font-medium leading-relaxed block mt-0.5">Gentle, expert-reviewed advice</span>
               </div>
             </Link>
             
@@ -80,8 +80,8 @@ export function HeaderNavbar() {
                 <Video className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-800 block">Video Hub</span>
-                <span className="text-[10px] text-slate-400 font-medium leading-relaxed block mt-0.5">LifeBloom masterclasses</span>
+                <span className="text-xs font-bold text-slate-800 block">Watch Videos</span>
+                <span className="text-[10px] text-slate-400 font-medium leading-relaxed block mt-0.5">Step-by-step visual help</span>
               </div>
             </Link>
           </div>
@@ -93,7 +93,7 @@ export function HeaderNavbar() {
             type="button"
             className="text-sm font-bold text-slate-600 hover:text-[#006948] transition-colors flex items-center gap-1.5 py-4 outline-none focus:text-[#006948]"
           >
-            Community <ChevronDown className="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform duration-200" />
+            Tools & Care Network <ChevronDown className="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform duration-200" />
           </button>
           
           <div className="absolute top-[68px] right-[-200px] lg:right-[-280px] w-[680px] bg-white rounded-3xl border border-slate-200/60 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-2 group-hover:translate-y-0 transition-all duration-200 p-8 grid grid-cols-12 gap-8 z-50">
@@ -103,9 +103,9 @@ export function HeaderNavbar() {
                 <span className="text-[9px] font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider block mb-2 self-start w-max">
                   Care Network
                 </span>
-                <h4 className="text-sm font-bold text-slate-800 font-display">Active Aging Community</h4>
+                <h4 className="text-sm font-bold text-slate-800 font-display">Active Family Community</h4>
                 <p className="text-[11px] text-slate-400 leading-relaxed font-semibold mt-2">
-                  Jump directly to specialized calculator widgets, wellness checks, and family safety planners.
+                  Find the exact calculators and safety checks you need for your loved ones, quickly and simply.
                 </p>
               </div>
               <Link 
@@ -313,17 +313,17 @@ export function HeaderNavbar() {
                   onClick={() => toggleMobileSection('insights')}
                   className="flex items-center justify-between w-full text-base font-bold text-slate-800 hover:text-[#006948] transition-colors py-2"
                 >
-                  <span>Insights</span>
+                  <span>Guides & Advice</span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileExpandedSection === 'insights' ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {mobileExpandedSection === 'insights' && (
                   <div className="pl-4 mt-2 space-y-3 animate-slide-down">
                     <Link href="/article" className="flex items-center gap-3 py-1.5 text-sm font-semibold text-slate-600 hover:text-[#006948]">
-                      <Newspaper className="w-4 h-4 text-emerald-600" /> Article Hub
+                      <Newspaper className="w-4 h-4 text-emerald-600" /> Read Articles
                     </Link>
                     <Link href="/videos" className="flex items-center gap-3 py-1.5 text-sm font-semibold text-slate-600 hover:text-[#006948]">
-                      <Video className="w-4 h-4 text-indigo-600" /> Video Hub
+                      <Video className="w-4 h-4 text-indigo-600" /> Watch Videos
                     </Link>
                   </div>
                 )}
@@ -335,7 +335,7 @@ export function HeaderNavbar() {
                   onClick={() => toggleMobileSection('community')}
                   className="flex items-center justify-between w-full text-base font-bold text-slate-800 hover:text-[#006948] transition-colors py-2"
                 >
-                  <span>Community</span>
+                  <span>Tools & Care Network</span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileExpandedSection === 'community' ? 'rotate-180' : ''}`} />
                 </button>
 
@@ -388,7 +388,7 @@ export function HeaderNavbar() {
                 href="/support" 
                 className="block text-base font-bold text-slate-800 hover:text-[#006948] transition-colors py-2 border-b border-slate-100/50"
               >
-                Helpdesk
+                Support
               </Link>
 
               {/* Join Us mobile collapse */}
@@ -416,15 +416,11 @@ export function HeaderNavbar() {
 
             {/* Bottom Actions */}
             <div className="p-5 bg-white border-t border-slate-200 space-y-3">
-              <Link href="/login" className="block w-full">
-                <button className="w-full h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
-                  <LogIn className="w-4 h-4" /> Log In
-                </button>
+              <Link href="/login" className="w-full h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <LogIn className="w-4 h-4" /> Log In
               </Link>
-              <Link href="/register" className="block w-full">
-                <button className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer">
-                  <UserPlus className="w-4 h-4" /> Create Account
-                </button>
+              <Link href="/register" className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer">
+                <UserPlus className="w-4 h-4" /> Create Account
               </Link>
             </div>
 

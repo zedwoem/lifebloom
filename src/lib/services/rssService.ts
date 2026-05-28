@@ -459,6 +459,46 @@ export async function scrapeFullArticleContent(url: string): Promise<{ contentTe
 }
 
 // ============================================================
+// RETRY HELPER FOR API CALLS (EXPONENTIAL BACKOFF)
+// ============================================================
+async function fetchWithRetry(url: string, options: any, retries = 3, delayMs = 3000): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout limit per try
+
+  const requestOptions = {
+    ...options,
+    signal: controller.signal
+  };
+
+  try {
+    const res = await fetch(url, requestOptions);
+    clearTimeout(timeoutId);
+    
+    if (res.status === 429 && retries > 0) {
+      console.warn(`[API] Rate limited (429). Retrying in ${delayMs}ms... (${retries} retries left)`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      return fetchWithRetry(url, options, retries - 1, delayMs * 2);
+    }
+    return res;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error?.name === 'AbortError') {
+      console.warn(`[API] Fetch aborted due to timeout for ${url}. Attempting next retry if available.`);
+      if (retries > 0) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        return fetchWithRetry(url, options, retries - 1, delayMs * 2);
+      }
+    }
+    if (retries > 0) {
+      console.warn(`[API] Fetch failed. Retrying in ${delayMs}ms... (${retries} retries left)`, error);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      return fetchWithRetry(url, options, retries - 1, delayMs * 2);
+    }
+    throw error;
+  }
+}
+
+// ============================================================
 // GEMINI AI SANITIZATION & SEMANTIC INTERLINKING
 // ============================================================
 
@@ -468,9 +508,9 @@ export async function enrichScrapedContentWithAI(
   category: string,
   locale: string = 'en'
 ): Promise<{ contentHtml: string; description: string; keywords: string[] }> {
-  const openRouterKey = process.env.OPENROUTER_API_KEY;
-  if (!openRouterKey) {
-    throw new Error('Missing OPENROUTER_API_KEY');
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey) {
+    throw new Error('Missing GEMINI_API_KEY');
   }
 
   // Strict Internal Linking Mapping
@@ -537,44 +577,253 @@ Instructions:
 
 IMPORTANT: Respond ONLY with the raw JSON object. Do not wrap in markdown code blocks like \`\`\`json. The response must be a single parsable JSON string.`;
 
+  let rawJson = "";
+  
+  // Tier 1: Gemini Native API
   try {
-    const res = await fetch(
-      `https://openrouter.ai/api/v1/chat/completions`,
+    const res = await fetchWithRetry(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${openRouterKey}`,
-          "HTTP-Referer": "https://lifebloomhub.com",
-          "X-Title": "LifeBloom Hub"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "deepseek/deepseek-chat", // DeepSeek via OpenRouter (cheap, reasoning)
-          messages: [{ role: "user", content: prompt }],
-          response_format: { type: "json_object" }
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
         }),
         signal: AbortSignal.timeout(30000)
       }
     );
 
-    if (!res.ok) {
-      throw new Error(`OpenRouter API HTTP ${res.status}`);
+    if (res.ok) {
+      const resData = await res.json();
+      rawJson = resData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    } else {
+      throw new Error(`Gemini API HTTP ${res.status}`);
+    }
+  } catch (err: any) {
+    console.warn("[Gemini Enrichment] Native API failed. Attempting OpenRouter Fallback...", err.message);
+    
+    // Tier 2: OpenRouter Fallback
+    if (process.env.OPENROUTER_API_KEY) {
+      try {
+        const orRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [{ role: "user", content: prompt }],
+            response_format: { type: "json_object" }
+          }),
+          signal: AbortSignal.timeout(30000)
+        });
+        
+        if (orRes.ok) {
+          const orData = await orRes.json();
+          rawJson = orData.choices?.[0]?.message?.content || "";
+        } else {
+          throw new Error(`OpenRouter HTTP ${orRes.status}`);
+        }
+      } catch (orErr: any) {
+        console.warn("[Gemini Enrichment] OpenRouter failed. Attempting OpenAI Fallback...", orErr.message);
+      }
     }
 
-    const resData = await res.json();
-    const rawJson = resData.choices?.[0]?.message?.content;
-    if (!rawJson) {
-      throw new Error("Empty response from OpenRouter API");
+    // Tier 2.2: OpenAI Fallback (gpt-4o-mini)
+    if (!rawJson && process.env.OPENAI_API_KEY) {
+      try {
+        console.log("[Gemini Ingestion Fallback] Attempting OpenAI Fallback...");
+        const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: prompt }],
+            response_format: { type: "json_object" }
+          }),
+          signal: AbortSignal.timeout(30000)
+        });
+        
+        if (openaiRes.ok) {
+          const openaiData = await openaiRes.json();
+          rawJson = openaiData.choices?.[0]?.message?.content || "";
+        } else {
+          throw new Error(`OpenAI HTTP ${openaiRes.status}`);
+        }
+      } catch (openaiErr: any) {
+        console.warn("[Gemini Enrichment] OpenAI failed. Attempting DeepSeek Fallback...", openaiErr.message);
+      }
     }
 
-    const cleanResult = JSON.parse(rawJson.trim());
+    // Tier 2.4: DeepSeek Fallback
+    if (!rawJson && process.env.DEEPSEEK_API_KEY) {
+      try {
+        console.log("[Gemini Ingestion Fallback] Attempting DeepSeek Fallback...");
+        const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "deepseek-chat",
+            messages: [{ role: "user", content: prompt }],
+            response_format: { type: "json_object" }
+          }),
+          signal: AbortSignal.timeout(30000)
+        });
+
+        if (dsRes.ok) {
+          const dsData = await dsRes.json();
+          rawJson = dsData.choices?.[0]?.message?.content || "";
+        } else {
+          throw new Error(`DeepSeek HTTP ${dsRes.status}`);
+        }
+      } catch (dsErr: any) {
+        console.warn("[Gemini Enrichment] DeepSeek failed. Attempting Groq Fallback...", dsErr.message);
+      }
+    }
+
+    // Tier 3: Groq Fallback
+    if (!rawJson && process.env.XAI_API_KEY) {
+      try {
+        let groqRes = await fetchWithRetry(
+          "https://api.groq.com/openai/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${process.env.XAI_API_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              model: "llama-3.3-70b-versatile",
+              messages: [{ role: "user", content: prompt }],
+              response_format: { type: "json_object" }
+            }),
+            signal: AbortSignal.timeout(30000)
+          },
+          3,
+          5000
+        );
+
+        // If JSON validation failed, try without JSON mode
+        let responseBody = await groqRes.clone().text().catch(() => "");
+        if (responseBody.includes("json_validate_failed") || groqRes.status === 400) {
+          console.warn("[Gemini Enrichment] Groq JSON validation failed. Retrying WITHOUT JSON mode...");
+          groqRes = await fetchWithRetry(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${process.env.XAI_API_KEY}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [{ role: "user", content: prompt }]
+              }),
+              signal: AbortSignal.timeout(30000)
+            },
+            2,
+            4000
+          );
+          responseBody = await groqRes.clone().text().catch(() => "");
+        }
+
+        if (groqRes.status === 429) {
+          console.warn("[Gemini Enrichment] Groq Llama-3 429. Attempting Groq Llama-3.1-8b fallback...");
+          groqRes = await fetchWithRetry(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${process.env.XAI_API_KEY}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "llama-3.1-8b-instant",
+                messages: [{ role: "user", content: prompt }],
+                response_format: { type: "json_object" }
+              }),
+              signal: AbortSignal.timeout(30000)
+            },
+            3,
+            6000
+          );
+          responseBody = await groqRes.clone().text().catch(() => "");
+          
+          if (responseBody.includes("json_validate_failed") || groqRes.status === 400) {
+            console.warn("[Gemini Enrichment] Groq Llama-3.1 fallback JSON validation failed. Retrying WITHOUT JSON mode...");
+            groqRes = await fetchWithRetry(
+              "https://api.groq.com/openai/v1/chat/completions",
+              {
+                method: "POST",
+                headers: {
+                  "Authorization": `Bearer ${process.env.XAI_API_KEY}`,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  model: "llama-3.1-8b-instant",
+                  messages: [{ role: "user", content: prompt }]
+                }),
+                signal: AbortSignal.timeout(30000)
+              },
+              2,
+              4000
+            );
+            responseBody = await groqRes.clone().text().catch(() => "");
+          }
+        }
+
+        if (groqRes.ok) {
+          const groqData = JSON.parse(responseBody);
+          rawJson = groqData.choices?.[0]?.message?.content || "";
+        } else {
+          console.error(`[Groq Error Details]: Status ${groqRes.status}, Body:`, responseBody);
+          throw new Error(`Groq HTTP ${groqRes.status}: ${responseBody}`);
+        }
+      } catch (groqErr: any) {
+        console.error("[Gemini Enrichment] All AI tiers failed:", groqErr.message);
+        throw new Error(`All translation/enrichment API tiers failed. Last error: ${groqErr.message}`);
+      }
+    }
+  }
+
+  if (!rawJson || !rawJson.trim()) {
+    throw new Error("Enrichment API returned empty response.");
+  }
+
+  try {
+    // Robust extraction of JSON object out of any conversational text wrappers or markdown fences
+    const startIdx = rawJson.indexOf('{');
+    const endIdx = rawJson.lastIndexOf('}');
+    if (startIdx === -1 || endIdx === -1) {
+      throw new Error(`Could not find valid JSON object boundaries in LLM response: ${rawJson.substring(0, 100)}...`);
+    }
+    const cleanJsonString = rawJson.substring(startIdx, endIdx + 1);
+    const cleanResult = JSON.parse(cleanJsonString);
+    
+    const contentHtml = cleanResult.content_html || cleanResult.contentHtml || cleanResult.content || cleanResult.html;
+    if (!contentHtml) {
+      console.warn("[JSON Warning] Missing direct content_html, raw parsed result keys:", Object.keys(cleanResult));
+    }
+    
     return {
-      contentHtml: cleanResult.content_html,
-      description: cleanResult.description,
-      keywords: cleanResult.keywords || []
+      contentHtml: contentHtml || "",
+      description: cleanResult.description || cleanResult.seo_description || "",
+      keywords: cleanResult.keywords || cleanResult.seo_keywords || []
     };
   } catch (err: any) {
-    console.error("[OpenRouter/DeepSeek Enrichment] Failed:", err.message);
+    console.error("[Gemini Enrichment] JSON Parse Failure:", err.message);
     throw err;
   }
 }
@@ -633,8 +882,8 @@ export async function processPendingArticlesBatch(limit: number = 5): Promise<{ 
           ? article.content_html.replace(/<[^>]*>/g, '').trim().slice(0, 500) 
           : '';
         
-        const openRouterKey = process.env.OPENROUTER_API_KEY;
-        if (!openRouterKey) throw new Error('Missing OPENROUTER_API_KEY for direct AI fallback.');
+        const geminiKey = process.env.GEMINI_API_KEY;
+        if (!geminiKey) throw new Error('Missing GEMINI_API_KEY for direct AI fallback.');
         
         console.log(`[Queue Processor] Generating direct AI content for "${article.title}"...`);
         const generationPrompt = `Write a highly informative, detailed, 600-word professional article in English for senior citizens about the topic: "${article.title}". 
@@ -644,31 +893,28 @@ Instructions:
 1. Use clear semantic HTML elements including paragraphs, <h2> and <h3> subheadings, and bullet lists.
 2. Ensure the tone is warm, extremely accessible, and authoritative. Do not wrap in markdown blocks, html, head, or body tags — output only the clean inner HTML.`;
         
-        const openRouterRes = await fetch(
-          `https://openrouter.ai/api/v1/chat/completions`,
+        const geminiRes = await fetchWithRetry(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${openRouterKey}`,
-              "HTTP-Referer": "https://lifebloomhub.com"
+              "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              model: "deepseek/deepseek-chat",
-              messages: [{ role: "user", content: generationPrompt }]
+              contents: [{ parts: [{ text: generationPrompt }] }]
             }),
             signal: AbortSignal.timeout(30000)
           }
         );
 
-        if (!openRouterRes.ok) {
-          throw new Error(`OpenRouter AI generation fallback failed with HTTP ${openRouterRes.status}`);
+        if (!geminiRes.ok) {
+          throw new Error(`Gemini AI generation fallback failed with HTTP ${geminiRes.status}`);
         }
 
-        const resData = await openRouterRes.json();
-        const generatedText = resData.choices?.[0]?.message?.content;
+        const resData = await geminiRes.json();
+        const generatedText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!generatedText || generatedText.trim().length < 100) {
-          throw new Error('OpenRouter direct generation returned empty content.');
+          throw new Error('Gemini direct generation returned empty content.');
         }
 
         scraped = {
@@ -756,6 +1002,9 @@ Instructions:
         })
         .eq('id', article.id);
     }
+
+    // Add a 2.5-second delay between articles to avoid hitting rate limits
+    await new Promise(resolve => setTimeout(resolve, 2500));
   }
 
   return results;

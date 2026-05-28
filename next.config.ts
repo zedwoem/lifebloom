@@ -51,7 +51,9 @@ export default withSentryConfig(
     org: "zedwoem",
     project: "javascript-nextjs",
     silent: !process.env.CI,
-    hideSourceMaps: true,
+    sourcemaps: {
+      deleteSourcemapsAfterUpload: true,
+    },
     widenClientFileUpload: true,
     tunnelRoute: "/monitoring",
     webpack: {

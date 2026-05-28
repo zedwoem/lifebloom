@@ -68,7 +68,7 @@ export class CoinGeckoService {
     const cacheKey = `cg:price:${assetId}`;
     try {
       const cached = await redis.get(cacheKey);
-      if (cached) return typeof cached === 'string' ? JSON.parse(cached) : cached;
+      if (cached) return (typeof cached === 'string' ? JSON.parse(cached) : cached) as CoinPriceResult;
     } catch (e) {
       secureLogger.error('Upstash Redis cache read failed', e);
     }
