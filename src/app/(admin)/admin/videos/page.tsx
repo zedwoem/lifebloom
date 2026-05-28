@@ -30,7 +30,7 @@ export default function AdminVideosPage() {
 
       if (!isUserAdmin) {
         setIsAdmin(false);
-        toast.error("Akses Ditolak. Anda bukan Administrator.");
+        toast.error("Access Denied. You are not an Administrator.");
         router.push(`/dashboard`);
         return;
       }
@@ -44,18 +44,18 @@ export default function AdminVideosPage() {
   }, [profile, router, supabase, locale]);
 
   const handleFetchPreview = async () => {
-    if (!url) return toast.error("Masukkan URL YouTube terlebih dahulu");
+    if (!url) return toast.error("Please enter a YouTube URL first");
     setLoading(true);
-    toast.loading("Menganalisis URL...");
+    toast.loading("Analyzing URL...");
     
     const res = await fetchYouTubeMetadata(url);
     toast.dismiss();
     
     if (res.success && res.data) {
       setPreview(res.data);
-      toast.success("Metadata berhasil ditarik!");
+      toast.success("Metadata successfully fetched!");
     } else {
-      toast.error(res.error || "Gagal menarik data dari YouTube API");
+      toast.error(res.error || "Failed to fetch data from YouTube API");
       setPreview(null);
     }
     setLoading(false);
@@ -64,7 +64,7 @@ export default function AdminVideosPage() {
   const handleIngest = async () => {
     if (!preview) return;
     setLoading(true);
-    toast.loading("Menyimpan ke Database...");
+    toast.loading("Saving to Database...");
 
     const res = await ingestVideoAction({
       youtubeUrl: url,
@@ -75,11 +75,11 @@ export default function AdminVideosPage() {
 
     toast.dismiss();
     if (res.success) {
-      toast.success("Video berhasil di-ingest ke Supabase!");
+      toast.success("Video successfully ingested to Supabase!");
       setUrl("");
       setPreview(null);
     } else {
-      toast.error(res.error || "Gagal menyimpan video");
+      toast.error(res.error || "Failed to save video");
     }
     setLoading(false);
   };
@@ -106,7 +106,7 @@ export default function AdminVideosPage() {
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
               CMS VIDEO ENGINE
             </h1>
-            <p className="text-slate-500 mt-1 text-lg">Ingesti YouTube API V3 ke Supabase</p>
+            <p className="text-slate-500 mt-1 text-lg">Ingest YouTube API V3 to Supabase</p>
           </div>
         </div>
       </header>
@@ -119,7 +119,7 @@ export default function AdminVideosPage() {
             <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center">
               <Activity className="w-5 h-5 text-rose-500" />
             </div>
-            <h2 className="text-xl font-bold">1. Tarik Metadata YouTube</h2>
+            <h2 className="text-xl font-bold">1. Fetch YouTube Metadata</h2>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -135,7 +135,7 @@ export default function AdminVideosPage() {
               disabled={loading}
               className="min-h-[52px] px-6 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <Search className="w-5 h-5" /> Analisis
+              <Search className="w-5 h-5" /> Analyze
             </button>
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function AdminVideosPage() {
               <div className="w-10 h-10 bg-[#f5fff7] rounded-xl flex items-center justify-center border border-[#006948]/20">
                 <Video className="w-5 h-5 text-[#006948]" />
               </div>
-              <h2 className="text-xl font-bold">2. Konfirmasi & Simpan</h2>
+              <h2 className="text-xl font-bold">2. Confirm & Save</h2>
             </div>
             
             <div className="aspect-video bg-slate-100 rounded-2xl mb-6 overflow-hidden border border-slate-200">
@@ -163,7 +163,7 @@ export default function AdminVideosPage() {
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-bold text-slate-700 mb-2">Judul Video</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Video Title</label>
               <input 
                 type="text" 
                 value={preview.title}
@@ -173,7 +173,7 @@ export default function AdminVideosPage() {
             </div>
 
             <div className="mb-8">
-              <label className="block text-sm font-bold text-slate-700 mb-2">Pilih Pilar Penempatan</label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">Select Pillar Placement</label>
               <select 
                 value={pillar}
                 onChange={(e) => setPillar(e.target.value)}
@@ -190,7 +190,7 @@ export default function AdminVideosPage() {
               disabled={loading}
               className="w-full min-h-[52px] bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <PlusCircle className="w-5 h-5" /> Ingest ke Supabase
+              <PlusCircle className="w-5 h-5" /> Ingest to Supabase
             </button>
           </div>
         )}

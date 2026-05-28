@@ -29,64 +29,33 @@ export default function VideoDetailClient({ video, relatedVideos, locale }: Vide
   const [copiedEmbed, setCopiedEmbed] = useState(false);
 
   // Language mapping
-  const dict = {
-    en: {
-      backToHub: "Back to Video Hub",
-      nowPlaying: "Now Playing",
-      views: "views",
-      chapters: "Chapter Navigation",
-      takeaways: "AI Key Takeaways",
-      reactions: "Did you find this educational?",
-      saved: "Saved",
-      save: "Save",
-      helpful: "Helpful",
-      insightful: "Insightful",
-      love: "Love It",
-      helpfulToast: "Glad you found this helpful!",
-      insightfulToast: "Thanks for your feedback!",
-      loveToast: "We love that you love it!",
-      copyLink: "Copy SmartLink",
-      copied: "Copied!",
-      copyEmbed: "Copy Embed Code",
-      toolsRecommendation: "Targeted Smart Utilities",
-      toolsSubtitle: "Put these learnings into practice with our custom-engineered expert calculators:",
-      relatedTitle: "More from this Series",
-      relatedSubtitle: "Keep expanding your expertise with related masterclasses.",
-      play: "Play Now",
-      verifiedExpert: "Verified Expert",
-      expertPledge: "This video analysis is peer-reviewed for professional consistency and active aging safety.",
-      embedPlaceholder: "Embed Code"
-    },
-    id: {
-      backToHub: "Kembali ke Pusat Video",
-      nowPlaying: "Sedang Diputar",
-      views: "tontonan",
-      chapters: "Navigasi Bab Video",
-      takeaways: "AI Poin Kunci Ringkasan",
-      reactions: "Apakah video ini bermanfaat?",
-      saved: "Tersimpan",
-      save: "Simpan",
-      helpful: "Bermanfaat",
-      insightful: "Inspiratif",
-      love: "Suka Sekali",
-      helpfulToast: "Senang video ini bermanfaat bagi Anda!",
-      insightfulToast: "Terima kasih atas masukan Anda!",
-      loveToast: "Kami sangat senang Anda menyukainya!",
-      copyLink: "Salin SmartLink",
-      copied: "Tersalin!",
-      copyEmbed: "Salin Kode Sematan",
-      toolsRecommendation: "Rekomendasi Alat Interaktif",
-      toolsSubtitle: "Praktikkan materi ini secara langsung dengan kalkulator ahli pilihan kami:",
-      relatedTitle: "Seri Masterclass Lainnya",
-      relatedSubtitle: "Terus tingkatkan wawasan Anda dengan video edukasi terkait.",
-      play: "Tonton Sekarang",
-      verifiedExpert: "Verifikasi Ahli",
-      expertPledge: "Analisis video ini telah ditinjau ulang demi konsistensi panduan profesional dan keamanan lansia.",
-      embedPlaceholder: "Kode Semat"
-    }
+  const t = {
+    backToHub: "Back to Video Hub",
+    nowPlaying: "Now Playing",
+    views: "views",
+    chapters: "Chapter Navigation",
+    takeaways: "AI Key Takeaways",
+    reactions: "Did you find this educational?",
+    saved: "Saved",
+    save: "Save",
+    helpful: "Helpful",
+    insightful: "Insightful",
+    love: "Love It",
+    helpfulToast: "Glad you found this helpful!",
+    insightfulToast: "Thanks for your feedback!",
+    loveToast: "We love that you love it!",
+    copyLink: "Copy SmartLink",
+    copied: "Copied!",
+    copyEmbed: "Copy Embed Code",
+    toolsRecommendation: "Targeted Smart Utilities",
+    toolsSubtitle: "Put these learnings into practice with our custom-engineered expert calculators:",
+    relatedTitle: "More from this Series",
+    relatedSubtitle: "Keep expanding your expertise with related masterclasses.",
+    play: "Play Now",
+    verifiedExpert: "Verified Expert",
+    expertPledge: "This video analysis is peer-reviewed for professional consistency and active aging safety.",
+    embedPlaceholder: "Embed Code"
   };
-
-  const t = dict.en;
 
   // 1. Session-based view counting deduplication
   useEffect(() => {

@@ -28,7 +28,7 @@ export default function AdminUsersPage() {
 
       if (!isUserAdmin) {
         setIsAdmin(false);
-        toast.error("Akses Ditolak. Anda bukan Administrator.");
+        toast.error("Access Denied. You are not an Administrator.");
         router.push(`/dashboard`);
         return;
       }
@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
       if (res.success && res.users) {
         setUsers(res.users);
       } else {
-        toast.error(res.error || "Gagal memuat pengguna.");
+        toast.error(res.error || "Failed to load users.");
       }
       setLoading(false);
     }
@@ -49,33 +49,33 @@ export default function AdminUsersPage() {
   }, [profile, router, supabase, locale]);
 
   const handleChangeRole = async (userId: string, newRole: string) => {
-    toast.loading("Memperbarui peran pengguna...");
+    toast.loading("Updating user role...");
     const res = await updateUserRole({ userId, newRole });
     toast.dismiss();
 
     if (res.success) {
-      toast.success("Peran berhasil diperbarui!");
+      toast.success("Role successfully updated!");
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
       );
     } else {
-      toast.error(res.error || "Gagal memperbarui peran.");
+      toast.error(res.error || "Failed to update role.");
     }
   };
 
   const handleToggleStatus = async (userId: string, currentActive: boolean) => {
     const nextActive = !currentActive;
-    toast.loading(nextActive ? "Mengaktifkan pengguna..." : "Membekukan pengguna...");
+    toast.loading(nextActive ? "Activating user..." : "Suspending user...");
     const res = await toggleUserActiveStatus({ userId, isActive: nextActive });
     toast.dismiss();
 
     if (res.success) {
-      toast.success(nextActive ? "Pengguna diaktifkan kembali!" : "Pengguna berhasil dibekukan!");
+      toast.success(nextActive ? "User reactivated successfully!" : "User successfully suspended!");
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, is_active: nextActive } : u))
       );
     } else {
-      toast.error(res.error || "Gagal memperbarui status aktif.");
+      toast.error(res.error || "Failed to update active status.");
     }
   };
 
@@ -106,7 +106,7 @@ export default function AdminUsersPage() {
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
                 USER & CRM MANAGER
               </h1>
-              <p className="text-slate-500 mt-1 text-lg">Kelola Hak Akses, Peran Pengguna, dan Keanggotaan Komunitas</p>
+              <p className="text-slate-500 mt-1 text-lg">Manage Access Control, User Roles, and Community Memberships</p>
             </div>
           </div>
         </header>
@@ -114,7 +114,7 @@ export default function AdminUsersPage() {
         <main className="max-w-[1120px] mx-auto space-y-6">
           <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
             <div className="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h3 className="text-xl font-bold Atkinson-font">Daftar Pengguna Aktif</h3>
+              <h3 className="text-xl font-bold Atkinson-font">Active Users List</h3>
               <span className="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-full border border-emerald-100">
                 {users.length} Total
               </span>
@@ -124,11 +124,11 @@ export default function AdminUsersPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/70 text-slate-400 uppercase text-xs font-bold tracking-wider border-b border-slate-100">
-                    <th className="px-6 py-4">Nama / Email</th>
-                    <th className="px-6 py-4">Peran Saat Ini</th>
-                    <th className="px-6 py-4">Status Akun</th>
-                    <th className="px-6 py-4">Bergabung</th>
-                    <th className="px-6 py-4 text-right">Aksi Manajemen</th>
+                    <th className="px-6 py-4">Name / Email</th>
+                    <th className="px-6 py-4">Current Role</th>
+                    <th className="px-6 py-4">Account Status</th>
+                    <th className="px-6 py-4">Joined</th>
+                    <th className="px-6 py-4 text-right">Management Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-base">
@@ -136,7 +136,7 @@ export default function AdminUsersPage() {
                     <tr key={u.id} className="hover:bg-[#faf8ff]/50 transition-colors">
                       <td className="px-6 py-5">
                         <div>
-                          <strong className="text-slate-800 block">{u.display_name || "Sahabat Lifebloom"}</strong>
+                          <strong className="text-slate-800 block">{u.display_name || "Lifebloom Friend"}</strong>
                           <span className="text-sm text-slate-400">{u.email}</span>
                         </div>
                       </td>
@@ -158,7 +158,7 @@ export default function AdminUsersPage() {
                             : "bg-rose-50 text-rose-700 border border-rose-100"
                         }`}>
                           <span className={`w-2 h-2 rounded-full ${u.is_active !== false ? "bg-emerald-500" : "bg-rose-500"}`}></span>
-                          {u.is_active !== false ? "Aktif" : "Beku (Banned)"}
+                          {u.is_active !== false ? "Active" : "Suspended"}
                         </span>
                       </td>
                       <td className="px-6 py-5 text-sm text-slate-500">
@@ -171,14 +171,14 @@ export default function AdminUsersPage() {
                             onClick={() => handleChangeRole(u.id, "expert")}
                             className="px-3.5 py-2 text-xs font-bold bg-[#faf8ff] text-slate-700 hover:bg-[#eef0ff] hover:text-indigo-600 rounded-lg border border-slate-200 transition-all min-h-[38px]"
                           >
-                            Jadikan Expert
+                            Make Expert
                           </button>
                         ) : (
                           <button 
                             onClick={() => handleChangeRole(u.id, "user")}
                             className="px-3.5 py-2 text-xs font-bold bg-[#faf8ff] text-slate-700 hover:bg-[#eef0ff] hover:text-indigo-600 rounded-lg border border-slate-200 transition-all min-h-[38px]"
                           >
-                            Jadikan User biasa
+                            Demote to User
                           </button>
                         )}
                         
@@ -191,7 +191,7 @@ export default function AdminUsersPage() {
                               : "bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100"
                           }`}
                         >
-                          {u.is_active !== false ? "Bekukan" : "Aktifkan"}
+                          {u.is_active !== false ? "Suspend" : "Activate"}
                         </button>
                       </td>
                     </tr>

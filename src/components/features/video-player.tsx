@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Maximize2, Minimize2, Play, AlertCircle, Volume2, Type } from "lucide-react";
 
+// @ts-ignore
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 export interface TranscriptLine {

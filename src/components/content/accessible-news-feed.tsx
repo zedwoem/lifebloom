@@ -24,13 +24,18 @@ export function AccessibleNewsFeed({ pillarSlug }: { pillarSlug: string }) {
         .limit(5);
       
       if (data) {
-        setArticles(data.map(d => ({
-          title: d.title,
-          source: d.source_domain || 'LifeBloom Hub',
-          date: new Date(d.published_at || d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          snippet: d.description || d.content?.substring(0, 100) + '...',
-          slug: d.slug
-        })));
+        setArticles(data.map(d => {
+          const cleanSnippet = d.content_html
+            ? d.content_html.replace(/<[^>]*>/g, '').substring(0, 120) + '...'
+            : 'Explore family care and wellness guidelines compiled by the LifeBloom Editorial Board.';
+          return {
+            title: d.title,
+            source: 'LifeBloom Hub',
+            date: new Date(d.published_at || d.ingested_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            snippet: cleanSnippet,
+            slug: d.slug
+          };
+        }));
       }
       setIsLoading(false);
     };

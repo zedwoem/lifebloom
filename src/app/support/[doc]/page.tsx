@@ -79,34 +79,16 @@ export default async function DocumentPage({ params }: { params: Promise<{ doc: 
   });
 
   return (
-    <div className="relative min-h-screen bg-background pb-20 overflow-x-hidden">
-      <div className="ambient-bg" />
-      
-      <div className="container mx-auto px-gutter-mobile md:px-margin-desktop pt-10 max-w-container-max relative z-10 animate-fade-in">
-        
-        {/* Navigation Breadcrumb */}
-        <Link 
-          href={`/${locale || 'en'}/support`}
-          className="inline-flex items-center gap-2 text-primary hover:text-primary-container mb-8 transition-all font-bold group min-h-[52px]"
-        >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          Back to Helpdesk
-        </Link>
+    <article className="prose prose-slate max-w-none prose-headings:text-foreground prose-headings:font-bold prose-p:leading-relaxed prose-p:mb-6 prose-a:text-primary animate-fade-in">
+      <header className="mb-8 border-b border-slate-200 pb-6">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-[#131b2e] mb-3 tracking-tight Atkinson-font" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>{data.title}</h1>
+        <p className="text-slate-400 text-sm font-semibold">Last updated: {lastUpdated}</p>
+      </header>
 
-        <main className="max-w-[720px] mx-auto bg-white rounded-3xl p-8 md:p-12 border border-border soft-shadow">
-          <article className="prose prose-slate max-w-none prose-headings:text-foreground prose-headings:font-bold prose-p:leading-relaxed prose-p:mb-6 prose-a:text-primary">
-            <header className="mb-8 border-b border-border pb-6">
-              <h1 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight">{data.title}</h1>
-              <p className="text-on-surface-variant text-[14px]">Last updated: {lastUpdated}</p>
-            </header>
-
-            <div 
-              className="space-y-6"
-              dangerouslySetInnerHTML={{ __html: contentHtml }}
-            />
-          </article>
-        </main>
-      </div>
-    </div>
+      <div 
+        className="space-y-6 text-slate-650 font-medium leading-relaxed"
+        dangerouslySetInnerHTML={{ __html: contentHtml }}
+      />
+    </article>
   );
 }

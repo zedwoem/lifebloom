@@ -141,7 +141,7 @@ export function GlobalSearch({ variant = 'navbar' }: { variant?: 'navbar' | 'her
   }, [debouncedQuery]);
 
   // 4. Combine results
-  const staticResults = query ? fuse.search(query).slice(0, 3) : [];
+  const staticResults = debouncedQuery ? fuse.search(debouncedQuery).slice(0, 3) : [];
   const results = [...staticResults, ...dbResults];
 
   // Focus input when modal opens

@@ -122,7 +122,7 @@ export default async function RootLayout({
           pageTitle="LifeBloom Hub — Inclusive High-Yield Lifestyle Utility Platform"
           pageDescription="LifeBloom Hub is an all-inclusive automated high-yield utility platform with smart tools for smart living, accessible travel, retirement planning, pet safety, and peer-reviewed medical checking."
           locale="en"
-          entityType="WebSite"
+          entityType="WebPage"
         />
 
         {seoGraph && (
@@ -133,6 +133,30 @@ export default async function RootLayout({
           />
         )}
         
+        {/* Safe PerformanceObserver polyfill to avoid W3C entryTypes + buffered mismatch warning in browser logs */}
+        <script
+          id="performance-observer-patch"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                if (typeof window !== 'undefined' && window.PerformanceObserver) {
+                  var originalObserve = PerformanceObserver.prototype.observe;
+                  PerformanceObserver.prototype.observe = function(options) {
+                    try {
+                      if (options && options.entryTypes && options.buffered) {
+                        var opt = Object.assign({}, options);
+                        delete opt.buffered;
+                        return originalObserve.call(this, opt);
+                      }
+                    } catch (e) {}
+                    return originalObserve.call(this, options);
+                  };
+                }
+              })();
+            `
+          }}
+        />
+
         {/* Custom Meta & Scripts */}
         <meta name="impact-site-verification" content="c188c067-926f-4925-8c8b-e04b15769573" />
         <meta name="impact-site-verification" content="ca6b1edc-0537-4c76-89fe-cbb058b59229" />

@@ -29,7 +29,7 @@ export default function LoginPage() {
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setErrorMsg("Harap masukkan email dan kata sandi.");
+      setErrorMsg("Please enter both email and password.");
       return;
     }
     
@@ -38,12 +38,11 @@ export default function LoginPage() {
     try {
       const { error } = await signInWithEmailPassword(email, password);
       if (error) {
-        setErrorMsg(error.message || "Gagal masuk. Periksa kembali email dan kata sandi Anda.");
+        setErrorMsg(error.message || "Failed to log in. Please check your credentials.");
         setIsSubmitting(false);
       }
-      // If success, Supabase will refresh the session and trigger the redirect in useEffect or callback
     } catch (err: any) {
-      setErrorMsg("Terjadi kesalahan sistem. Silakan coba lagi.");
+      setErrorMsg("A system error occurred. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -54,12 +53,11 @@ export default function LoginPage() {
     try {
       const { error } = await signInWithGoogle();
       if (error) {
-        setErrorMsg(error.message || "Gagal menghubungi Google SSO. Coba lagi.");
+        setErrorMsg(error.message || "Failed to authenticate with Google SSO. Please try again.");
         setIsSubmitting(false);
       }
-      // If success, Supabase will redirect to the OAuth provider
     } catch (err: any) {
-      setErrorMsg("Terjadi kesalahan sistem. Silakan coba lagi.");
+      setErrorMsg("A system error occurred. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -69,7 +67,7 @@ export default function LoginPage() {
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-[#006948] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-500 font-bold" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Verifikasi Sesi...</p>
+          <p className="text-slate-500 font-bold" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Verifying Session...</p>
         </div>
       </div>
     );
@@ -85,10 +83,10 @@ export default function LoginPage() {
             <Lock className="w-8 h-8 text-indigo-600" />
           </div>
           <h1 className="text-[28px] font-extrabold tracking-tight text-[#131b2e] mb-3" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-            Akses Aman
+            Secure Access
           </h1>
           <p className="text-slate-500 text-[18px] leading-relaxed">
-            Masuk untuk mengakses dasbor personalisasi, kalkulator terenkripsi, dan forum komunitas eksklusif.
+            Sign in to access your personalized dashboard, encrypted calculators, and exclusive community forums.
           </p>
         </div>
 
@@ -108,12 +106,12 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#006948]/30 outline-none transition-all"
-              placeholder="nama@email.com"
+              placeholder="name@email.com"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Kata Sandi</label>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Password</label>
             <input 
               type="password" 
               value={password}
@@ -131,14 +129,14 @@ export default function LoginPage() {
             {isSubmitting ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              "Masuk dengan Email"
+              "Sign In with Email"
             )}
           </Button>
         </form>
 
         <div className="relative flex items-center justify-center mb-6">
           <div className="absolute border-t border-slate-200 w-full"></div>
-          <span className="bg-white px-4 text-slate-400 font-bold text-sm z-10">ATAU</span>
+          <span className="bg-white px-4 text-slate-400 font-bold text-sm z-10">OR</span>
         </div>
 
         {/* Massive Accessible Google Button */}
@@ -152,7 +150,7 @@ export default function LoginPage() {
           {isSubmitting ? (
             <>
               <div className="w-5 h-5 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
-              <span>Menghubungkan...</span>
+              <span>Connecting...</span>
             </>
           ) : (
             <>
@@ -170,12 +168,12 @@ export default function LoginPage() {
         </Button>
 
         <div className="mt-6 text-center">
-          <p className="text-slate-500 font-medium">Belum punya akun? <a href={`/register`} className="text-[#006948] font-bold hover:underline">Daftar sekarang</a></p>
+          <p className="text-slate-500 font-medium">Don't have an account? <a href={`/register`} className="text-[#006948] font-bold hover:underline">Register now</a></p>
         </div>
 
         <div className="mt-8 text-center border-t border-slate-100 pt-6">
           <p className="text-slate-500 text-sm leading-relaxed">
-            Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi kami. Data Anda tidak akan pernah dijual kepada pihak ketiga.
+            By continuing, you agree to our Terms of Service and Privacy Policy. Your data will never be shared with third parties or sold.
           </p>
         </div>
       </div>

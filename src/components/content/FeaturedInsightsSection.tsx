@@ -23,9 +23,9 @@ interface VideoItem {
   title: string;
   slug: string;
   pillar: string;
-  thumbnail_url: string;
-  duration?: number;
-  view_count?: number;
+  thumbnail_url: string | null;
+  duration?: number | null;
+  view_count?: number | null;
   created_at: string;
 }
 
@@ -66,7 +66,11 @@ export function FeaturedInsightsSection({ articles, videos }: FeaturedInsightsSe
   const filteredArticles = useMemo(() => {
     let list = [...articles];
     if (articlePillar !== 'all') {
-      list = list.filter(a => a.pillar === articlePillar);
+      const dbPillar = articlePillar === 'home-living' ? 'home'
+                     : articlePillar === 'pet-family' ? 'pet'
+                     : articlePillar === 'money-future' ? 'money'
+                     : articlePillar;
+      list = list.filter(a => a.pillar === dbPillar);
     }
     if (articleSort === 'new') {
       list.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
@@ -87,7 +91,11 @@ export function FeaturedInsightsSection({ articles, videos }: FeaturedInsightsSe
   const filteredVideos = useMemo(() => {
     let list = [...videos];
     if (videoPillar !== 'all') {
-      list = list.filter(v => v.pillar === videoPillar);
+      const dbPillar = videoPillar === 'home-living' ? 'home'
+                     : videoPillar === 'pet-family' ? 'pet'
+                     : videoPillar === 'money-future' ? 'money'
+                     : videoPillar;
+      list = list.filter(v => v.pillar === dbPillar);
     }
     if (videoSort === 'new') {
       list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

@@ -21,7 +21,10 @@ const CONTENT_ENGINE_SOURCES = [
   {
     pillar: "Money & Future",
     feeds: [
-      { name: "The Money Guy Show RSS", url: "https://moneyguy.com/feed/", type: "RSS" },
+      { name: "Kitces Nerds Eye View RSS", url: "http://feeds.feedblitz.com/KitcesNerdsEyeView", type: "RSS" },
+      { name: "Retirement Researcher Feed", url: "https://retirementresearcher.com/feed/", type: "RSS" },
+      { name: "Get Rich Slowly Feed", url: "https://www.getrichslowly.org/feed/", type: "RSS" },
+      { name: "NYT Retirement RSS", url: "https://www.nytimes.com/svc/collections/v1/publish/http://www.nytimes.com/topic/subject/retirement/rss.xml", type: "RSS" },
       { name: "James Shack Channel", url: "https://youtube.com/c/JamesShack", type: "YouTube" }
     ]
   },
@@ -40,7 +43,7 @@ const CONTENT_ENGINE_SOURCES = [
     ]
   },
   {
-    pillar: "Slow Travel multigenerasional",
+    pillar: "Multigenerational Slow Travel",
     feeds: [
       { name: "Rick Steves Travel RSS", url: "https://ricksteves.com/rss", type: "RSS" },
       { name: "Lonely Planet Feed", url: "https://lonelyplanet.com/feed", type: "RSS" }
@@ -65,14 +68,14 @@ export default function AdminSourcesPage() {
 
       if (!isUserAdmin) {
         setIsAdmin(false);
-        toast.error("Akses Ditolak. Anda bukan Administrator.");
+        toast.error("Access Denied. You are not an Administrator.");
         router.push(`/dashboard`);
         return;
       }
 
       setIsAdmin(true);
 
-      // Load counts per pillar from aggregated_content
+      // Load counts per pillar from canonical_articles
       const { data: countsData } = await supabase
         .from("canonical_articles")
         .select("pillar");
@@ -120,7 +123,7 @@ export default function AdminSourcesPage() {
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
                 RSS & VIDEO SOURCES CONFIG
               </h1>
-              <p className="text-slate-500 mt-1 text-lg">Konfigurasi Target Ingesti Content Engine per Pilar Komunitas</p>
+              <p className="text-slate-500 mt-1 text-lg">Configure Content Engine Ingestion Targets per Community Pillar</p>
             </div>
           </div>
         </header>
@@ -128,10 +131,10 @@ export default function AdminSourcesPage() {
         <main className="max-w-[1120px] mx-auto space-y-8">
           <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
             <h3 className="text-2xl font-bold Atkinson-font flex items-center gap-2">
-              <Database className="w-6 h-6 text-[#006948]" /> Konfigurasi Sumber Ingestion Aktif
+              <Database className="w-6 h-6 text-[#006948]" /> Active Ingestion Sources Configuration
             </h3>
             <p className="text-slate-500 text-base leading-relaxed">
-              Berikut adalah daftar feed RSS dan channel YouTube yang secara otomatis dikonsumsi oleh robot parser ingestion Lifebloom Hub untuk memperkaya pilar komunitas secara multi-bahasa.
+              Below is the list of RSS feeds and YouTube channels automatically consumed by the Lifebloom Hub ingestion system to enrich our multigenerational community pillars.
             </p>
 
             <div className="space-y-6">
@@ -142,7 +145,7 @@ export default function AdminSourcesPage() {
                   "Money & Future": "money",
                   "Pet Family": "pet",
                   "Seniors & Health": "senior",
-                  "Slow Travel multigenerasional": "travel"
+                  "Multigenerational Slow Travel": "travel"
                 };
                 const pillarKey = keyMap[source.pillar] || "home";
                 const totalArticles = stats[pillarKey] || 0;
@@ -152,7 +155,7 @@ export default function AdminSourcesPage() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-200/60">
                       <div>
                         <h4 className="text-xl font-bold text-slate-800 Atkinson-font">{source.pillar}</h4>
-                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Pilar Target</span>
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Target Pillar</span>
                       </div>
                       <span className="px-3.5 py-1.5 bg-[#f0fbf5] text-[#006948] text-xs font-bold rounded-full border border-emerald-100">
                         {totalArticles} Ingested Articles

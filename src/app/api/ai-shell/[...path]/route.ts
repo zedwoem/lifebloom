@@ -15,10 +15,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const userAgent = request.headers.get("user-agent") || "Unknown Bot";
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
   
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const adminSupabase = createAdminClient();
+
   try {
-    const { createAdminClient } = await import("@/lib/supabase/admin");
-    const adminSupabase = createAdminClient();
-    
     // Low-level reverse lookup / IP cloud range validation:
     // Exclude private/loopback addresses; in production this maps against known OpenAI/Perplexity CIDR ranges
     const isVerified = ip !== "127.0.0.1" && !ip.startsWith("192.168.") && !ip.startsWith("10.") && !ip.startsWith("172.16.");
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Here you would normally fetch data from Supabase based on the slug
     const { data: article } = await adminSupabase
       .from('canonical_articles')
-      .select('title, content, description')
+      .select('title, content_html')
       .eq('slug', slug)
       .single();
 
@@ -44,12 +44,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return new NextResponse("Article not found", { status: 404 });
     }
 
+    const cleanSnippet = article.content_html 
+      ? article.content_html.replace(/<[^>]*>/g, '').substring(0, 160) + '...'
+      : 'Explore detailed family care and active aging guidance compiled by the LifeBloom Editorial Board.';
+
     const rawMarkdown = `
 # ${article.title}
 
-${article.description ? `> ${article.description}\n` : ''}
+> ${cleanSnippet}
 
-${article.content}
+${article.content_html}
     `;
 
     // Parse Markdown to Semantic HTML using unified/remark

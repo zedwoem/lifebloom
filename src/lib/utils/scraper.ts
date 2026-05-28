@@ -77,6 +77,7 @@ export async function scrapeLiveCDRates(): Promise<ScrapedDeal[]> {
 
     // If scraper succeeded but DOM changed, provide our dynamic fallback 
     // to ensure the UI demonstration works flawlessly for the MVP
+    if (deals.length === 0) {
       return [];
     }
 

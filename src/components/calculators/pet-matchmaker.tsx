@@ -169,7 +169,7 @@ export function PetMatchmaker() {
                 <div>
                   <h4 className="font-bold text-lg text-slate-800 mb-1">{breed.name}</h4>
                   <p className="text-slate-600 text-sm line-clamp-2">{breed.description}</p>
-                  <Link href="/support/privacy" className="mt-2 block text-brand-blue font-bold hover:underline text-xs">
+                  <Link href="/support/partners/partner-3" className="mt-2 block text-brand-blue font-bold hover:underline text-xs">
                     {t.seeInsurance}
                   </Link>
                 </div>
