@@ -104,6 +104,16 @@ To maintain high code quality and architectural integrity, all developers must a
 - Hardcoded text must be avoided. Use the localization keys provided by the platform.
 - New translations should be synchronized with the Edge Cloudflare Worker dictionary, not stored as massive static JSON files inside the Next.js bundle.
 
+### 4. Feature / Module Addition Lifecycle
+When creating a new feature or module, follow this strict top-to-bottom architectural lifecycle to ensure robust integration:
+- **Environment (`.env.local`)**: If the feature requires a new third-party API or secret, prefix public variables with `NEXT_PUBLIC_` and backend secrets with descriptive nouns (e.g., `VENDOR_API_KEY`). Sync these changes to `.env.example` immediately.
+- **Database Schema (`supabase/migrations`)**: Never use the Supabase UI to alter tables directly in production. Write a raw `.sql` file via `npx supabase migration new <feature_name>`, define the schema, `RLS` policies, and necessary `BTREE` indices.
+- **Services (`src/lib/services`)**: Business logic, third-party API wrappers, or heavy abstractions (like scraping or AI parsing) must be encapsulated in a class or distinct service file here. Do not leak heavy logic into UI components or Server Actions.
+- **Server Actions (`src/lib/actions`)**: Build the bridge between the UI and Services/Database here. Every action must validate incoming payloads using `zod`.
+- **API / Edge Routes (`src/app/api`)**: Only use API routes for Webhooks, Cron Jobs, or external proxies. Protect these endpoints with `Upstash Rate Limiting` and validate headers/signatures (e.g., strict CORS, `CRON_SECRET`, or HMAC).
+- **UI Pages (`src/app/[locale]/.../page.tsx`)**: The actual Next.js page must remain a Server Component (`RSC`). Fetch data on the server via Server Actions or Services, and pass strictly serializable props to any interactive `use client` components. 
+- **SEO & Metadata**: Any new public page must explicitly define `generateMetadata()` exporting localized titles, canonical URLs, and inject `<UnifiedStructuredData>` (JSON-LD) tailored for the demographic.
+
 ---
 
 ## 🏛️ Foundational & Critical Files
