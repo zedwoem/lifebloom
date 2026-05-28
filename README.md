@@ -86,6 +86,39 @@ Always keep `.env.example` mirrored with `.env.local`. Ensure variables are type
 
 ---
 
+## 💻 Development Guidelines & Rules
+
+To maintain high code quality and architectural integrity, all developers must adhere to the following rules:
+
+### 1. File Modification Rules
+- **DO NOT** edit legacy files outside of your scoped feature branch.
+- **DO NOT** introduce arbitrary third-party UI libraries. Use `shadcn/ui` and standard Tailwind classes for all styling.
+- **DO NOT** use `export const runtime = 'edge'` on API routes that require standard Node.js libraries (e.g., direct PostgreSQL pooling or heavy file parsing). Use Server Actions or standard Node API routes instead.
+
+### 2. State & Data Fetching
+- Favor **React Server Components (RSC)** for all non-interactive data fetching to reduce client bundle sizes.
+- Use `use client` strictly at the leaf nodes of the component tree (e.g., interactive calculators, form inputs, or video players).
+- All Supabase mutations must go through **Server Actions** (`/src/lib/actions/*`) and be validated by `zod` schemas.
+
+### 3. Localization Strategy
+- Hardcoded text must be avoided. Use the localization keys provided by the platform.
+- New translations should be synchronized with the Edge Cloudflare Worker dictionary, not stored as massive static JSON files inside the Next.js bundle.
+
+---
+
+## 🏛️ Foundational & Critical Files
+
+When debugging or extending the platform, developers should familiarize themselves with these key files:
+
+- **`next.config.ts`**: Governs strict `remotePatterns` for images, Sentry configurations (`hideSourceMaps`), and security headers. Modifying this requires a full build cycle.
+- **`src/lib/supabase/server.ts`**: The core Supabase SSR client initiator. Always imported by Server Components or Server Actions to interact securely with RLS.
+- **`src/lib/supabase/pooler.ts`**: The dedicated Postgres connection pooler isolated for Server-only operations.
+- **`src/app/api/affiliate/route.ts`**: The critical edge proxy for monetization. Contains Upstash rate limits and asynchronous background tracking using `after()`.
+- **`src/lib/upstash.ts`**: The centralized Redis client initiator used for global rate-limiting and cache invalidation.
+- **`supabase/migrations/`**: Contains the irreversible SQL history of the database structure. **NEVER** edit past migrations; always create a new one using `npx supabase migration new <name>`.
+
+---
+
 ## 🚀 Roadmap & Future Expansion
 
 The LifeBloom ecosystem is continuously evolving. The following phases dictate the next cycle of feature implementations and asset inclusions:
