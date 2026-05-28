@@ -9,21 +9,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   
   
-  const titles: Record<string, string> = {
-    en: 'Educational Video Hub — Professional Masterclasses',
-    id: 'Pusat Video Edukasi — Kelas Master Profesional',
-    es: 'Centro de Videos Educativos — Clases Maestras Profesionales',
-  };
-
-  const descriptions: Record<string, string> = {
-    en: 'Access premium masterclasses and curated video guides with responsive transcripts for senior care, travel, pet safety, and smart living.',
-    id: 'Akses kelas master premium dan panduan video terkurasi dengan transkrip responsif untuk perawatan lansia, perjalanan, keselamatan hewan peliharaan, dan gaya hidup cerdas.',
-    es: 'Acceda a clases maestras premium y guías de video seleccionadas con transcripciones adaptables para el cuidado de personas mayores, viajes, seguridad de mascotas y vida inteligente.',
-  };
+  const title = 'Educational Video Hub — Professional Masterclasses';
+  const description = 'Access premium masterclasses and curated video guides with responsive transcripts for senior care, travel, pet safety, and smart living.';
 
   return {
-    title: titles.en,
-    description: descriptions.en,
+    title,
+    description,
     alternates: {
       canonical: '/videos',
       languages: {
@@ -32,8 +23,8 @@ export async function generateMetadata({
                       }
     },
     openGraph: {
-      title: titles.en,
-      description: descriptions.en,
+      title: title,
+      description: description,
       url: `https://lifebloomhub.vercel.app/videos`,
       type: 'website',
       images: [

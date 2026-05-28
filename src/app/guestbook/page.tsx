@@ -49,6 +49,8 @@ export default async function GuestbookPage({
 
   const initialEntries = entriesData || [];
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app';
+
   // 3. Compile high-fidelity Structured JSON-LD Data for E-E-A-T validation
   const guestbookSchema = {
     '@context': 'https://schema.org',
@@ -60,7 +62,7 @@ export default async function GuestbookPage({
       name: 'LifeBloom Hub',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://lifebloomhub.vercel.app/logo.png'
+        url: `${baseUrl}/logo.png`
       }
     },
     comment: initialEntries.map(entry => ({

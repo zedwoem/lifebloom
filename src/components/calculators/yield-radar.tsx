@@ -24,9 +24,20 @@ export function YieldRadar() {
   useEffect(() => {
     const fetchYields = async () => {
       try {
-        const econ = await getEconomicMetrics();
-        const btc = await getCryptoPrice("bitcoin");
-        const eth = await getCryptoPrice("ethereum");
+        const [econ, btc, eth] = await Promise.all([
+          getEconomicMetrics().catch(err => {
+            console.error("Failed to fetch economic metrics:", err);
+            return null;
+          }),
+          getCryptoPrice("bitcoin").catch(err => {
+            console.error("Failed to fetch BTC price:", err);
+            return null;
+          }),
+          getCryptoPrice("ethereum").catch(err => {
+            console.error("Failed to fetch ETH price:", err);
+            return null;
+          })
+        ]);
 
         const loadedData: YieldData[] = [
           {

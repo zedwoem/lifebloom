@@ -3,10 +3,12 @@
 import React, { useState } from "react";
 import { useSavedItems } from "@/lib/hooks/useSavedItems";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { Heart, Search, Trash2, ExternalLink, Activity, BookOpen, Download, Calculator, MapPin, ArrowRight } from "lucide-react";
+import { Heart, Trash2, BookOpen, Download, Calculator, MapPin, ArrowRight } from "lucide-react";
 import { HydrationGuard } from "@/components/ui/hydration-guard";
 import dynamic from "next/dynamic";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 // Prevent Leaflet SSR crash by loading dynamically with ssr: false
 const DynamicTravelMap = dynamic(
@@ -20,8 +22,6 @@ const DynamicTravelMap = dynamic(
     )
   }
 );
-import Link from "next/link";
-import { useParams } from "next/navigation";
 
 export default function UserWorkspacePage() {
   const { profile } = useAuth();
@@ -68,7 +68,7 @@ export default function UserWorkspacePage() {
                 <span className="text-2xl">🧓</span>
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                RUANG NYAMAN SAYA
+                MY SAVED DASHBOARD
               </h1>
             </div>
             <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200">
@@ -104,15 +104,15 @@ export default function UserWorkspacePage() {
                 <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 border border-emerald-100">
                   <Calculator className="w-6 h-6 text-[#006948]" />
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Kalkulator & Yield Perjalanan</h3>
+                <h3 className="text-2xl font-bold tracking-tight mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Travel Calculator & Yield</h3>
                 <p className="text-slate-500 text-lg leading-relaxed mb-6">
-                  Pantau pertumbuhan yield tabungan jangka panjang Anda secara live.
+                  Track the live growth of your long-term travel yields and savings.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link href={`/money-future/yield-radar`} className="flex-1">
                   <button className="w-full px-5 py-3.5 bg-[#006948] hover:bg-[#005439] text-white rounded-xl font-bold text-base min-h-[52px] transition-all flex items-center justify-center gap-2">
-                    Buka Alat <ArrowRight className="w-5 h-5" />
+                    Open Tool <ArrowRight className="w-5 h-5" />
                   </button>
                 </Link>
               </div>
@@ -124,9 +124,9 @@ export default function UserWorkspacePage() {
                 <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center mb-6 border border-rose-100">
                   <Heart className="w-6 h-6 text-rose-600" />
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Keamanan Dapur Peliharaan</h3>
+                <h3 className="text-2xl font-bold tracking-tight mb-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Kitchen Pet Safety</h3>
                 <p className="text-slate-500 text-lg leading-relaxed mb-6">
-                  Pengecekan bahan masakan beracun terintegrasi dengan database Wiki & USDA.
+                  Scan recipes and kitchen ingredients against verified USDA and veterinary toxic food databases.
                 </p>
               </div>
               <div className="px-4 py-3 bg-emerald-50/50 rounded-2xl border border-emerald-100 text-emerald-800 font-bold flex items-center gap-2 text-sm min-h-[52px]">
@@ -142,13 +142,13 @@ export default function UserWorkspacePage() {
                     <MapPin className="w-6 h-6 text-[#006948]" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Rute & Peta Ramah Aksesibilitas</h3>
-                    <p className="text-slate-500 text-base">Perencanaan slow travel multigenerasi, 100% bebas iklan dan tracker pihak ketiga.</p>
+                    <h3 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Accessible Travel Navigation Map</h3>
+                    <p className="text-slate-500 text-base">Plan safe, multi-generational journeys. 100% adware-free and zero third-party trackers.</p>
                   </div>
                 </div>
                 <Link href={`/travel/trip-planner`}>
                   <button className="px-5 py-3.5 bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-base min-h-[52px] transition-all">
-                    Buka Peta Rute
+                    Open Route Map
                   </button>
                 </Link>
               </div>
@@ -159,13 +159,13 @@ export default function UserWorkspacePage() {
           {/* Section 2: Saved Calculations */}
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-              PANDUAN & KALKULASI YANG SAYA SIMPAN:
+              MY SAVED GUIDES & CALCULATIONS:
             </h2>
             
             {calculators.length === 0 ? (
               <div className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center shadow-sm">
-                <Activity className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500 font-bold text-lg">Belum ada kalkulasi yang disimpan.</p>
+                <Calculator className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500 font-bold text-lg">No saved calculations found.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -182,14 +182,14 @@ export default function UserWorkspacePage() {
                             {title}
                           </h3>
                           <p className="text-slate-500 mt-2">
-                            Terakhir Diperbarui: {new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                            Last Updated: {new Date(item.created_at).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}
                           </p>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-3">
                         <Link href={`/${item.metadata?.pillar || "home"}`} className="flex-1">
                           <button className="w-full px-5 py-3 bg-[#006948] hover:bg-[#00855d] text-white rounded-xl font-bold min-h-[52px] transition-all outline-none focus:ring-4 focus:ring-[#68dba9]/30">
-                            Buka Hasil
+                            View Results
                           </button>
                         </Link>
                         {item.item_type === "calculation" && (
@@ -200,7 +200,7 @@ export default function UserWorkspacePage() {
                         <button 
                           onClick={() => toggleSaveItem(item.item_type, item.referenced_id)}
                           className="px-5 py-3 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl font-bold min-h-[52px] transition-all flex items-center justify-center"
-                          aria-label="Hapus Kalkulasi"
+                          aria-label="Delete Projections"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -216,11 +216,11 @@ export default function UserWorkspacePage() {
           <section>
             <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
               <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider flex items-center gap-2" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-                <BookOpen className="w-6 h-6 text-[#006948]" /> ARTIKEL & BREADCRUMBS YANG SAYA IKUTI
+                <BookOpen className="w-6 h-6 text-[#006948]" /> SAVED ARTICLES & ADVISORY READS
               </h2>
               
               {articles.length === 0 ? (
-                <p className="text-slate-500 text-center py-6 border-2 border-dashed border-slate-100 rounded-2xl">Belum ada artikel yang dibaca/disimpan.</p>
+                <p className="text-slate-500 text-center py-6 border-2 border-dashed border-slate-100 rounded-2xl">No saved articles found.</p>
               ) : (
                 <ul className="space-y-4">
                   {articles.map(item => (
@@ -231,14 +231,14 @@ export default function UserWorkspacePage() {
                           <Link href={`/article/${item.referenced_id}`} className="hover:underline hover:text-[#006948] decoration-2 underline-offset-4">
                             <h3 className="font-bold text-slate-900 text-lg">&quot;{item.metadata?.title || item.referenced_id}&quot;</h3>
                           </Link>
-                          <p className="text-slate-500 mt-1">Disimpan pada {new Date(item.created_at).toLocaleDateString("id-ID")}</p>
+                          <p className="text-slate-500 mt-1">Saved on {new Date(item.created_at).toLocaleDateString("en-US")}</p>
                         </div>
                       </div>
                       <button 
                         onClick={() => toggleSaveItem(item.item_type, item.referenced_id)}
                         className="px-4 py-2 text-rose-500 hover:bg-rose-50 rounded-xl font-bold min-h-[52px] transition-all flex items-center gap-2 shrink-0"
                       >
-                        <Trash2 className="w-5 h-5" /> Hapus
+                        <Trash2 className="w-5 h-5" /> Remove
                       </button>
                     </li>
                   ))}

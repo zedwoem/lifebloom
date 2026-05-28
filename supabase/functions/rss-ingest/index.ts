@@ -44,11 +44,11 @@ serve(async (req) => {
       let pillar = 'senior';
       if (url.includes('handyman') || url.includes('younghouselove')) {
         pillar = 'home-living';
-      } else if (url.includes('moneyguy')) {
+      } else if (url.includes('moneyguy') || url.includes('getrichslowly') || url.includes('retirementresearcher') || url.includes('kitces') || url.includes('nerdeyeview')) {
         pillar = 'money-future';
       } else if (url.includes('avma') || url.includes('bark')) {
         pillar = 'pet-family';
-      } else if (url.includes('disabled-world')) {
+      } else if (url.includes('disabled-world') || url.includes('wheelchairtravel') || url.includes('thepointsguy')) {
         pillar = 'travel';
       }
 

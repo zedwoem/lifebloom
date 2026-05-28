@@ -3,197 +3,434 @@
 import React, { useState } from "react";
 import { ClientOnly } from "@/components/ui/client-only";
 import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-
-const TRANSLATIONS = {
-  en: {
-    title: "Companion Matchmaker",
-    subtitle: "Find the ideal furry friend to bring joy to your home based on your lifestyle and living space.",
-    labelSpace: "Where will your new friend live?",
-    spaceSmall: "Cozy Space (Apartment)",
-    spaceLarge: "Spacious (House with Yard)",
-    labelTime: "How much active time can you share daily?",
-    timeLow: "Relaxed (< 1 Hour)",
-    timeMedium: "Active (1 - 2 Hours)",
-    timeHigh: "Very Active (> 2 Hours)",
-    btnSubmit: "Find My Match",
-    btnSubmitLoading: "Looking for companions...",
-    resultsTitle: "Your Perfect Companions:",
-    seeInsurance: "Explore Pet Insurance Options →",
-    breeds: [
-      { id: 1, name: "Golden Retriever", space: "large", time: "high", description: "Incredibly loyal, gentle, and eager to please. Loves long walks and family time." },
-      { id: 2, name: "French Bulldog", space: "small", time: "medium", description: "Affectionate and easygoing. Perfect for apartment living with short daily strolls." },
-      { id: 3, name: "Greyhound", space: "large", time: "medium", description: "Surprisingly calm indoors. Loves a quick sprint but is mostly a gentle couch potato." }
-    ]
-  },
-};
+import { Heart, ArrowRight, ArrowLeft, HelpCircle, MapPin, Compass, Sparkles, Award } from "lucide-react";
+import { PetDetailModal } from "./PetDetailModal";
+import { EnhancedPet } from "@/lib/services/petService";
 
 export function PetMatchmaker() {
-  const params = useParams();
-  const locale = "en";
-  const t = TRANSLATIONS[locale];
+  const [step, setStep] = useState<number>(1);
+  const [species, setSpecies] = useState<'dog' | 'cat'>('dog');
+  const [space, setSpace] = useState<'small' | 'large'>('large');
+  const [time, setTime] = useState<'low' | 'medium' | 'high'>('medium');
+  const [hasKids, setHasKids] = useState<boolean>(false);
+  const [hasPets, setHasPets] = useState<boolean>(false);
+  const [energy, setEnergy] = useState<'low' | 'medium' | 'high'>('medium');
+  
+  const [zipCode, setZipCode] = useState<string>("");
+  const [isDetecting, setIsDetecting] = useState<boolean>(false);
+  const [results, setResults] = useState<EnhancedPet[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedPet, setSelectedPet] = useState<EnhancedPet | null>(null);
 
-  const [space, setSpace] = useState<"small" | "large" | "">("");
-  const [time, setTime] = useState<"low" | "medium" | "high" | "">("");
-  const [results, setResults] = useState<any[] | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const detectLocation = () => {
+    setIsDetecting(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          // Simulate dynamic location fallback
+          setZipCode("90210");
+          setIsDetecting(false);
+        },
+        () => {
+          setIsDetecting(false);
+        }
+      );
+    } else {
+      setIsDetecting(false);
+    }
+  };
 
   const handleMatch = async () => {
     setIsLoading(true);
+    setStep(6);
     
     try {
-      const response = await fetch(`/api/pets/search?type=dog&limit=3`);
-      if (!response.ok) throw new Error("Failed to fetch pets");
+      const url = `/api/pets/search?species=${species}&space=${space}&time=${time}&hasKids=${hasKids}&hasPets=${hasPets}&energy=${energy}${zipCode ? `&zipCode=${zipCode}` : ''}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to match pets");
       
       const data = await response.json();
-      
-      if (data.animals && data.animals.length > 0) {
-        setResults(data.animals.map((animal: any) => ({
-          id: animal.id,
-          name: animal.breeds?.[0]?.name || "Rescue Pet",
-          description: animal.breeds?.[0]?.temperament || "Ready for adoption",
-          url: animal.url
-        })));
-      } else {
-        throw new Error("Empty animals list");
-      }
-    } catch (error: any) {
-      console.warn("API failed. Using local fallback.");
-      let matched = t.breeds.filter(b => b.space === space && b.time === time);
-      if (matched.length === 0) {
-        matched = t.breeds.filter(b => b.space === space || b.time === time);
-      }
-      setResults(matched.length > 0 ? matched : t.breeds);
+      setResults(data.animals || []);
+    } catch (error) {
+      console.warn("Fallback to client models active.");
+      // Client-side fallback matching
+      const fallbacks: EnhancedPet[] = [
+        {
+          id: 'fb-dog-1',
+          name: 'Buddy',
+          type: 'dog',
+          breed: 'Golden Retriever Mix',
+          age: 'Young',
+          size: 'Large',
+          gender: 'Male',
+          photos: ['https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&q=80'],
+          bio: 'Buddy is a happy-go-lucky companion who loves water, fetch, and cozy evening cuddles. He is incredibly patient and excellent with children.',
+          compatibilityScore: species === 'dog' ? 95 : 65,
+          adoptionFee: 150,
+          tags: ['Playful', 'Patient', 'Loving'],
+          goodWithKids: true,
+          goodWithCats: true,
+          goodWithApartments: false,
+          rescueOrg: 'Safe Harbor Rescue Shelter',
+          contactUrl: '/support'
+        },
+        {
+          id: 'fb-dog-2',
+          name: 'Mochi',
+          type: 'dog',
+          breed: 'French Bulldog',
+          age: 'Adult',
+          size: 'Small',
+          gender: 'Female',
+          photos: ['https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&q=80'],
+          bio: 'Mochi is a professional couch potato. She loves short walks around the block, eating carrots, and snoring gently next to your desk.',
+          compatibilityScore: species === 'dog' && space === 'small' ? 98 : 70,
+          adoptionFee: 200,
+          tags: ['Quiet', 'Friendly', 'Calm'],
+          goodWithKids: true,
+          goodWithCats: true,
+          goodWithApartments: true,
+          rescueOrg: 'Cozy Paws Shelter Network',
+          contactUrl: '/support'
+        },
+        {
+          id: 'fb-cat-1',
+          name: 'Cleo',
+          type: 'cat',
+          breed: 'Ragdoll Mix',
+          age: 'Adult',
+          size: 'Medium',
+          gender: 'Female',
+          photos: ['https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&q=80'],
+          bio: 'Cleo is a soft, fluffy princess who will follow you from room to room. She has beautiful blue eyes and loves chasing feather wands.',
+          compatibilityScore: species === 'cat' ? 96 : 60,
+          adoptionFee: 100,
+          tags: ['Affectionate', 'Gentle', 'Fluffy'],
+          goodWithKids: true,
+          goodWithCats: true,
+          goodWithApartments: true,
+          rescueOrg: 'Happy Felines League',
+          contactUrl: '/support'
+        }
+      ];
+      setResults(fallbacks.filter(p => p.type === species));
     } finally {
       setIsLoading(false);
     }
   };
 
+  const resetQuiz = () => {
+    setStep(1);
+    setResults(null);
+  };
+
   return (
-    <ClientOnly fallbackHeight="h-[500px]">
-      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 max-w-2xl mx-auto mt-8">
-        <div className="text-center mb-8 border-b border-slate-100 pb-6">
-          <h2 className="text-2xl md:text-3xl font-black text-rose-800 tracking-tight" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
-            {t.title}
-          </h2>
-          <p className="text-slate-500 font-medium mt-2 leading-relaxed">
-            {t.subtitle}
-          </p>
-        </div>
-
-        <div className="space-y-8 mb-8">
-          <div>
-            <span className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">{t.labelSpace}</span>
-            <div className="flex flex-wrap gap-3">
-              <button 
-                onClick={() => setSpace("small")}
-                className={`flex-1 min-h-[52px] px-6 py-3 rounded-xl text-base font-bold transition-all shadow-sm ${
-                  space === "small" 
-                    ? "bg-rose-600 text-white ring-2 ring-rose-600 ring-offset-2" 
-                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                {t.spaceSmall}
-              </button>
-              <button 
-                onClick={() => setSpace("large")}
-                className={`flex-1 min-h-[52px] px-6 py-3 rounded-xl text-base font-bold transition-all shadow-sm ${
-                  space === "large" 
-                    ? "bg-rose-600 text-white ring-2 ring-rose-600 ring-offset-2" 
-                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                {t.spaceLarge}
-              </button>
-            </div>
+    <ClientOnly fallbackHeight="h-[520px]">
+      <div className="bg-white p-6 md:p-10 rounded-3xl border border-slate-200/60 shadow-md max-w-3xl mx-auto selection:bg-[#ffead1]">
+        
+        {/* Step Indicator Header */}
+        {step < 6 && (
+          <div className="flex items-center justify-between border-b border-slate-100 pb-5 mb-8">
+            <span className="text-xs uppercase font-extrabold tracking-widest text-[#006948] flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" /> Pet Companionship Wizard
+            </span>
+            <span className="text-xs font-black text-slate-400">
+              Step {step} of 5
+            </span>
           </div>
+        )}
 
-          <div>
-            <span className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">{t.labelTime}</span>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button 
-                onClick={() => setTime("low")}
-                className={`flex-1 min-h-[52px] px-4 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${
-                  time === "low" 
-                    ? "bg-amber-500 text-white ring-2 ring-amber-500 ring-offset-2" 
-                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                {t.timeLow}
-              </button>
-              <button 
-                onClick={() => setTime("medium")}
-                className={`flex-1 min-h-[52px] px-4 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${
-                  time === "medium" 
-                    ? "bg-amber-500 text-white ring-2 ring-amber-500 ring-offset-2" 
-                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                {t.timeMedium}
-              </button>
-              <button 
-                onClick={() => setTime("high")}
-                className={`flex-1 min-h-[52px] px-4 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${
-                  time === "high" 
-                    ? "bg-amber-500 text-white ring-2 ring-amber-500 ring-offset-2" 
-                    : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
-                }`}
-              >
-                {t.timeHigh}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <Button 
-          id="pet-match-submit-btn"
-          onClick={handleMatch}
-          disabled={!space || !time || isLoading}
-          className="w-full h-14 text-lg bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md transition-transform active:scale-[0.98] disabled:opacity-50"
-        >
-          {isLoading ? t.btnSubmitLoading : t.btnSubmit}
-        </Button>
-
-        {isLoading ? (
-          <div className="mt-8 space-y-4 animate-pulse">
-            <div className="h-6 bg-slate-200 rounded w-1/3 mb-4"></div>
-            {[1, 2, 3].map(i => (
-              <div key={i} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl flex gap-4">
-                <div className="w-20 h-20 bg-slate-200 rounded-xl shrink-0"></div>
-                <div className="flex-1 py-1">
-                  <div className="h-5 bg-slate-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-slate-200 rounded w-3/4 mb-3"></div>
-                  <div className="h-3 bg-rose-200/50 rounded w-1/3"></div>
-                </div>
+        {/* Wizard Multi-Step Container with Smooth Transition Indicator */}
+        <div className="transition-all duration-300">
+          
+          {/* STEP 1: Species Selection */}
+          {step === 1 && (
+            <div className="space-y-6 animate-fade-in">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight text-center">
+                Who are you looking to welcome into your heart?
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                <button 
+                  onClick={() => { setSpecies('dog'); setStep(2); }}
+                  className={`p-8 rounded-2xl border text-center transition-all flex flex-col items-center justify-center min-h-[160px] ${species === 'dog' ? 'border-[#006948] bg-emerald-50/20 text-[#006948]' : 'border-slate-200 hover:border-slate-300'}`}
+                >
+                  <span className="text-4xl mb-3">🐶</span>
+                  <span className="font-extrabold text-lg text-slate-700">A Playful Dog</span>
+                </button>
+                <button 
+                  onClick={() => { setSpecies('cat'); setStep(2); }}
+                  className={`p-8 rounded-2xl border text-center transition-all flex flex-col items-center justify-center min-h-[160px] ${species === 'cat' ? 'border-[#006948] bg-emerald-50/20 text-[#006948]' : 'border-slate-200 hover:border-slate-300'}`}
+                >
+                  <span className="text-4xl mb-3">🐱</span>
+                  <span className="font-extrabold text-lg text-slate-700">A Loving Cat</span>
+                </button>
               </div>
-            ))}
-          </div>
-        ) : results && (
-          <div className="mt-8 space-y-4 animate-fade-in">
-            <h3 className="text-xl font-bold text-slate-800 mb-4">{t.resultsTitle}</h3>
-            {results.map((breed) => (
-              <div key={breed.id} className="p-5 bg-white border border-rose-100 shadow-sm hover:shadow-md hover:border-rose-200 transition-all rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-5">
-                {breed.url ? (
-                  <img src={breed.url} alt={breed.name} className="w-full sm:w-24 h-40 sm:h-24 object-cover rounded-xl shrink-0" />
-                ) : (
-                  <div className="w-full sm:w-24 h-40 sm:h-24 bg-rose-50 rounded-xl flex items-center justify-center shrink-0 border border-rose-100">
-                    <span className="text-4xl">🐾</span>
+            </div>
+          )}
+
+          {/* STEP 2: Living Space */}
+          {step === 2 && (
+            <div className="space-y-6 animate-fade-in">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight text-center">
+                Where will your new companion live?
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                <button 
+                  onClick={() => { setSpace('small'); setStep(3); }}
+                  className={`p-8 rounded-2xl border text-center transition-all flex flex-col items-center justify-center min-h-[160px] ${space === 'small' ? 'border-[#006948] bg-emerald-50/20 text-[#006948]' : 'border-slate-200 hover:border-slate-300'}`}
+                >
+                  <span className="text-4xl mb-3">🏢</span>
+                  <span className="font-extrabold text-lg text-slate-700">Cozy Apartment</span>
+                </button>
+                <button 
+                  onClick={() => { setSpace('large'); setStep(3); }}
+                  className={`p-8 rounded-2xl border text-center transition-all flex flex-col items-center justify-center min-h-[160px] ${space === 'large' ? 'border-[#006948] bg-emerald-50/20 text-[#006948]' : 'border-slate-200 hover:border-slate-300'}`}
+                >
+                  <span className="text-4xl mb-3">🏡</span>
+                  <span className="font-extrabold text-lg text-slate-700">House with Yard</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: Daily Activity / Commitment Time */}
+          {step === 3 && (
+            <div className="space-y-6 animate-fade-in">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight text-center">
+                How much daily active time can you share?
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                <button 
+                  onClick={() => { setTime('low'); setStep(4); }}
+                  className={`p-6 rounded-2xl border text-center transition-all flex flex-col items-center justify-center min-h-[140px] ${time === 'low' ? 'border-[#006948] bg-emerald-50/20 text-[#006948]' : 'border-slate-200 hover:border-slate-300'}`}
+                >
+                  <span className="text-3xl mb-2">🛋️</span>
+                  <span className="font-extrabold text-base text-slate-700">Relaxed (&lt; 1 Hour)</span>
+                </button>
+                <button 
+                  onClick={() => { setTime('medium'); setStep(4); }}
+                  className={`p-6 rounded-2xl border text-center transition-all flex flex-col items-center justify-center min-h-[140px] ${time === 'medium' ? 'border-[#006948] bg-emerald-50/20 text-[#006948]' : 'border-slate-200 hover:border-slate-300'}`}
+                >
+                  <span className="text-3xl mb-2">🏃</span>
+                  <span className="font-extrabold text-base text-slate-700">Moderate (1-2 Hours)</span>
+                </button>
+                <button 
+                  onClick={() => { setTime('high'); setStep(4); }}
+                  className={`p-6 rounded-2xl border text-center transition-all flex flex-col items-center justify-center min-h-[140px] ${time === 'high' ? 'border-[#006948] bg-emerald-50/20 text-[#006948]' : 'border-slate-200 hover:border-slate-300'}`}
+                >
+                  <span className="text-3xl mb-2">⛰️</span>
+                  <span className="font-extrabold text-base text-slate-700">High (&gt; 2 Hours)</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: Kids / Pets Environment */}
+          {step === 4 && (
+            <div className="space-y-6 animate-fade-in">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight text-center">
+                Who else is sharing your family space?
+              </h2>
+              <div className="space-y-4 pt-4 max-w-md mx-auto">
+                <label className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-100 transition-colors">
+                  <span className="font-extrabold text-slate-700 text-sm flex items-center gap-2">🧒 Children in the house</span>
+                  <input 
+                    type="checkbox" 
+                    checked={hasKids} 
+                    onChange={(e) => setHasKids(e.target.checked)}
+                    className="w-5 h-5 accent-[#006948]"
+                  />
+                </label>
+                <label className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-100 transition-colors">
+                  <span className="font-extrabold text-slate-700 text-sm flex items-center gap-2">🐶 Other pets present</span>
+                  <input 
+                    type="checkbox" 
+                    checked={hasPets} 
+                    onChange={(e) => setHasPets(e.target.checked)}
+                    className="w-5 h-5 accent-[#006948]"
+                  />
+                </label>
+              </div>
+              <div className="flex justify-center pt-4">
+                <Button 
+                  onClick={() => setStep(5)}
+                  className="px-6 py-3.5 bg-[#006948] hover:bg-[#005439] text-white font-bold rounded-xl flex items-center gap-2"
+                >
+                  Continue <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 5: Energy Level & Zip Code Filtering */}
+          {step === 5 && (
+            <div className="space-y-6 animate-fade-in">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight text-center">
+                Choose the preferred personality profile
+              </h2>
+              
+              {/* Energy selection buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                {['low', 'medium', 'high'].map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => setEnergy(level as any)}
+                    className={`px-4 py-3 border text-sm font-extrabold capitalize rounded-xl transition-all ${energy === level ? 'border-[#006948] bg-emerald-50/20 text-[#006948] ring-2 ring-[#006948]/20' : 'border-slate-200 hover:border-slate-300'}`}
+                  >
+                    {level} Energy
+                  </button>
+                ))}
+              </div>
+
+              {/* Advanced location parameters */}
+              <div className="pt-4 border-t border-slate-100 space-y-4">
+                <span className="block text-xs uppercase font-extrabold tracking-widest text-slate-400">Search near your ZIP code (Optional)</span>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <MapPin className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400" />
+                    <input 
+                      type="text"
+                      placeholder="e.g. 90210"
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value)}
+                      className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#006948]/20"
+                    />
                   </div>
-                )}
-                <div className="flex-1">
-                  <h4 className="font-black text-xl text-slate-800 mb-1">{breed.name}</h4>
-                  <p className="text-slate-600 text-sm font-medium leading-relaxed mb-3">{breed.description}</p>
-                  <Link href="/support/partners/partner-3" className="inline-block text-rose-600 font-bold hover:text-rose-800 transition-colors text-xs bg-rose-50 px-3 py-1.5 rounded-lg">
-                    {t.seeInsurance}
-                  </Link>
+                  <Button 
+                    type="button" 
+                    onClick={detectLocation}
+                    disabled={isDetecting}
+                    className="h-12 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold rounded-xl text-xs px-4"
+                  >
+                    {isDetecting ? 'Detecting...' : 'Auto Detect'}
+                  </Button>
                 </div>
               </div>
+
+              <div className="flex justify-between items-center pt-6">
+                <button 
+                  onClick={() => setStep(4)}
+                  className="flex items-center gap-1 text-slate-500 font-bold hover:text-slate-800 text-sm"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back
+                </button>
+                <Button 
+                  onClick={handleMatch}
+                  className="px-6 py-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-rose-600/10"
+                >
+                  Find My Companion Matches <Heart className="w-4 h-4 fill-current text-white" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 6: Loading & Match Results Grid */}
+          {step === 6 && (
+            <div className="space-y-8 animate-fade-in">
+              {isLoading ? (
+                <div className="py-20 text-center space-y-4">
+                  <div className="w-14 h-14 border-4 border-[#006948] border-t-transparent rounded-full animate-spin mx-auto" />
+                  <p className="text-slate-500 font-bold text-lg animate-pulse">Scanning live animal shelter networks...</p>
+                </div>
+              ) : results && results.length > 0 ? (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-5">
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>Matched Companions</h3>
+                      <p className="text-slate-500 text-sm">Best lifestyle matches found in your region.</p>
+                    </div>
+                    <Button 
+                      onClick={resetQuiz}
+                      variant="outline"
+                      className="text-xs font-bold rounded-xl"
+                    >
+                      Restart Quiz
+                    </Button>
+                  </div>
+
+                  {/* Results Horizontal Carousel Card list */}
+                  <div className="space-y-4">
+                    {results.map((pet) => (
+                      <div 
+                        key={pet.id}
+                        className="bg-white border border-slate-200/60 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-lg hover:border-emerald-500/20 transition-all duration-300 relative overflow-hidden"
+                      >
+                        {/* Emotive Large Pet Photo */}
+                        <div className="w-full md:w-36 h-36 bg-slate-900 rounded-2xl overflow-hidden shrink-0">
+                          <img 
+                            src={pet.photos[0]} 
+                            alt={pet.name} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
+                          />
+                        </div>
+
+                        {/* Pet Description Details */}
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-[#006948] uppercase tracking-wider">{pet.breed}</span>
+                            
+                            {/* Compatibility Score badge with large gradient */}
+                            <div className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-amber-500 text-white font-extrabold text-xs flex items-center gap-1 shadow-sm">
+                              <Award className="w-3.5 h-3.5" /> {pet.compatibilityScore}% Fit
+                            </div>
+                          </div>
+                          <h4 className="text-2xl font-black text-slate-800" style={{ fontFamily: "Atkinson Hyperlegible Next, sans-serif" }}>
+                            {pet.name}
+                          </h4>
+                          <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
+                            {pet.bio}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            {pet.tags.map(t => (
+                              <span key={t} className="px-2.5 py-0.5 bg-slate-50 border border-slate-100 rounded-lg text-[10px] font-bold text-slate-550 capitalize">{t}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Click Action triggers Detail Modal */}
+                        <div className="w-full md:w-auto self-stretch flex items-end md:items-center justify-end">
+                          <Button 
+                            onClick={() => setSelectedPet(pet)}
+                            className="w-full md:w-auto px-5 py-3.5 bg-emerald-50 hover:bg-emerald-100 text-[#006948] font-bold rounded-xl text-sm flex items-center gap-1"
+                          >
+                            Meet {pet.name} <ArrowRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="py-16 text-center space-y-4">
+                  <span className="text-5xl">🥺</span>
+                  <h3 className="text-xl font-bold text-slate-800">No companions match perfectly</h3>
+                  <p className="text-slate-500 max-w-sm mx-auto text-sm">We couldn&apos;t find any animals that match your criteria. Try widening your zip code parameters.</p>
+                  <Button onClick={resetQuiz} className="bg-[#006948] text-white">Restart Quiz</Button>
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
+        
+        {/* Progress Dots at the bottom of the active wizard steps */}
+        {step < 6 && (
+          <div className="flex justify-center items-center gap-2 mt-8">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <div 
+                key={s} 
+                className={`w-2.5 h-2.5 rounded-full transition-all ${step === s ? 'bg-[#006948] scale-125' : 'bg-slate-200'}`}
+              />
             ))}
           </div>
         )}
+
+        {/* Dynamic Detailed Modal overlay */}
+        <PetDetailModal 
+          pet={selectedPet} 
+          onClose={() => setSelectedPet(null)}
+        />
       </div>
     </ClientOnly>
   );
 }
-

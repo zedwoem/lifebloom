@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pillarKeywords: Record<string, string[]> = {
     money: ['pension planning', 'recession simulator', 'compound dividend payouts', 'compound interest', 'early retirement secrets', 'expert financial video'],
     home: ['Matter smart hub integration', 'residential fall audits', 'budget renovations', 'home building efficiency', 'smart devices'],
-    pet: ['dog illness checklist', 'canine symptom checker', 'pet compatibility ras', 'adopsi anjing', 'animal family advisor'],
+    pet: ['dog illness checklist', 'canine symptom checker', 'pet compatibility ras', 'dog adoption', 'animal family advisor'],
     senior: ['prevent drug interaction', 'medication checklist for elderly', 'mobility planner standards', 'prevent senior falls'],
     travel: ['wheelchair accessible route', 'travel budget projection', 'inclusive holiday planner']
   };

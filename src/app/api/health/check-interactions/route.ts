@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const { drugs } = await req.json();
 
     if (!drugs || !Array.isArray(drugs) || drugs.length < 2) {
-      return NextResponse.json({ error: 'Sediakan setidaknya dua jenis obat untuk dianalisis.' }, { status: 400 });
+      return NextResponse.json({ error: 'Please provide at least two medications to analyze.' }, { status: 400 });
     }
 
     const query = drugs.map(d => `"${d}"`).join('+AND+');
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const openFdaKey = process.env.OPENFDA_API_KEY;
     const headers: HeadersInit = openFdaKey ? { 'Authorization': `Basic ${openFdaKey}` } : {};
 
-    // Utilitas timeout ketat 4 detik untuk melindungi sistem dari pembekuan (app crash)
+    // Strict 4-second timeout utility to protect the system from serverless freezing/hanging
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 4000);
 
@@ -26,32 +26,32 @@ export async function POST(req: Request) {
 
       if (response.ok) {
         const data = await response.json();
-        // Cek apakah ada interaksi tercatat dari OpenFDA
+        // Check if there are recorded adverse event interactions from OpenFDA
         if (data.results && data.results.length > 0) {
            return NextResponse.json({
              severity: 'High',
-             description: `Ditemukan potensi interaksi obat (Adverse Events) untuk kombinasi: ${drugs.join(', ')}. Konsultasikan dengan tenaga medis segera.`,
+             description: `Potential drug interaction (Adverse Events) found for combination: ${drugs.join(', ')}. Please consult a medical professional immediately.`,
              details: data.results[0]
            });
         }
       }
       
-      // Jika request berhasil tapi tidak ada hasil, fallback ke status rendah secara halus
+      // If request succeeds but no interaction matches, gracefully report a low severity status
       return NextResponse.json({
         severity: 'Low',
-        description: `Tidak ditemukan riwayat interaksi mayor pada database OpenFDA untuk kombinasi: ${drugs.join(', ')}.`
+        description: `No major adverse drug interactions found in the OpenFDA database for the combination: ${drugs.join(', ')}.`
       });
 
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
-      // Graceful degradation: Fallback lokal jika API time out atau limit quota
+      // Graceful degradation: Local fallback if the API times out or hits standard quotas
       return NextResponse.json({
         severity: 'Low',
-        description: `Fallback Sistem Lokal: Data interaksi untuk ${drugs.join(', ')} saat ini tidak dapat ditarik dari OpenFDA. Silakan gunakan panduan medis standar.`
+        description: `Local System Fallback: Interaction data for ${drugs.join(', ')} cannot be fetched from OpenFDA at this time. Please rely on standard clinical guidelines.`
       });
     }
 
   } catch (error: any) {
-    return NextResponse.json({ error: 'Terjadi kesalahan sistem internal saat memproses interaksi.' }, { status: 500 });
+    return NextResponse.json({ error: 'An internal system error occurred while checking drug interactions.' }, { status: 500 });
   }
 }

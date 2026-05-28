@@ -18,55 +18,28 @@ export default function VideoHubClient({ initialVideos, locale }: VideoHubClient
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 12;
 
-  // Language mapping
-  const dict = {
-    en: {
-      title: "Educational Video Hub",
-      subtitle: "Premium, verified masterclasses designed to empower your wellness, financial growth, and home layout.",
-      all: "All Masterclasses",
-      home: "Home & Living",
-      money: "Money & Future",
-      pet: "Pet & Family",
-      senior: "Senior Care",
-      travel: "Accessible Travel",
-      featured: "Featured Masterclass",
-      watchNow: "Watch Masterclass",
-      related: "Related Content",
-      play: "Play",
-      newest: "Newest",
-      popular: "Popular",
-      sortBy: "Sort by",
-      noVideos: "No masterclasses found in this category.",
-      loadMore: "Load More",
-      prev: "Previous",
-      next: "Next",
-      views: "views"
-    },
-    id: {
-      title: "Pusat Edukasi Video",
-      subtitle: "Kelas master pilihan dan terverifikasi untuk mendukung kesehatan, pertumbuhan finansial, dan tata ruang rumah Anda.",
-      all: "Semua Video",
-      home: "Rumah & Hunian",
-      money: "Uang & Masa Depan",
-      pet: "Hewan & Keluarga",
-      senior: "Perawatan Lansia",
-      travel: "Travel Aksesibel",
-      featured: "Kelas Master Pilihan",
-      watchNow: "Tonton Sekarang",
-      related: "Konten Terkait",
-      play: "Putar",
-      newest: "Terbaru",
-      popular: "Terpopuler",
-      sortBy: "Urutkan",
-      noVideos: "Tidak ada kelas master dalam kategori ini.",
-      loadMore: "Muat Lebih Banyak",
-      prev: "Sebelumnya",
-      next: "Berikutnya",
-      views: "tontonan"
-    }
+  const t = {
+    title: "Educational Video Hub",
+    subtitle: "Premium, verified masterclasses designed to empower your wellness, financial growth, and home layout.",
+    all: "All Masterclasses",
+    home: "Home & Living",
+    money: "Money & Future",
+    pet: "Pet & Family",
+    senior: "Senior Care",
+    travel: "Accessible Travel",
+    featured: "Featured Masterclass",
+    watchNow: "Watch Masterclass",
+    related: "Related Content",
+    play: "Play",
+    newest: "Newest",
+    popular: "Popular",
+    sortBy: "Sort by",
+    noVideos: "No masterclasses found in this category.",
+    loadMore: "Load More",
+    prev: "Previous",
+    next: "Next",
+    views: "views"
   };
-
-  const t = dict.en;
 
   const pillarTabs = [
     { key: 'all', label: t.all },

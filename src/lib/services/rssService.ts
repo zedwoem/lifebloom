@@ -57,7 +57,9 @@ export const CONTENT_ENGINE_SOURCES: Record<string, { rss: string[]; youtubeChan
   },
   "money-future": {
     rss: [
-      "https://moneyguy.com/feed/"
+      "https://www.getrichslowly.org/feed/",
+      "https://retirementresearcher.com/feed/",
+      "http://feeds.feedblitz.com/KitcesNerdsEyeView"
     ],
     youtubeChannels: [
       "UC9vUu4vlIlMC0dHQCTvQPbg", // The Money Guy Show
@@ -139,6 +141,10 @@ export async function ingestRSSFeeds(): Promise<IngestResult> {
         console.log(`[RSS Ingest] Fetching XML: ${feedUrl} [${pillarSlug}]`);
         const feed = await parser.parseURL(feedUrl);
         const items = feed.items || [];
+
+        if (!items || items.length === 0) {
+          throw new Error("No items returned in RSS feed (possibly blocked by Cloudflare or empty feed)");
+        }
 
         // Ingest max 15 items per feed in queue status
         for (const item of items.slice(0, 15)) {

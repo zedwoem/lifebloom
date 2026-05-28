@@ -161,9 +161,11 @@ export default async function RootLayout({
         <meta name="impact-site-verification" content="c188c067-926f-4925-8c8b-e04b15769573" />
         <meta name="impact-site-verification" content="ca6b1edc-0537-4c76-89fe-cbb058b59229" />
         <meta name="google-site-verification" content="BsuKe58zHtvtyw7zN_tK9zTo_ZDK7qW533ds7-uoPEg" />
+        {/* Hybrid Monetization Strategy: Stack Stay22 LetMeAllez + Travelpayouts Drive */}
+        {/* 1. Travelpayouts Drive (Primary Metasearch Script) */}
         <Script
-          id="emrld-script"
-          strategy="lazyOnload"
+          id="travelpayouts-drive-script"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
@@ -175,6 +177,25 @@ export default async function RootLayout({
             `
           }}
         />
+        {/* 2. Stay22 LetMeAllez (Hybrid Affiliate Monetization Script with lmaID) */}
+        <Script
+          id="stay22-letmeallez-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function (s, t, a, y, twenty, two) {
+                s.Stay22 = s.Stay22 || {};
+                s.Stay22.params = { lmaID: '6a1857bf5a2081a1a33d1a2f' };
+                twenty = t.createElement(a);
+                two = t.getElementsByTagName(a)[0];
+                twenty.async = 1;
+                twenty.src = y;
+                two.parentNode.insertBefore(twenty, two);
+              })(window, document, 'script', 'https://scripts.stay22.com/letmeallez.js');
+            `
+          }}
+        />
+
         
         {/* Affiliate Marketing Verification & Scripts */}
         {process.env.IMPACT_VERIFICATION_TAG && (

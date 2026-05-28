@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 
 // Strict validation of incoming request parameters using Zod Schema
 const affiliateQuerySchema = z.object({
-  network: z.enum(['awin', 'impact', 'shareasale', 'amazon', 'direct']),
+  network: z.enum(['awin', 'impact', 'shareasale', 'amazon', 'direct', 'travelpayouts']),
   product_id: z.string(),
   pillar: z.string().optional().default('general'),
   calculator_slug: z.string().optional().default('none')
@@ -33,9 +33,12 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   
+  // Resolve network parameter supporting vendor alias
+  const networkParam = searchParams.get('network') || searchParams.get('vendor') || 'direct';
+
   // Validate input parameters
   const parseResult = affiliateQuerySchema.safeParse({
-    network: searchParams.get('network'),
+    network: networkParam,
     product_id: searchParams.get('product_id'),
     pillar: searchParams.get('pillar'),
     calculator_slug: searchParams.get('calculator_slug')
@@ -66,6 +69,10 @@ export async function GET(req: Request) {
   // Determine Target URL Based on Official Partner Affiliate Network
   let finalTargetUrl = '';
   switch (network) {
+    case 'travelpayouts':
+      const travelpayoutsMarker = process.env.TRAVELPAYOUTS_MARKER || '533106';
+      finalTargetUrl = `https://travelpayouts.com/click?marker=${travelpayoutsMarker}&sub_id=${subId}&destination=${encodeURIComponent(product_id)}`;
+      break;
     case 'awin':
       finalTargetUrl = `https://www.awin1.com/cread.php?awinmid=${product_id}&clickref=${subId}`;
       break;

@@ -13,20 +13,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   
   
-  const dict = {
-    en: {
-      title: "Educational Video Hub | LifeBloom Hub",
-      description: "Explore verified, premium masterclasses in health wellness, home layout, pet family, and retirement planning. Step-by-step guidance for active longevity.",
-      keywords: ["educational video hub", "active longevity guide", "retirement masterclass", "home renovator wellness", "expert senior health check", "LifeBloom Academy"]
-    },
-    id: {
-      title: "Pusat Video Edukasi | LifeBloom Hub",
-      description: "Jelajahi kelas master premium dan terverifikasi untuk kesehatan lansia, dana pensiun, hewan peliharaan, dan arsitektur rumah pintar.",
-      keywords: ["pusat edukasi video", "panduan hidup sehat lansia", "kelas master pensiun", "renovasi rumah praktis", "LifeBloom Academy"]
-    }
+  const t = {
+    title: "Educational Video Hub | LifeBloom Hub",
+    description: "Explore verified, premium masterclasses in health wellness, home layout, pet family, and retirement planning. Step-by-step guidance for active longevity.",
+    keywords: ["educational video hub", "active longevity guide", "retirement masterclass", "home renovator wellness", "expert senior health check", "LifeBloom Academy"]
   };
-
-  const t = dict.en;
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lifebloomhub.vercel.app';
 
